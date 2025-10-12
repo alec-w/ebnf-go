@@ -1,0 +1,58 @@
+version: "2"
+linters:
+  default: all
+  disable:
+    - wsl # Deprecated in favour of wsl_v5
+    - wsl_v5 # Overly opinionated
+    - exhaustruct # Overly opinionated
+    - varnamelen # Overly opinionated
+    - noinlineerr # Inline errs is idiomatic
+    - nlreturn # Overly opinionated
+    - err113 # To be enabled later
+    - wrapcheck # To be enabled later
+#    - ireturn # To be enabled later with config
+    - forbidigo # To be enabled after main no longer printing for debugging
+    - cyclop # Will look to reenable after setting up parsers fully
+    - revive # To be enabled later
+    - funlen # Will look to re-enable in the future
+    - dupl # To be enabled later (easier to setup parsers with some duplication)
+  settings:
+    depguard:
+      rules:
+        main:
+          list-mode: strict
+          files:
+            - $all
+            - "!$test"
+          allow:
+            - github.com/alec-w/ebnf-go
+            - $gostd
+          deny:
+            - pkg: testing
+        test:
+          list-mode: strict
+          files:
+            - $test
+          allow:
+            - github.com/alec-w/ebnf-go
+            - $gostd
+            - golang.org/x/text/cases
+            - golang.org/x/text/language
+    nolintlint:
+      require-specific: true
+      require-explanation: true
+    ireturn:
+      allow:
+        - error
+        - generic
+
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+    - golines
+    - swaggo
+run:
+  timeout: 1m

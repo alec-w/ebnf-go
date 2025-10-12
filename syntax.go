@@ -1,0 +1,66 @@
+package ebnf
+
+import (
+	"encoding/json"
+)
+
+type Syntax struct {
+	Rules []Rule `json:"rules"`
+}
+
+type Rule struct {
+	MetaIdentifier string          `json:"metaIdentifier"`
+	Definitions    DefinitionsList `json:"definitions"`
+}
+
+type DefinitionsList = []Definition
+
+type Definition struct {
+	Terms []Term `json:"terms"`
+}
+
+type Term struct {
+	Factor    Factor
+	Exception Factor
+}
+
+func (t Term) MarshalJSON() ([]byte, error) {
+	out := map[string]any{}
+	out["factor"] = t.Factor
+	if !t.Exception.Primary.IsZero() {
+		out["exception"] = t.Exception
+	}
+	return json.Marshal(out)
+}
+
+type Factor struct {
+	Repetitions int
+	Primary     Primary
+}
+
+func (f Factor) MarshalJSON() ([]byte, error) {
+	out := map[string]any{}
+	out["prmary"] = f.Primary
+	if f.Repetitions >= 0 {
+		out["repetitions"] = f.Repetitions
+	}
+	return json.Marshal(out)
+}
+
+type Primary struct {
+	OptionalSequence DefinitionsList `json:"optionalSequence,omitempty"`
+	RepeatedSequence DefinitionsList `json:"repeatedSequence,omitempty"`
+	SpecialSequence  string          `json:"specialSequence,omitempty"`
+	GroupedSequence  DefinitionsList `json:"groupedSequence,omitempty"`
+	MetaIdentifier   string          `json:"metaIdentifier,omitempty"`
+	Terminal         string          `json:"terminal,omitempty"`
+	Empty            bool            `json:"empty,omitempty"`
+}
+
+func (p *Primary) IsZero() bool {
+	return p.OptionalSequence == nil && p.RepeatedSequence == nil && p.SpecialSequence == "" &&
+		p.GroupedSequence == nil &&
+		p.MetaIdentifier == "" &&
+		p.Terminal == "" &&
+		!p.Empty
+}
