@@ -16,6 +16,7 @@ linters:
     - revive # To be enabled later
     - funlen # Will look to re-enable in the future
     - dupl # To be enabled later (easier to setup parsers with some duplication)
+    - maintidx # To be enabled later (getting long tests in place before refactors)
   settings:
     depguard:
       rules:

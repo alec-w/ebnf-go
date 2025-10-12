@@ -68,6 +68,7 @@ func parseRule(input string) (Rule, int, error) {
 	offset += skipWhitespace(input[offset:])
 	char, width = utf8.DecodeRuneInString(input[offset:])
 	if char != ';' && char != '.' {
+		fmt.Printf("Remaining:\n%q\n", input[offset:])
 		return Rule{}, 0, fmt.Errorf(
 			"no terminator symbol (one of %q or %q) found at end of syntax rule at offset %d",
 			'.',
@@ -115,6 +116,12 @@ func parseDefinitionsList(input string) (DefinitionsList, int, error) {
 	offset += skipWhitespace(input[offset:])
 	next, width := utf8.DecodeRuneInString(input[offset:])
 	for next == '|' || next == '/' || next == '!' {
+		if next == '/' {
+			if next2, _ := utf8.DecodeRuneInString(input[offset+width:]); next2 == ')' {
+				// "/)" is the end of an optional sequence
+				break
+			}
+		}
 		offset += width
 		definition, width, err = parseDefinition(input[offset:])
 		if err != nil {
@@ -248,7 +255,7 @@ func parsePrimary(input string) (Primary, int, error) {
 	// repeated sequence
 	handleRepeatedSequence := func() error {
 		var repeatedSequence DefinitionsList
-		repeatedSequence, offset, err = parseRepeatedSequence(input)
+		repeatedSequence, width, err = parseRepeatedSequence(input)
 		if err != nil {
 			return err
 		}
@@ -280,7 +287,7 @@ func parsePrimary(input string) (Primary, int, error) {
 	case char == '(':
 		next, _ := utf8.DecodeRuneInString(input[width:])
 		switch next {
-		case '\\':
+		case '/':
 			if err := handleOptionalSequence(); err != nil {
 				return Primary{}, 0, err
 			}
@@ -313,6 +320,7 @@ func parsePrimary(input string) (Primary, int, error) {
 		}
 		primary.Terminal = terminal
 	default:
+		width = 0
 		primary.Empty = true
 	}
 	return primary, offset + width, nil
@@ -328,16 +336,16 @@ func parseOptionalSequence(input string) (DefinitionsList, int, error) {
 				"parsing optional sequence at offset %d but did not start with %q or %q",
 				offset,
 				'[',
-				"(\\",
+				"(/",
 			)
 		}
-		char, width := utf8.DecodeRuneInString(input)
-		if char != '\\' {
+		char, width := utf8.DecodeRuneInString(input[offset:])
+		if char != '/' {
 			return nil, 0, fmt.Errorf(
 				"parsing optional sequence at offset %d but did not start with %q or %q",
 				offset,
 				'[',
-				"(\\",
+				"(/",
 			)
 		}
 		offset += width
@@ -351,21 +359,21 @@ func parseOptionalSequence(input string) (DefinitionsList, int, error) {
 	char, width = utf8.DecodeRuneInString(input[offset:])
 	offset += width
 	if char != ']' {
-		if char != '\\' {
+		if char != '/' {
 			return nil, 0, fmt.Errorf(
 				"parsing optional sequence at offset %d but did not end with %q or %q",
 				offset,
 				']',
-				"\\)",
+				"/)",
 			)
 		}
-		char, width := utf8.DecodeRuneInString(input)
+		char, width := utf8.DecodeRuneInString(input[offset:])
 		if char != ')' {
 			return nil, 0, fmt.Errorf(
 				"parsing optional sequence at offset %d but did not end with %q or %q",
 				offset,
 				']',
-				"\\)",
+				"/)",
 			)
 		}
 		offset += width
@@ -386,7 +394,7 @@ func parseRepeatedSequence(input string) (DefinitionsList, int, error) {
 				"(:",
 			)
 		}
-		char, width := utf8.DecodeRuneInString(input)
+		char, width := utf8.DecodeRuneInString(input[offset:])
 		if char != ':' {
 			return nil, 0, fmt.Errorf(
 				"parsing repeated sequence at offset %d but did not start with %q or %q",
@@ -414,7 +422,7 @@ func parseRepeatedSequence(input string) (DefinitionsList, int, error) {
 				":)",
 			)
 		}
-		char, width := utf8.DecodeRuneInString(input)
+		char, width := utf8.DecodeRuneInString(input[offset:])
 		if char != ')' {
 			return nil, 0, fmt.Errorf(
 				"parsing repeated sequence at offset %d but did not end with %q or %q",
@@ -467,7 +475,6 @@ func parseGroupedSequence(input string) (DefinitionsList, int, error) {
 	offset += width
 	offset += skipWhitespace(input[offset:])
 	char, width = utf8.DecodeRuneInString(input[offset:])
-	offset += width
 	if char != ')' {
 		return nil, 0, fmt.Errorf(
 			"parsing grouped sequence at offset %d but did not end with %q",
@@ -475,6 +482,7 @@ func parseGroupedSequence(input string) (DefinitionsList, int, error) {
 			')',
 		)
 	}
+	offset += width
 	return definitionsList, offset, nil
 }
 
@@ -494,7 +502,7 @@ func parseTerminal(input string) (string, int, error) {
 	startOffset := offset
 	char, width := utf8.DecodeRuneInString(input[offset:])
 	offset += width
-	for ; char != '\'' && char != '"'; offset += width {
+	for ; char != terminatingChar; offset += width {
 		char, width = utf8.DecodeRuneInString(input[offset:])
 	}
 	return input[startOffset : offset-width], offset, nil
