@@ -16,6 +16,9 @@ func New() Parser {
 	return Parser{}
 }
 
+// Parse is the entrypoint of the parser.
+//
+// Given a source EBNF grammar it produces a structured representation of it.
 func (p *Parser) Parse(source string) (Syntax, error) {
 	p.source = source
 	p.offset = 0
@@ -23,6 +26,8 @@ func (p *Parser) Parse(source string) (Syntax, error) {
 }
 
 func (p *Parser) parseSyntax() (Syntax, error) {
+	// A syntax is made up of one or more rules.
+	// So parse one rule...
 	var syntax Syntax
 	rule, err := p.parseRule()
 	if err != nil {
@@ -30,6 +35,7 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 	}
 	syntax.Rules = append(syntax.Rules, rule)
 	p.skipWhitespace()
+	// ...then optionally parse more if the entire grammar has not been parsed.
 	for p.source[p.offset:] != "" {
 		rule, err := p.parseRule()
 		if err != nil {
@@ -42,7 +48,8 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 }
 
 func (p *Parser) parseRule() (Rule, error) {
-	// Remove leading whitespace
+	// A rule is made up of a meta identifier followed by a literal "=" then a list of definitions, then a terminating
+	// symbol (";" or ".")
 	p.skipWhitespace()
 	// Look for start of meta identifier (letter)
 	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
@@ -53,14 +60,11 @@ func (p *Parser) parseRule() (Rule, error) {
 		)
 	}
 	// Parse the meta identifier
-	metaIdentifier, err := p.parseMetaIdentifier()
-	if err != nil {
-		return Rule{}, err
-	}
+	metaIdentifier := p.parseMetaIdentifier()
 	rule := Rule{MetaIdentifier: metaIdentifier}
 	// Remove leading whitespace
 	p.skipWhitespace()
-	// Look for "=" character and remove it
+	// Look for "=" character
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != '=' {
 		return Rule{}, fmt.Errorf(
@@ -91,36 +95,38 @@ func (p *Parser) parseRule() (Rule, error) {
 	return rule, nil
 }
 
-func (p *Parser) parseMetaIdentifier() (string, error) {
+func (p *Parser) parseMetaIdentifier() string {
 	p.skipWhitespace()
-	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-	if !unicode.IsLetter(char) {
-		return "", fmt.Errorf(
-			"parsing meta identifier at offset %d but first character was not letter",
-			p.offset,
-		)
-	}
+	// A meta identifier is a sequence of letters and digits starting with a letter.
+	// This assumes that first character has already checked to be a letter.
+	// Since this is internal to the parser this should be checked there to avoid unreachable error handling code here
 	startOffset := p.offset
-	for unicode.IsLetter(char) || unicode.IsDigit(char) {
+	for {
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+		if !unicode.IsLetter(char) && !unicode.IsDigit(char) {
+			break
+		}
 		p.offset += width
-		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
-	return p.source[startOffset:p.offset], nil
+	return p.source[startOffset:p.offset]
 }
 
 func (p *Parser) parseDefinitionsList() (DefinitionsList, error) {
-	var definitionsList DefinitionsList
+	// A defintions list is a sequence of one or more definitions separated by "|", "/" or "!".
+	// So parse the first definition...
 	definition, err := p.parseDefinition()
 	if err != nil {
 		return nil, err
 	}
-	definitionsList = append(definitionsList, definition)
+	definitionsList := DefinitionsList{definition}
 	p.skipWhitespace()
+	// ...then optionally parse additional definitions.
 	next, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	for next == '|' || next == '/' || next == '!' {
 		if next == '/' {
 			if next2, _ := utf8.DecodeRuneInString(p.source[p.offset+width:]); next2 == ')' {
-				// "/)" is the end of an optional sequence
+				// "/)" is the end of an optional sequence, which contains a definition list
+				// so have to peek twice here to check that and avoid swallowing it
 				break
 			}
 		}
@@ -137,13 +143,15 @@ func (p *Parser) parseDefinitionsList() (DefinitionsList, error) {
 }
 
 func (p *Parser) parseDefinition() (Definition, error) {
-	var definition Definition
+	// A definition is a sequence of one or more terms separated by ","
+	// So parse one term...
 	term, err := p.parseTerm()
 	if err != nil {
 		return Definition{}, err
 	}
-	definition.Terms = append(definition.Terms, term)
+	definition := Definition{Terms: []Term{term}}
 	p.skipWhitespace()
+	// ...then optionally parse additional terms
 	next, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	for next == ',' {
 		p.offset += width
@@ -158,12 +166,15 @@ func (p *Parser) parseDefinition() (Definition, error) {
 }
 
 func (p *Parser) parseTerm() (Term, error) {
-	var term Term
+	// A term is a factor, then with an optional exception (also a factor) preceded by a literal "-"
+	// So parse a factor...
 	factor, err := p.parseFactor()
 	if err != nil {
 		return Term{}, err
 	}
+	term := Term{Factor: factor}
 	term.Factor = factor
+	// ...then optionally parse an exception
 	p.skipWhitespace()
 	next, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if next == '-' {
@@ -179,7 +190,11 @@ func (p *Parser) parseTerm() (Term, error) {
 }
 
 func (p *Parser) parseFactor() (Factor, error) {
+	// A factor is a primary preceded by an optional integer number of repetitions (followed by a literal "*")
+	// By the spec, a repetitions of 0 is allowed (although pointless), so default (unspecified) to -1 to distinguish
+	// that case.
 	factor := Factor{Repetitions: -1}
+	// So optionally parse a repetition count...
 	p.skipWhitespace()
 	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
 	if unicode.IsDigit(char) {
@@ -199,6 +214,7 @@ func (p *Parser) parseFactor() (Factor, error) {
 		}
 		p.offset += width
 	}
+	// ...then parse a primary
 	primary, err := p.parsePrimary()
 	if err != nil {
 		return Factor{}, err
@@ -208,20 +224,25 @@ func (p *Parser) parseFactor() (Factor, error) {
 }
 
 func (p *Parser) parseInteger() (int, error) {
+	// An integer is a sequence of one of more digits.
+	// This assumes the first character is a digit as this is internal to the parser so this should have
+	// already been checked to avoid unrreachable error handling code here.
 	p.skipWhitespace()
 	startOffset := p.offset
-	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-	if !unicode.IsDigit(char) {
-		return 0, fmt.Errorf(
-			"parsing integer but first character was not digit at offset %d",
-			p.offset,
-		)
+	for {
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+		if !unicode.IsDigit(char) {
+			break
+		}
+		p.offset += width
 	}
-	p.offset += width
-	for ; unicode.IsDigit(char); p.offset += width {
-		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
-	}
-	parsedInt, err := strconv.Atoi(p.source[startOffset : p.offset-width])
+	parsedInt, err := strconv.Atoi(p.source[startOffset:p.offset])
+	// The spec allows unsized integers, for simplicity this only allows up to 2^63-1, which should be enough for all
+	// practical grammars.
+	// The simplest example of a grammar that used a value larger than this (and doesn't arbitrarily define the empty
+	// string) would be
+	// root = 9223372036854775808 * "0" ;
+	// which (if encoding "0" in a single byte) would require exabytes of text to have required the 2^63 repetitions.
 	if err != nil {
 		return 0, fmt.Errorf(
 			"parsed integer could not be converted to integer type at offset %d",
@@ -232,17 +253,11 @@ func (p *Parser) parseInteger() (int, error) {
 }
 
 func (p *Parser) parsePrimary() (Primary, error) {
-	// Remove leading whitespace
+	// A primary is one of an optional sequence, a repeated sequence, a special sequence, a grouped sequence, a meta
+	// identifier, a terminal, or empty.
+	// To determine which one should be matched the next character is inspected
 	p.skipWhitespace()
 	primary := Primary{}
-	// Parse one of:
-	// optional sequence
-	// repeated sequence
-	// special sequence
-	// grouped sequence
-	// meta identifier
-	// terminal
-	// empty
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	switch {
 	case char == '[':
@@ -264,6 +279,8 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		}
 		primary.SpecialSequence = specialSequence
 	case char == '(':
+		// "(" can denote the start of an optional sequence, repeated sequence or grouped sequence depending on the
+		// next character
 		next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
 		switch next {
 		case '/':
@@ -286,11 +303,7 @@ func (p *Parser) parsePrimary() (Primary, error) {
 			primary.GroupedSequence = groupedSequence
 		}
 	case unicode.IsLetter(char):
-		metaIdentifier, err := p.parseMetaIdentifier()
-		if err != nil {
-			return Primary{}, err
-		}
-		primary.MetaIdentifier = metaIdentifier
+		primary.MetaIdentifier = p.parseMetaIdentifier()
 	case char == '\'':
 		fallthrough
 	case char == '"':
@@ -306,6 +319,9 @@ func (p *Parser) parsePrimary() (Primary, error) {
 }
 
 func (p *Parser) parseOptionalSequence() (DefinitionsList, error) {
+	// An optional sequence is a definitions list wrapped in either [...] or (/.../)
+	// The spec says that grammars should only use one of these throughout, but the parser is more lenient
+	// as it is possible to support that without changing the parsing behaviour for grammars that use one set of symbols.
 	return p.parseWrappedDefinitionsList(
 		"optional sequence",
 		[][]rune{{'['}, {'(', '/'}},
@@ -314,6 +330,9 @@ func (p *Parser) parseOptionalSequence() (DefinitionsList, error) {
 }
 
 func (p *Parser) parseRepeatedSequence() (DefinitionsList, error) {
+	// A repeated sequence is a definitions list wrapped in either {...} or (:...:)
+	// The spec says that grammars should only use one of these throughout, but the parser is more lenient
+	// as it is possible to support that without changing the parsing behaviour for grammars that use one set of symbols.
 	return p.parseWrappedDefinitionsList(
 		"repeated sequence",
 		[][]rune{{'{'}, {'(', ':'}},
@@ -322,6 +341,7 @@ func (p *Parser) parseRepeatedSequence() (DefinitionsList, error) {
 }
 
 func (p *Parser) parseSpecialSequence() (string, error) {
+	// A special sequence is any sequence of characters apart from "?" wrapped in ?...?.
 	p.skipWhitespace()
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != '?' {
@@ -342,6 +362,7 @@ func (p *Parser) parseSpecialSequence() (string, error) {
 }
 
 func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
+	// A grouped sequence is a definitions list wrapped in parentheses (...)
 	return p.parseWrappedDefinitionsList(
 		"repeated sequence",
 		[][]rune{{'('}},
@@ -349,6 +370,8 @@ func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
 	)
 }
 
+// parseWrappedDefinitionsList is a utility function used to parse repeated, optional and grouped sequences as the
+// logic is the same for each because they are just definitions lists wrapped in different enclosing characters.
 func (p *Parser) parseWrappedDefinitionsList(
 	sequenceName string,
 	startIdentifiers, endIdentifiers [][]rune,
@@ -417,6 +440,9 @@ func (p *Parser) parseWrappedDefinitionsList(
 }
 
 func (p *Parser) parseTerminal() (string, error) {
+	// A terminal is any set of characters apart from single quotes, wrapped in single quotes,
+	// or any set of characters apart from double quotes wrapped in double quotes.
+	// Essentially '...' or "..." where the character used as the terminator does not appear inside.
 	p.skipWhitespace()
 	terminatingChar, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if terminatingChar != '\'' && terminatingChar != '"' {
@@ -437,6 +463,10 @@ func (p *Parser) parseTerminal() (string, error) {
 	return p.source[startOffset : p.offset-width], nil
 }
 
+// skipWhitespace is a utility function used to skip whitespace.
+//
+// The spec allows whitespace anywhere between the different components, whitespace is used to make a grammar easier
+// to read but does not change its meaning.
 func (p *Parser) skipWhitespace() {
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	for unicode.IsSpace(char) {
