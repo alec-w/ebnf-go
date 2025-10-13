@@ -235,28 +235,9 @@ func (p *Parser) parsePrimary() (Primary, error) {
 	// Remove leading whitespace
 	p.skipWhitespace()
 	primary := Primary{}
-	var err error
 	// Parse one of:
 	// optional sequence
-	handleOptionalSequence := func() error {
-		var optionalSequence DefinitionsList
-		optionalSequence, err = p.parseOptionalSequence()
-		if err != nil {
-			return err
-		}
-		primary.OptionalSequence = optionalSequence
-		return nil
-	}
 	// repeated sequence
-	handleRepeatedSequence := func() error {
-		var repeatedSequence DefinitionsList
-		repeatedSequence, err = p.parseRepeatedSequence()
-		if err != nil {
-			return err
-		}
-		primary.RepeatedSequence = repeatedSequence
-		return nil
-	}
 	// special sequence
 	// grouped sequence
 	// meta identifier
@@ -265,16 +246,19 @@ func (p *Parser) parsePrimary() (Primary, error) {
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	switch {
 	case char == '[':
-		if err := handleOptionalSequence(); err != nil {
+		optionalSequence, err := p.parseOptionalSequence()
+		if err != nil {
 			return Primary{}, err
 		}
+		primary.OptionalSequence = optionalSequence
 	case char == '{':
-		if err := handleRepeatedSequence(); err != nil {
+		repeatedSequence, err := p.parseRepeatedSequence()
+		if err != nil {
 			return Primary{}, err
 		}
+		primary.RepeatedSequence = repeatedSequence
 	case char == '?':
-		var specialSequence string
-		specialSequence, err = p.parseSpecialSequence()
+		specialSequence, err := p.parseSpecialSequence()
 		if err != nil {
 			return Primary{}, err
 		}
@@ -283,24 +267,26 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
 		switch next {
 		case '/':
-			if err := handleOptionalSequence(); err != nil {
+			optionalSequence, err := p.parseOptionalSequence()
+			if err != nil {
 				return Primary{}, err
 			}
+			primary.OptionalSequence = optionalSequence
 		case ':':
-			if err := handleRepeatedSequence(); err != nil {
+			repeatedSequence, err := p.parseRepeatedSequence()
+			if err != nil {
 				return Primary{}, err
 			}
+			primary.RepeatedSequence = repeatedSequence
 		default:
-			var groupedSequence DefinitionsList
-			groupedSequence, err = p.parseGroupedSequence()
+			groupedSequence, err := p.parseGroupedSequence()
 			if err != nil {
 				return Primary{}, err
 			}
 			primary.GroupedSequence = groupedSequence
 		}
 	case unicode.IsLetter(char):
-		var metaIdentifier string
-		metaIdentifier, err = p.parseMetaIdentifier()
+		metaIdentifier, err := p.parseMetaIdentifier()
 		if err != nil {
 			return Primary{}, err
 		}
@@ -308,8 +294,7 @@ func (p *Parser) parsePrimary() (Primary, error) {
 	case char == '\'':
 		fallthrough
 	case char == '"':
-		var terminal string
-		terminal, err = p.parseTerminal()
+		terminal, err := p.parseTerminal()
 		if err != nil {
 			return Primary{}, err
 		}
