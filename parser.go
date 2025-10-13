@@ -236,7 +236,6 @@ func (p *Parser) parsePrimary() (Primary, error) {
 	p.skipWhitespace()
 	primary := Primary{}
 	var err error
-	var width int
 	// Parse one of:
 	// optional sequence
 	handleOptionalSequence := func() error {
@@ -245,7 +244,6 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		if err != nil {
 			return err
 		}
-		width = 0
 		primary.OptionalSequence = optionalSequence
 		return nil
 	}
@@ -256,7 +254,6 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		if err != nil {
 			return err
 		}
-		width = 0
 		primary.RepeatedSequence = repeatedSequence
 		return nil
 	}
@@ -281,7 +278,6 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		if err != nil {
 			return Primary{}, err
 		}
-		width = 0
 		primary.SpecialSequence = specialSequence
 	case char == '(':
 		next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
@@ -300,7 +296,6 @@ func (p *Parser) parsePrimary() (Primary, error) {
 			if err != nil {
 				return Primary{}, err
 			}
-			width = 0
 			primary.GroupedSequence = groupedSequence
 		}
 	case unicode.IsLetter(char):
@@ -309,7 +304,6 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		if err != nil {
 			return Primary{}, err
 		}
-		width = 0
 		primary.MetaIdentifier = metaIdentifier
 	case char == '\'':
 		fallthrough
@@ -319,13 +313,10 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		if err != nil {
 			return Primary{}, err
 		}
-		width = 0
 		primary.Terminal = terminal
 	default:
-		width = 0
 		primary.Empty = true
 	}
-	p.offset += width
 	return primary, nil
 }
 
