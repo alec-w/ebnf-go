@@ -306,111 +306,19 @@ func (p *Parser) parsePrimary() (Primary, error) {
 }
 
 func (p *Parser) parseOptionalSequence() (DefinitionsList, error) {
-	p.skipWhitespace()
-	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-	p.offset += width
-	if char != '[' {
-		if char != '(' {
-			return nil, fmt.Errorf(
-				"parsing optional sequence at offset %d but did not start with %q or %q",
-				p.offset,
-				'[',
-				"(/",
-			)
-		}
-		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-		if char != '/' {
-			return nil, fmt.Errorf(
-				"parsing optional sequence at offset %d but did not start with %q or %q",
-				p.offset,
-				'[',
-				"(/",
-			)
-		}
-		p.offset += width
-	}
-	definitionsList, err := p.parseDefinitionsList()
-	if err != nil {
-		return nil, err
-	}
-	p.skipWhitespace()
-	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
-	p.offset += width
-	if char != ']' {
-		if char != '/' {
-			return nil, fmt.Errorf(
-				"parsing optional sequence at offset %d but did not end with %q or %q",
-				p.offset,
-				']',
-				"/)",
-			)
-		}
-		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-		if char != ')' {
-			return nil, fmt.Errorf(
-				"parsing optional sequence at offset %d but did not end with %q or %q",
-				p.offset,
-				']',
-				"/)",
-			)
-		}
-		p.offset += width
-	}
-	return definitionsList, nil
+	return p.parseWrappedDefinitionsList(
+		"optional sequence",
+		[][]rune{{'['}, {'(', '/'}},
+		[][]rune{{']'}, {'/', ')'}},
+	)
 }
 
 func (p *Parser) parseRepeatedSequence() (DefinitionsList, error) {
-	p.skipWhitespace()
-	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-	p.offset += width
-	if char != '{' {
-		if char != '(' {
-			return nil, fmt.Errorf(
-				"parsing repeated sequence at offset %d but did not start with %q or %q",
-				p.offset,
-				'{',
-				"(:",
-			)
-		}
-		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-		if char != ':' {
-			return nil, fmt.Errorf(
-				"parsing repeated sequence at offset %d but did not start with %q or %q",
-				p.offset,
-				'{',
-				"(:",
-			)
-		}
-		p.offset += width
-	}
-	definitionsList, err := p.parseDefinitionsList()
-	if err != nil {
-		return nil, err
-	}
-	p.skipWhitespace()
-	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
-	p.offset += width
-	if char != '}' {
-		if char != ':' {
-			return nil, fmt.Errorf(
-				"parsing repeated sequence at offset %d but did not end with %q or %q",
-				p.offset,
-				'}',
-				":)",
-			)
-		}
-		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-		if char != ')' {
-			return nil, fmt.Errorf(
-				"parsing repeated sequence at offset %d but did not end with %q or %q",
-				p.offset,
-				'}',
-				":)",
-			)
-		}
-		p.offset += width
-	}
-	return definitionsList, nil
+	return p.parseWrappedDefinitionsList(
+		"repeated sequence",
+		[][]rune{{'{'}, {'(', ':'}},
+		[][]rune{{'}'}, {':', ')'}},
+	)
 }
 
 func (p *Parser) parseSpecialSequence() (string, error) {
@@ -434,30 +342,77 @@ func (p *Parser) parseSpecialSequence() (string, error) {
 }
 
 func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
-	p.skipWhitespace()
-	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-	p.offset += width
-	if char != '(' {
-		return nil, fmt.Errorf(
-			"parsing grouped sequence at offset %d but did not start with %q",
+	return p.parseWrappedDefinitionsList(
+		"repeated sequence",
+		[][]rune{{'('}},
+		[][]rune{{')'}},
+	)
+}
+
+func (p *Parser) parseWrappedDefinitionsList(
+	sequenceName string,
+	startIdentifiers, endIdentifiers [][]rune,
+) (DefinitionsList, error) {
+	parseEnclosingCharacters := func(position string, identifiers [][]rune) error {
+		p.skipWhitespace()
+		var found bool
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+		for _, identifier := range identifiers {
+			totalWidth := 0
+			for _, identifierChar := range identifier {
+				if identifierChar != char {
+					break
+				}
+				totalWidth += width
+				char, width = utf8.DecodeRuneInString(p.source[p.offset+totalWidth:])
+			}
+			if totalWidth == len(identifier) {
+				p.offset += totalWidth
+				found = true
+				break
+			}
+		}
+		if found {
+			return nil
+		}
+		var identifierStrings []string
+		for _, identifier := range identifiers {
+			identifierStrings = append(identifierStrings, string(identifier))
+		}
+		var errSuffix string
+		if len(identifierStrings) == 0 {
+			errSuffix = "but no " + position + " identifiers were supplied"
+		} else {
+			errSuffix = fmt.Sprintf("%q", identifierStrings[len(identifierStrings)-1])
+			identifierStrings = identifierStrings[:len(identifierStrings)-1]
+			if len(identifierStrings) > 0 {
+				errSuffix = fmt.Sprintf("%q or "+errSuffix, identifierStrings[len(identifierStrings)-1])
+			}
+			identifierStrings = identifierStrings[:len(identifierStrings)-1]
+			if len(identifierStrings) > 0 {
+				for i := len(identifierStrings) - 1; i >= 0; i-- {
+					errSuffix = fmt.Sprintf("%q, "+errSuffix, identifierStrings[i])
+				}
+			}
+			errSuffix = "but did not " + position + " with " + errSuffix
+		}
+		return fmt.Errorf(
+			"parsing %s at offset %d %s",
+			sequenceName,
 			p.offset,
-			'(',
+			errSuffix,
 		)
+	}
+	if err := parseEnclosingCharacters("start", startIdentifiers); err != nil {
+		return nil, err
 	}
 	definitionsList, err := p.parseDefinitionsList()
 	if err != nil {
 		return nil, err
 	}
-	p.skipWhitespace()
-	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
-	if char != ')' {
-		return nil, fmt.Errorf(
-			"parsing grouped sequence at offset %d but did not end with %q",
-			p.offset,
-			')',
-		)
+	if err := parseEnclosingCharacters("end", endIdentifiers); err != nil {
+		return nil, err
 	}
-	p.offset += width
 	return definitionsList, nil
 }
 
