@@ -1180,9 +1180,10 @@ COMMENTSYMBOL
 	}
 
 	for _, tc := range tcs {
+		parser := ebnf.New()
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
-			syntax, err := ebnf.ParseSyntax(tc.grammar)
+			syntax, err := parser.Parse(tc.grammar)
 			if err != nil {
 				t.Fatalf("Got unexpected error %s.", err)
 			}

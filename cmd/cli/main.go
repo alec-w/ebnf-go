@@ -16,7 +16,8 @@ integer = "0" | nonZeroDigit, { digit } ;
 `
 
 func main() {
-	syntax, err := ebnf.ParseSyntax(sample)
+	parser := ebnf.New()
+	syntax, err := parser.Parse(sample)
 	if err != nil {
 		fmt.Printf("Error: %s.\n", err)
 		os.Exit(1)

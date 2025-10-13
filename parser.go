@@ -7,236 +7,233 @@ import (
 	"unicode/utf8"
 )
 
-func ParseSyntax(input string) (Syntax, error) {
+type Parser struct {
+	source string
+	offset int
+}
+
+func New() Parser {
+	return Parser{}
+}
+
+func (p *Parser) Parse(source string) (Syntax, error) {
+	p.source = source
+	p.offset = 0
+	return p.parseSyntax()
+}
+
+func (p *Parser) parseSyntax() (Syntax, error) {
 	var syntax Syntax
-	rule, offset, err := parseRule(input)
+	rule, err := p.parseRule()
 	if err != nil {
 		return Syntax{}, err
 	}
 	syntax.Rules = append(syntax.Rules, rule)
-	offset += skipWhitespace(input[offset:])
-	for input[offset:] != "" {
-		rule, width, err := parseRule(input[offset:])
+	p.skipWhitespace()
+	for p.source[p.offset:] != "" {
+		rule, err := p.parseRule()
 		if err != nil {
 			return Syntax{}, err
 		}
 		syntax.Rules = append(syntax.Rules, rule)
-		offset += width
-		offset += skipWhitespace(input[offset:])
+		p.skipWhitespace()
 	}
 	return syntax, nil
 }
 
-func parseRule(input string) (Rule, int, error) {
+func (p *Parser) parseRule() (Rule, error) {
 	// Remove leading whitespace
-	offset := skipWhitespace(input)
+	p.skipWhitespace()
 	// Look for start of meta identifier (letter)
-	char, _ := utf8.DecodeRuneInString(input[offset:])
+	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
 	if !unicode.IsLetter(char) {
-		return Rule{}, 0, fmt.Errorf(
+		return Rule{}, fmt.Errorf(
 			"rule meta identifier does not start with letter, starts with %q",
 			char,
 		)
 	}
 	// Parse the meta identifier
-	metaIdentifier, next, err := parseMetaIdentifier(input[offset:])
+	metaIdentifier, err := p.parseMetaIdentifier()
 	if err != nil {
-		return Rule{}, 0, err
+		return Rule{}, err
 	}
-	offset += next
 	rule := Rule{MetaIdentifier: metaIdentifier}
 	// Remove leading whitespace
-	offset += skipWhitespace(input[offset:])
+	p.skipWhitespace()
 	// Look for "=" character and remove it
-	char, width := utf8.DecodeRuneInString(input[offset:])
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != '=' {
-		return Rule{}, 0, fmt.Errorf(
+		return Rule{}, fmt.Errorf(
 			"next non-whitespace character after rule meta identifier should be %q but character at offset %d was not",
 			'=',
-			offset,
+			p.offset,
 		)
 	}
-	offset += width
+	p.offset += width
 	// Parse a definitions list
-	defintitionsList, width, err := parseDefinitionsList(input[offset:])
+	defintitionsList, err := p.parseDefinitionsList()
 	if err != nil {
-		return Rule{}, 0, err
+		return Rule{}, err
 	}
-	offset += width
 	rule.Definitions = defintitionsList
 	// Look for terminating character
-	offset += skipWhitespace(input[offset:])
-	char, width = utf8.DecodeRuneInString(input[offset:])
+	p.skipWhitespace()
+	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != ';' && char != '.' {
-		return Rule{}, 0, fmt.Errorf(
+		return Rule{}, fmt.Errorf(
 			"no terminator symbol (one of %q or %q) found at end of syntax rule at offset %d",
 			'.',
 			';',
-			offset,
+			p.offset,
 		)
 	}
-	return rule, offset + width, nil
+	p.offset += width
+	return rule, nil
 }
 
-func skipWhitespace(input string) int {
-	offset := 0
-	char, width := utf8.DecodeRuneInString(input)
-	for unicode.IsSpace(char) {
-		offset += width
-		char, width = utf8.DecodeRuneInString(input[offset:])
-	}
-	return offset
-}
-
-func parseMetaIdentifier(input string) (string, int, error) {
-	offset := skipWhitespace(input)
-	char, width := utf8.DecodeRuneInString(input)
+func (p *Parser) parseMetaIdentifier() (string, error) {
+	p.skipWhitespace()
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if !unicode.IsLetter(char) {
-		return "", 0, fmt.Errorf(
+		return "", fmt.Errorf(
 			"parsing meta identifier at offset %d but first character was not letter",
-			offset,
+			p.offset,
 		)
 	}
-	startOffset := offset
+	startOffset := p.offset
 	for unicode.IsLetter(char) || unicode.IsDigit(char) {
-		offset += width
-		char, width = utf8.DecodeRuneInString(input[offset:])
+		p.offset += width
+		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
-	return input[startOffset:offset], offset, nil
+	return p.source[startOffset:p.offset], nil
 }
 
-func parseDefinitionsList(input string) (DefinitionsList, int, error) {
+func (p *Parser) parseDefinitionsList() (DefinitionsList, error) {
 	var definitionsList DefinitionsList
-	definition, offset, err := parseDefinition(input)
+	definition, err := p.parseDefinition()
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	definitionsList = append(definitionsList, definition)
-	offset += skipWhitespace(input[offset:])
-	next, width := utf8.DecodeRuneInString(input[offset:])
+	p.skipWhitespace()
+	next, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	for next == '|' || next == '/' || next == '!' {
 		if next == '/' {
-			if next2, _ := utf8.DecodeRuneInString(input[offset+width:]); next2 == ')' {
+			if next2, _ := utf8.DecodeRuneInString(p.source[p.offset+width:]); next2 == ')' {
 				// "/)" is the end of an optional sequence
 				break
 			}
 		}
-		offset += width
-		definition, width, err = parseDefinition(input[offset:])
+		p.offset += width
+		definition, err = p.parseDefinition()
 		if err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		definitionsList = append(definitionsList, definition)
-		offset += width
-		next, width = utf8.DecodeRuneInString(input[offset:])
+		p.skipWhitespace()
+		next, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
-	return definitionsList, offset, nil
+	return definitionsList, nil
 }
 
-func parseDefinition(input string) (Definition, int, error) {
+func (p *Parser) parseDefinition() (Definition, error) {
 	var definition Definition
-	term, offset, err := parseTerm(input)
+	term, err := p.parseTerm()
 	if err != nil {
-		return Definition{}, 0, err
+		return Definition{}, err
 	}
 	definition.Terms = append(definition.Terms, term)
-	offset += skipWhitespace(input[offset:])
-	next, width := utf8.DecodeRuneInString(input[offset:])
+	p.skipWhitespace()
+	next, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	for next == ',' {
-		offset += width
-		term, width, err = parseTerm(input[offset:])
+		p.offset += width
+		term, err = p.parseTerm()
 		if err != nil {
-			return Definition{}, 0, err
+			return Definition{}, err
 		}
 		definition.Terms = append(definition.Terms, term)
-		offset += width
-		next, width = utf8.DecodeRuneInString(input[offset:])
+		next, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
-	return definition, offset, nil
+	return definition, nil
 }
 
-func parseTerm(input string) (Term, int, error) {
+func (p *Parser) parseTerm() (Term, error) {
 	var term Term
-	factor, offset, err := parseFactor(input)
+	factor, err := p.parseFactor()
 	if err != nil {
-		return Term{}, 0, err
+		return Term{}, err
 	}
 	term.Factor = factor
-	offset += skipWhitespace(input[offset:])
-	next, width := utf8.DecodeRuneInString(input[offset:])
+	p.skipWhitespace()
+	next, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if next == '-' {
-		offset += width
-		offset += skipWhitespace(input[offset:])
-		exception, width, err := parseFactor(input[offset:])
+		p.offset += width
+		p.skipWhitespace()
+		exception, err := p.parseFactor()
 		if err != nil {
-			return Term{}, 0, err
+			return Term{}, err
 		}
-		offset += width
 		term.Exception = exception
 	}
-	return term, offset, nil
+	return term, nil
 }
 
-func parseFactor(input string) (Factor, int, error) {
+func (p *Parser) parseFactor() (Factor, error) {
 	factor := Factor{Repetitions: -1}
-	offset := skipWhitespace(input)
-	char, _ := utf8.DecodeRuneInString(input[offset:])
+	p.skipWhitespace()
+	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
 	if unicode.IsDigit(char) {
-		integer, width, err := parseInteger(input[offset:])
+		integer, err := p.parseInteger()
 		if err != nil {
-			return Factor{}, 0, err
+			return Factor{}, err
 		}
-		offset += width
 		factor.Repetitions = integer
-		offset += skipWhitespace(input[offset:])
-		char, width := utf8.DecodeRuneInString(input[offset:])
+		p.skipWhitespace()
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != '*' {
-			return Factor{}, 0, fmt.Errorf(
+			return Factor{}, fmt.Errorf(
 				"parsing factor had integer for repetitions but non-whitespace character after was not %q at offset %d",
 				'*',
-				offset,
+				p.offset,
 			)
 		}
-		offset += width
+		p.offset += width
 	}
-	primary, width, err := parsePrimary(input[offset:])
+	primary, err := p.parsePrimary()
 	if err != nil {
-		return Factor{}, 0, err
+		return Factor{}, err
 	}
-	offset += width
 	factor.Primary = primary
-	return factor, offset, nil
+	return factor, nil
 }
 
-func parseInteger(input string) (int, int, error) {
-	offset := skipWhitespace(input)
-	input = input[offset:]
-	startOffset := offset
-	char, width := utf8.DecodeRuneInString(input[offset:])
+func (p *Parser) parseInteger() (int, error) {
+	p.skipWhitespace()
+	startOffset := p.offset
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if !unicode.IsDigit(char) {
-		return 0, 0, fmt.Errorf(
+		return 0, fmt.Errorf(
 			"parsing integer but first character was not digit at offset %d",
-			offset,
+			p.offset,
 		)
 	}
-	offset += width
-	for ; unicode.IsDigit(char); offset += width {
-		char, width = utf8.DecodeRuneInString(input[offset:])
+	p.offset += width
+	for ; unicode.IsDigit(char); p.offset += width {
+		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
-	parsedInt, err := strconv.Atoi(input[startOffset : offset-width])
+	parsedInt, err := strconv.Atoi(p.source[startOffset : p.offset-width])
 	if err != nil {
-		return 0, 0, fmt.Errorf(
+		return 0, fmt.Errorf(
 			"parsed integer could not be converted to integer type at offset %d",
 			startOffset,
 		)
 	}
-	return parsedInt, offset, nil
+	return parsedInt, nil
 }
 
-func parsePrimary(input string) (Primary, int, error) {
+func (p *Parser) parsePrimary() (Primary, error) {
 	// Remove leading whitespace
-	offset := skipWhitespace(input)
-	input = input[offset:]
+	p.skipWhitespace()
 	primary := Primary{}
 	var err error
 	var width int
@@ -244,20 +241,22 @@ func parsePrimary(input string) (Primary, int, error) {
 	// optional sequence
 	handleOptionalSequence := func() error {
 		var optionalSequence DefinitionsList
-		optionalSequence, width, err = parseOptionalSequence(input)
+		optionalSequence, err = p.parseOptionalSequence()
 		if err != nil {
 			return err
 		}
+		width = 0
 		primary.OptionalSequence = optionalSequence
 		return nil
 	}
 	// repeated sequence
 	handleRepeatedSequence := func() error {
 		var repeatedSequence DefinitionsList
-		repeatedSequence, width, err = parseRepeatedSequence(input)
+		repeatedSequence, err = p.parseRepeatedSequence()
 		if err != nil {
 			return err
 		}
+		width = 0
 		primary.RepeatedSequence = repeatedSequence
 		return nil
 	}
@@ -266,243 +265,251 @@ func parsePrimary(input string) (Primary, int, error) {
 	// meta identifier
 	// terminal
 	// empty
-	char, width := utf8.DecodeRuneInString(input)
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	switch {
 	case char == '[':
 		if err := handleOptionalSequence(); err != nil {
-			return Primary{}, 0, err
+			return Primary{}, err
 		}
 	case char == '{':
 		if err := handleRepeatedSequence(); err != nil {
-			return Primary{}, 0, err
+			return Primary{}, err
 		}
 	case char == '?':
 		var specialSequence string
-		specialSequence, width, err = parseSpecialSequence(input)
+		specialSequence, err = p.parseSpecialSequence()
 		if err != nil {
-			return Primary{}, 0, err
+			return Primary{}, err
 		}
+		width = 0
 		primary.SpecialSequence = specialSequence
 	case char == '(':
-		next, _ := utf8.DecodeRuneInString(input[width:])
+		next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
 		switch next {
 		case '/':
 			if err := handleOptionalSequence(); err != nil {
-				return Primary{}, 0, err
+				return Primary{}, err
 			}
 		case ':':
 			if err := handleRepeatedSequence(); err != nil {
-				return Primary{}, 0, err
+				return Primary{}, err
 			}
 		default:
 			var groupedSequence DefinitionsList
-			groupedSequence, width, err = parseGroupedSequence(input)
+			groupedSequence, err = p.parseGroupedSequence()
 			if err != nil {
-				return Primary{}, 0, err
+				return Primary{}, err
 			}
+			width = 0
 			primary.GroupedSequence = groupedSequence
 		}
 	case unicode.IsLetter(char):
 		var metaIdentifier string
-		metaIdentifier, width, err = parseMetaIdentifier(input)
+		metaIdentifier, err = p.parseMetaIdentifier()
 		if err != nil {
-			return Primary{}, 0, err
+			return Primary{}, err
 		}
+		width = 0
 		primary.MetaIdentifier = metaIdentifier
 	case char == '\'':
 		fallthrough
 	case char == '"':
 		var terminal string
-		terminal, width, err = parseTerminal(input)
+		terminal, err = p.parseTerminal()
 		if err != nil {
-			return Primary{}, 0, err
+			return Primary{}, err
 		}
+		width = 0
 		primary.Terminal = terminal
 	default:
 		width = 0
 		primary.Empty = true
 	}
-	return primary, offset + width, nil
+	p.offset += width
+	return primary, nil
 }
 
-func parseOptionalSequence(input string) (DefinitionsList, int, error) {
-	offset := skipWhitespace(input)
-	char, width := utf8.DecodeRuneInString(input[offset:])
-	offset += width
+func (p *Parser) parseOptionalSequence() (DefinitionsList, error) {
+	p.skipWhitespace()
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
 	if char != '[' {
 		if char != '(' {
-			return nil, 0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"parsing optional sequence at offset %d but did not start with %q or %q",
-				offset,
+				p.offset,
 				'[',
 				"(/",
 			)
 		}
-		char, width := utf8.DecodeRuneInString(input[offset:])
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != '/' {
-			return nil, 0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"parsing optional sequence at offset %d but did not start with %q or %q",
-				offset,
+				p.offset,
 				'[',
 				"(/",
 			)
 		}
-		offset += width
+		p.offset += width
 	}
-	definitionsList, width, err := parseDefinitionsList(input[offset:])
+	definitionsList, err := p.parseDefinitionsList()
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-	offset += width
-	offset += skipWhitespace(input[offset:])
-	char, width = utf8.DecodeRuneInString(input[offset:])
-	offset += width
+	p.skipWhitespace()
+	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
 	if char != ']' {
 		if char != '/' {
-			return nil, 0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"parsing optional sequence at offset %d but did not end with %q or %q",
-				offset,
+				p.offset,
 				']',
 				"/)",
 			)
 		}
-		char, width := utf8.DecodeRuneInString(input[offset:])
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != ')' {
-			return nil, 0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"parsing optional sequence at offset %d but did not end with %q or %q",
-				offset,
+				p.offset,
 				']',
 				"/)",
 			)
 		}
-		offset += width
+		p.offset += width
 	}
-	return definitionsList, offset, nil
+	return definitionsList, nil
 }
 
-func parseRepeatedSequence(input string) (DefinitionsList, int, error) {
-	offset := skipWhitespace(input)
-	char, width := utf8.DecodeRuneInString(input[offset:])
-	offset += width
+func (p *Parser) parseRepeatedSequence() (DefinitionsList, error) {
+	p.skipWhitespace()
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
 	if char != '{' {
 		if char != '(' {
-			return nil, 0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"parsing repeated sequence at offset %d but did not start with %q or %q",
-				offset,
+				p.offset,
 				'{',
 				"(:",
 			)
 		}
-		char, width := utf8.DecodeRuneInString(input[offset:])
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != ':' {
-			return nil, 0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"parsing repeated sequence at offset %d but did not start with %q or %q",
-				offset,
+				p.offset,
 				'{',
 				"(:",
 			)
 		}
-		offset += width
+		p.offset += width
 	}
-	definitionsList, width, err := parseDefinitionsList(input[offset:])
+	definitionsList, err := p.parseDefinitionsList()
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-	offset += width
-	offset += skipWhitespace(input[offset:])
-	char, width = utf8.DecodeRuneInString(input[offset:])
-	offset += width
+	p.skipWhitespace()
+	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
 	if char != '}' {
 		if char != ':' {
-			return nil, 0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"parsing repeated sequence at offset %d but did not end with %q or %q",
-				offset,
+				p.offset,
 				'}',
 				":)",
 			)
 		}
-		char, width := utf8.DecodeRuneInString(input[offset:])
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != ')' {
-			return nil, 0, fmt.Errorf(
+			return nil, fmt.Errorf(
 				"parsing repeated sequence at offset %d but did not end with %q or %q",
-				offset,
+				p.offset,
 				'}',
 				":)",
 			)
 		}
-		offset += width
+		p.offset += width
 	}
-	return definitionsList, offset, nil
+	return definitionsList, nil
 }
 
-func parseSpecialSequence(input string) (string, int, error) {
-	offset := skipWhitespace(input)
-	input = input[offset:]
-	char, width := utf8.DecodeRuneInString(input)
+func (p *Parser) parseSpecialSequence() (string, error) {
+	p.skipWhitespace()
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != '?' {
-		return "", 0, fmt.Errorf(
+		return "", fmt.Errorf(
 			"parsing special sequence at offset %d but did not start with %q",
-			offset,
+			p.offset,
 			'?',
 		)
 	}
-	offset += width
-	startOffset := offset
-	char, width = utf8.DecodeRuneInString(input[offset:])
-	offset += width
-	for ; char != '?'; offset += width {
-		char, width = utf8.DecodeRuneInString(input[offset:])
+	p.offset += width
+	startOffset := p.offset
+	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
+	for ; char != '?'; p.offset += width {
+		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
-	return input[startOffset : offset-width], offset, nil
+	return p.source[startOffset : p.offset-width], nil
 }
 
-func parseGroupedSequence(input string) (DefinitionsList, int, error) {
-	offset := skipWhitespace(input)
-	char, width := utf8.DecodeRuneInString(input[offset:])
-	offset += width
+func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
+	p.skipWhitespace()
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
 	if char != '(' {
-		return nil, 0, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"parsing grouped sequence at offset %d but did not start with %q",
-			offset,
+			p.offset,
 			'(',
 		)
 	}
-	definitionsList, width, err := parseDefinitionsList(input[offset:])
+	definitionsList, err := p.parseDefinitionsList()
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
-	offset += width
-	offset += skipWhitespace(input[offset:])
-	char, width = utf8.DecodeRuneInString(input[offset:])
+	p.skipWhitespace()
+	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != ')' {
-		return nil, 0, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"parsing grouped sequence at offset %d but did not end with %q",
-			offset,
+			p.offset,
 			')',
 		)
 	}
-	offset += width
-	return definitionsList, offset, nil
+	p.offset += width
+	return definitionsList, nil
 }
 
-func parseTerminal(input string) (string, int, error) {
-	offset := skipWhitespace(input)
-	input = input[offset:]
-	terminatingChar, width := utf8.DecodeRuneInString(input)
+func (p *Parser) parseTerminal() (string, error) {
+	p.skipWhitespace()
+	terminatingChar, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if terminatingChar != '\'' && terminatingChar != '"' {
-		return "", 0, fmt.Errorf(
+		return "", fmt.Errorf(
 			"parsing terminal at offset %d but did not start with %q or %q",
-			offset,
+			p.offset,
 			'\'',
 			'"',
 		)
 	}
-	offset += width
-	startOffset := offset
-	char, width := utf8.DecodeRuneInString(input[offset:])
-	offset += width
-	for ; char != terminatingChar; offset += width {
-		char, width = utf8.DecodeRuneInString(input[offset:])
+	p.offset += width
+	startOffset := p.offset
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
+	for ; char != terminatingChar; p.offset += width {
+		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
-	return input[startOffset : offset-width], offset, nil
+	return p.source[startOffset : p.offset-width], nil
+}
+
+func (p *Parser) skipWhitespace() {
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	for unicode.IsSpace(char) {
+		p.offset += width
+		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+	}
 }
