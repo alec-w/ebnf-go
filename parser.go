@@ -68,7 +68,6 @@ func parseRule(input string) (Rule, int, error) {
 	offset += skipWhitespace(input[offset:])
 	char, width = utf8.DecodeRuneInString(input[offset:])
 	if char != ';' && char != '.' {
-		fmt.Printf("Remaining:\n%q\n", input[offset:])
 		return Rule{}, 0, fmt.Errorf(
 			"no terminator symbol (one of %q or %q) found at end of syntax rule at offset %d",
 			'.',

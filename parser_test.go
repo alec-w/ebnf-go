@@ -633,39 +633,546 @@ COMMENTSYMBOL
 					},
 					{
 						MetaIdentifier: "FACTOR",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												OptionalSequence: ebnf.DefinitionsList{
+													{Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "INTEGER",
+																},
+															},
+														},
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	Terminal: "*",
+																},
+															},
+														},
+													}},
+												},
+											},
+										},
+									},
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "PRIMARY"},
+										},
+									},
+								},
+							},
+						},
 					},
 					{
 						MetaIdentifier: "PRIMARY",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "OPTIONALSEQUENCE",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "REPEATEDSEQUENCE",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "SPECIALSEQUENCE",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "GROUPEDSEQUENCE",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "METAIDENTIFIER",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "TERMINAL"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "EMPTY"},
+										},
+									},
+								},
+							},
+						},
 					},
 					{
 						MetaIdentifier: "EMPTY",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Empty: true},
+										},
+									},
+								},
+							},
+						},
 					},
 					{
 						MetaIdentifier: "OPTIONALSEQUENCE",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "(/"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "DEFINITIONSLIST",
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "/)"},
+									},
+								},
+							}},
+						},
 					},
 					{
 						MetaIdentifier: "REPEATEDSEQUENCE",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "(:"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "DEFINITIONSLIST",
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: ":)"},
+									},
+								},
+							}},
+						},
 					},
 					{
 						MetaIdentifier: "GROUPEDSEQUENCE",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "("},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "DEFINITIONSLIST",
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: ")"},
+									},
+								},
+							}},
+						},
 					},
 					{
 						MetaIdentifier: "TERMINAL",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "'"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{MetaIdentifier: "CHARACTER"},
+									},
+									Exception: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "'"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "CHARACTER",
+																},
+															},
+															Exception: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	Terminal: "'",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "'"},
+									},
+								},
+							}},
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "\""},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{MetaIdentifier: "CHARACTER"},
+									},
+									Exception: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "\""},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "CHARACTER",
+																},
+															},
+															Exception: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	Terminal: "\"",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "\""},
+									},
+								},
+							}},
+						},
 					},
 					{
 						MetaIdentifier: "METAIDENTIFIER",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{MetaIdentifier: "LETTER"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "LETTER",
+																},
+															},
+														},
+													},
+												},
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "DIGIT",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							}},
+						},
 					},
 					{
 						MetaIdentifier: "INTEGER",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{MetaIdentifier: "DIGIT"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "DIGIT",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							}},
+						},
 					},
 					{
 						MetaIdentifier: "SPECIALSEQUENCE",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "?"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Exception: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	Terminal: "?",
+																},
+															},
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "CHARACTER",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "?"},
+									},
+								},
+							}},
+						},
 					},
 					{
 						MetaIdentifier: "COMMENT",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "(*"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "COMMENTSYMBOL",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Terminal: "*)"},
+									},
+								},
+							}},
+						},
 					},
 					{
 						MetaIdentifier: "COMMENTSYMBOL",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "COMMENT"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "TERMINAL"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "SPECIALSEQUENCE",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "CHARACTER"},
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
