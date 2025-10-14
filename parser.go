@@ -29,18 +29,40 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 	// A syntax is made up of one or more rules.
 	// So parse one rule...
 	var syntax Syntax
+	// It is not possible to distinguish between comments on the syntax as a whole and comments on the first rule of
+	// the syntax therefore comments at the start of the syntax will be attached to the first rule, so they are not
+	// parsed here.
+	var comments []string
+	for p.isCommentStart() {
+		comments = append(comments, p.parseComment())
+	}
 	rule, err := p.parseRule()
 	if err != nil {
 		return Syntax{}, err
 	}
+	rule.Comments = comments
 	syntax.Rules = append(syntax.Rules, rule)
 	p.skipWhitespace()
 	// ...then optionally parse more if the entire grammar has not been parsed.
 	for p.source[p.offset:] != "" {
+		// We may have trailing comments or another rule (optionally preceded by comments)
+		// So parse any comments...
+		var comments []string
+		for p.isCommentStart() {
+			comments = append(comments, p.parseComment())
+		}
+		p.skipWhitespace()
+		// ...then see if we've reached the end (so these were trailing comments)...
+		if p.source[p.offset:] == "" {
+			syntax.TrailingComments = comments
+			break
+		}
+		// ...otherwise those were the comments preceding the next rule
 		rule, err := p.parseRule()
 		if err != nil {
 			return Syntax{}, err
 		}
+		rule.Comments = comments
 		syntax.Rules = append(syntax.Rules, rule)
 		p.skipWhitespace()
 	}
@@ -60,8 +82,10 @@ func (p *Parser) parseRule() (Rule, error) {
 		)
 	}
 	// Parse the meta identifier
-	metaIdentifier := p.parseMetaIdentifier()
-	rule := Rule{MetaIdentifier: metaIdentifier}
+	rule := Rule{MetaIdentifier: p.parseMetaIdentifier()}
+	for p.isCommentStart() {
+		rule.Comments = append(rule.Comments, p.parseComment())
+	}
 	// Remove leading whitespace
 	p.skipWhitespace()
 	// Look for "=" character
@@ -194,6 +218,10 @@ func (p *Parser) parseFactor() (Factor, error) {
 	// By the spec, a repetitions of 0 is allowed (although pointless), so default (unspecified) to -1 to distinguish
 	// that case.
 	factor := Factor{Repetitions: -1}
+	// Optionally parse any preceding comments
+	for p.isCommentStart() {
+		factor.Comments = append(factor.Comments, p.parseComment())
+	}
 	// So optionally parse a repetition count...
 	p.skipWhitespace()
 	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
@@ -203,6 +231,10 @@ func (p *Parser) parseFactor() (Factor, error) {
 			return Factor{}, err
 		}
 		factor.Repetitions = integer
+		// Optionally parse any comments after the number of repetitions
+		for p.isCommentStart() {
+			factor.Comments = append(factor.Comments, p.parseComment())
+		}
 		p.skipWhitespace()
 		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != '*' {
@@ -213,6 +245,10 @@ func (p *Parser) parseFactor() (Factor, error) {
 			)
 		}
 		p.offset += width
+		// Optionally parse any comments after the repetitions
+		for p.isCommentStart() {
+			factor.Comments = append(factor.Comments, p.parseComment())
+		}
 	}
 	// ...then parse a primary
 	primary, err := p.parsePrimary()
@@ -273,11 +309,7 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		}
 		primary.RepeatedSequence = repeatedSequence
 	case char == '?':
-		specialSequence, err := p.parseSpecialSequence()
-		if err != nil {
-			return Primary{}, err
-		}
-		primary.SpecialSequence = specialSequence
+		primary.SpecialSequence = p.parseSpecialSequence()
 	case char == '(':
 		// "(" can denote the start of an optional sequence, repeated sequence or grouped sequence depending on the
 		// next character
@@ -334,25 +366,22 @@ func (p *Parser) parseRepeatedSequence() (DefinitionsList, error) {
 	)
 }
 
-func (p *Parser) parseSpecialSequence() (string, error) {
+func (p *Parser) parseSpecialSequence() string {
 	// A special sequence is any sequence of characters apart from "?" wrapped in ?...?.
 	p.skipWhitespace()
-	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
-	if char != '?' {
-		return "", fmt.Errorf(
-			"parsing special sequence at offset %d but did not start with %q",
-			p.offset,
-			'?',
-		)
-	}
+	// This assumes the first non-whitespace character is "?" which should have been checked before calling this
+	// function. As this is internal to the parser this allows the removal of unreachable error handling code.
+	_, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	p.offset += width
 	startOffset := p.offset
-	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
-	p.offset += width
-	for ; char != '?'; p.offset += width {
-		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+	for {
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+		if char == '?' {
+			break
+		}
+		p.offset += width
 	}
-	return p.source[startOffset : p.offset-width], nil
+	return p.source[startOffset:p.offset]
 }
 
 func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
@@ -416,6 +445,68 @@ func (p *Parser) parseTerminal() string {
 		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
 	return p.source[startOffset : p.offset-width]
+}
+
+func (p *Parser) parseComment() string {
+	// A comment is a repeated sequence of comment symbols wrapped in parentheses and stars (*...*).
+	p.skipWhitespace()
+	// This assumes the first non-whitespace characters are "(*" which should have been checked before calling this
+	// function. As this is internal to the parser this allows the removal of unreachable error handling code.
+	_, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
+	_, width = utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
+	startOffset := p.offset
+	for {
+		p.skipWhitespace()
+		if char, width := utf8.DecodeRuneInString(p.source[p.offset:]); char == '*' {
+			next, nextWidth := utf8.DecodeRuneInString(p.source[p.offset+width:])
+			if next == ')' {
+				p.offset += width + nextWidth
+				return p.source[startOffset : p.offset-(width+nextWidth)]
+			}
+		}
+		p.parseCommentSymbol()
+	}
+}
+
+func (p *Parser) parseCommentSymbol() {
+	// A comment symbol is a comment, a terminal, a special sequence or any other character.
+	// This means that comments can enclose other comments, but the inner comments must be correctly terminated
+	// and comments can contain quoted strings, but they must be correctly terminated, and comments can include
+	// special sequences, but they must be correctly terminated.
+	// This function doesn't return anything, but simply advances the offset forwards, so the outermost comment is
+	// just stored as a sequence of characters on the final parsed syntax.
+	p.skipWhitespace()
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	switch char {
+	case '(':
+		next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
+		if next == '*' {
+			p.parseComment()
+		}
+	case '\'':
+		fallthrough
+	case '"':
+		p.parseTerminal()
+	case '?':
+		p.parseSpecialSequence()
+	default:
+		p.offset += width
+	}
+}
+
+// isCommentStart is a utility function used to check if the next non whitespace character is a comment start symbol.
+func (p *Parser) isCommentStart() bool {
+	p.skipWhitespace()
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	if char == '(' {
+		next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
+		if next == '*' {
+			return true
+		}
+	}
+	return false
 }
 
 // skipWhitespace is a utility function used to skip whitespace.

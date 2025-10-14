@@ -5,10 +5,12 @@ import (
 )
 
 type Syntax struct {
-	Rules []Rule `json:"rules"`
+	Rules            []Rule   `json:"rules"`
+	TrailingComments []string `json:"trailingComments,omitempty"`
 }
 
 type Rule struct {
+	Comments       []string        `json:"comments,omitempty"`
 	MetaIdentifier string          `json:"metaIdentifier"`
 	Definitions    DefinitionsList `json:"definitions"`
 }
@@ -34,13 +36,17 @@ func (t Term) MarshalJSON() ([]byte, error) {
 }
 
 type Factor struct {
+	Comments    []string
 	Repetitions int
 	Primary     Primary
 }
 
 func (f Factor) MarshalJSON() ([]byte, error) {
 	out := map[string]any{}
-	out["prmary"] = f.Primary
+	if len(f.Comments) > 0 {
+		out["comments"] = f.Comments
+	}
+	out["primary"] = f.Primary
 	if f.Repetitions >= 0 {
 		out["repetitions"] = f.Repetitions
 	}
