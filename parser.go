@@ -307,11 +307,7 @@ func (p *Parser) parsePrimary() (Primary, error) {
 	case char == '\'':
 		fallthrough
 	case char == '"':
-		terminal, err := p.parseTerminal()
-		if err != nil {
-			return Primary{}, err
-		}
-		primary.Terminal = terminal
+		primary.Terminal = p.parseTerminal()
 	default:
 		primary.Empty = true
 	}
@@ -323,7 +319,6 @@ func (p *Parser) parseOptionalSequence() (DefinitionsList, error) {
 	// The spec says that grammars should only use one of these throughout, but the parser is more lenient
 	// as it is possible to support that without changing the parsing behaviour for grammars that use one set of symbols.
 	return p.parseWrappedDefinitionsList(
-		"optional sequence",
 		[][]rune{{'['}, {'(', '/'}},
 		[][]rune{{']'}, {'/', ')'}},
 	)
@@ -334,7 +329,6 @@ func (p *Parser) parseRepeatedSequence() (DefinitionsList, error) {
 	// The spec says that grammars should only use one of these throughout, but the parser is more lenient
 	// as it is possible to support that without changing the parsing behaviour for grammars that use one set of symbols.
 	return p.parseWrappedDefinitionsList(
-		"repeated sequence",
 		[][]rune{{'{'}, {'(', ':'}},
 		[][]rune{{'}'}, {':', ')'}},
 	)
@@ -364,7 +358,6 @@ func (p *Parser) parseSpecialSequence() (string, error) {
 func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
 	// A grouped sequence is a definitions list wrapped in parentheses (...)
 	return p.parseWrappedDefinitionsList(
-		"repeated sequence",
 		[][]rune{{'('}},
 		[][]rune{{')'}},
 	)
@@ -373,86 +366,48 @@ func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
 // parseWrappedDefinitionsList is a utility function used to parse repeated, optional and grouped sequences as the
 // logic is the same for each because they are just definitions lists wrapped in different enclosing characters.
 func (p *Parser) parseWrappedDefinitionsList(
-	sequenceName string,
 	startIdentifiers, endIdentifiers [][]rune,
 ) (DefinitionsList, error) {
-	parseEnclosingCharacters := func(position string, identifiers [][]rune) error {
+	// This assumes that the source at the current offset already starts with the one of the given start identifier#
+	// sequences (after whitespace is ignored) since this is internal to the parser this avoids unreachable error
+	// handling code.
+	parseEnclosingCharacters := func(identifiers [][]rune) {
 		p.skipWhitespace()
-		var found bool
 		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		for _, identifier := range identifiers {
+			chars := 0
 			totalWidth := 0
 			for _, identifierChar := range identifier {
 				if identifierChar != char {
 					break
 				}
+				chars++
 				totalWidth += width
 				char, width = utf8.DecodeRuneInString(p.source[p.offset+totalWidth:])
 			}
-			if totalWidth == len(identifier) {
+			if chars == len(identifier) {
 				p.offset += totalWidth
-				found = true
 				break
 			}
 		}
-		if found {
-			return nil
-		}
-		var identifierStrings []string
-		for _, identifier := range identifiers {
-			identifierStrings = append(identifierStrings, string(identifier))
-		}
-		var errSuffix string
-		if len(identifierStrings) == 0 {
-			errSuffix = "but no " + position + " identifiers were supplied"
-		} else {
-			errSuffix = fmt.Sprintf("%q", identifierStrings[len(identifierStrings)-1])
-			identifierStrings = identifierStrings[:len(identifierStrings)-1]
-			if len(identifierStrings) > 0 {
-				errSuffix = fmt.Sprintf("%q or "+errSuffix, identifierStrings[len(identifierStrings)-1])
-			}
-			identifierStrings = identifierStrings[:len(identifierStrings)-1]
-			if len(identifierStrings) > 0 {
-				for i := len(identifierStrings) - 1; i >= 0; i-- {
-					errSuffix = fmt.Sprintf("%q, "+errSuffix, identifierStrings[i])
-				}
-			}
-			errSuffix = "but did not " + position + " with " + errSuffix
-		}
-		return fmt.Errorf(
-			"parsing %s at offset %d %s",
-			sequenceName,
-			p.offset,
-			errSuffix,
-		)
 	}
-	if err := parseEnclosingCharacters("start", startIdentifiers); err != nil {
-		return nil, err
-	}
+	parseEnclosingCharacters(startIdentifiers)
 	definitionsList, err := p.parseDefinitionsList()
 	if err != nil {
 		return nil, err
 	}
-	if err := parseEnclosingCharacters("end", endIdentifiers); err != nil {
-		return nil, err
-	}
+	parseEnclosingCharacters(endIdentifiers)
 	return definitionsList, nil
 }
 
-func (p *Parser) parseTerminal() (string, error) {
+func (p *Parser) parseTerminal() string {
 	// A terminal is any set of characters apart from single quotes, wrapped in single quotes,
 	// or any set of characters apart from double quotes wrapped in double quotes.
 	// Essentially '...' or "..." where the character used as the terminator does not appear inside.
 	p.skipWhitespace()
+	// This assumes the next character is either single quote or double quote which should have been checked already
+	// as this is internal to the parser this avoids unreachable error handling code.
 	terminatingChar, width := utf8.DecodeRuneInString(p.source[p.offset:])
-	if terminatingChar != '\'' && terminatingChar != '"' {
-		return "", fmt.Errorf(
-			"parsing terminal at offset %d but did not start with %q or %q",
-			p.offset,
-			'\'',
-			'"',
-		)
-	}
 	p.offset += width
 	startOffset := p.offset
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
@@ -460,7 +415,7 @@ func (p *Parser) parseTerminal() (string, error) {
 	for ; char != terminatingChar; p.offset += width {
 		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
-	return p.source[startOffset : p.offset-width], nil
+	return p.source[startOffset : p.offset-width]
 }
 
 // skipWhitespace is a utility function used to skip whitespace.
