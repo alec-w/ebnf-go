@@ -37,12 +37,22 @@ func assertSlicesEqual[T any](
 
 func assertSyntaxesEqual(t *testing.T, expected, actual ebnf.Syntax) bool {
 	t.Helper()
-	if !assertSlicesEqual(t, expected.Rules, actual.Rules, "rules", "rule", assertRulesEqual) {
-		t.Log("Syntax rules were not equal")
-		t.Fail()
-		return false
+	if assertSlicesEqual(t, expected.Rules, actual.Rules, "rules", "rule", assertRulesEqual) {
+		return true
 	}
-	return true
+	t.Log("Syntax rules were not equal")
+	t.Fail()
+	return false
+}
+
+func assertCommentsEqual(t *testing.T, expected, actual string) bool {
+	t.Helper()
+	if expected == actual {
+		return true
+	}
+	t.Logf("Expected comment %q. Got %q.", expected, actual)
+	t.Fail()
+	return false
 }
 
 func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
@@ -59,27 +69,39 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 	}
 	if !assertSlicesEqual(
 		t,
+		expected.Comments,
+		actual.Comments,
+		"comments",
+		"comment",
+		assertCommentsEqual,
+	) {
+		t.Log("Rule comments were not equal")
+		t.Fail()
+		failed = true
+	}
+	if assertSlicesEqual(
+		t,
 		expected.Definitions,
 		actual.Definitions,
 		"definitions",
 		"definition",
 		assertDefinitionsEqual,
 	) {
-		t.Log("Rule definitions were not equal")
-		t.Fail()
-		failed = true
+		return !failed
 	}
-	return !failed
+	t.Log("Rule definitions were not equal")
+	t.Fail()
+	return false
 }
 
 func assertDefinitionsEqual(t *testing.T, expected, actual ebnf.Definition) bool {
 	t.Helper()
-	if !assertSlicesEqual(t, expected.Terms, actual.Terms, "terms", "term", assertTermsEqual) {
-		t.Log("Definition terms were not equal")
-		t.Fail()
-		return false
+	if assertSlicesEqual(t, expected.Terms, actual.Terms, "terms", "term", assertTermsEqual) {
+		return true
 	}
-	return true
+	t.Log("Definition terms were not equal")
+	t.Fail()
+	return false
 }
 
 func assertTermsEqual(t *testing.T, expected, actual ebnf.Term) bool {
@@ -90,12 +112,12 @@ func assertTermsEqual(t *testing.T, expected, actual ebnf.Term) bool {
 		t.Fail()
 		failed = true
 	}
-	if !assertFactorsEqual(t, expected.Exception, actual.Exception) {
-		t.Log("Term exceptions were not equal")
-		t.Fail()
-		failed = true
+	if assertFactorsEqual(t, expected.Exception, actual.Exception) {
+		return !failed
 	}
-	return !failed
+	t.Log("Term exceptions were not equal")
+	t.Fail()
+	return false
 }
 
 func assertFactorsEqual(t *testing.T, expected, actual ebnf.Factor) bool {
@@ -107,6 +129,18 @@ func assertFactorsEqual(t *testing.T, expected, actual ebnf.Factor) bool {
 			expected.Repetitions,
 			actual.Repetitions,
 		)
+		t.Fail()
+		failed = true
+	}
+	if !assertSlicesEqual(
+		t,
+		expected.Comments,
+		actual.Comments,
+		"comments",
+		"comment",
+		assertCommentsEqual,
+	) {
+		t.Log("Factor comments were not equal")
 		t.Fail()
 		failed = true
 	}
@@ -1168,6 +1202,603 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary:     ebnf.Primary{MetaIdentifier: "CHARACTER"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "EBNF definition",
+			grammar: `
+(*
+The syntax of Extended BNF can be defined using
+itself. There are four parts in this example,
+the first part names the characters, the second
+part defines the removal of unnecessary non-
+printing characters, the third part defines the
+removal of textual comments, and the final part
+defines the structure of Extended BNF itself.
+
+Each syntax rule in this example starts with a
+comment that identifies the corresponding clause
+in the standard.
+
+The meaning of special-sequences is not defined
+in the standard. In this example (see the
+reference to 7.6) they represent control
+functions defined by ISO/IEC 6429:1992.
+Another special-sequence defines a
+syntactic-exception (see the reference to 4.7).
+*)
+(*
+The first part of the lexical syntax defines the
+characters in the 7-bit character set (ISO/IEC
+646:1991) that represent each terminal-character
+and gap-separator in Extended BNF.
+*)
+(* see 7.2 *) letter
+= 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h'
+| 'i'| 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p'
+| 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x'
+| 'y' | 'z'
+| 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H'
+| 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P'
+| 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X'
+| 'Y' | 'Z';
+`,
+			expectedSyntax: ebnf.Syntax{
+				Rules: []ebnf.Rule{
+					{
+						Comments: []string{
+							`
+The syntax of Extended BNF can be defined using
+itself. There are four parts in this example,
+the first part names the characters, the second
+part defines the removal of unnecessary non-
+printing characters, the third part defines the
+removal of textual comments, and the final part
+defines the structure of Extended BNF itself.
+
+Each syntax rule in this example starts with a
+comment that identifies the corresponding clause
+in the standard.
+
+The meaning of special-sequences is not defined
+in the standard. In this example (see the
+reference to 7.6) they represent control
+functions defined by ISO/IEC 6429:1992.
+Another special-sequence defines a
+syntactic-exception (see the reference to 4.7).
+`, `
+The first part of the lexical syntax defines the
+characters in the 7-bit character set (ISO/IEC
+646:1991) that represent each terminal-character
+and gap-separator in Extended BNF.
+`,
+							` see 7.2 `,
+						},
+						MetaIdentifier: "letter",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "a"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "b"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "c"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "d"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "e"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "f"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "g"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "h"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "i"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "j"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "k"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "l"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "m"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "n"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "o"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "p"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "q"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "r"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "s"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "t"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "u"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "v"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "w"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "x"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "y"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "z"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "A"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "B"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "C"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "D"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "E"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "F"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "G"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "H"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "I"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "J"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "K"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "L"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "M"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "N"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "O"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "P"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "Q"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "R"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "S"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "T"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "U"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "V"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "W"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "X"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "Y"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "Z"},
 										},
 									},
 								},

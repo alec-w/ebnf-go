@@ -484,6 +484,8 @@ func (p *Parser) parseCommentSymbol() {
 		next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
 		if next == '*' {
 			p.parseComment()
+		} else {
+			p.offset += width
 		}
 	case '\'':
 		fallthrough

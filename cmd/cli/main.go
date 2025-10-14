@@ -10,6 +10,11 @@ import (
 )
 
 const sample = `
+(* A comment *)
+(* Another comment *)
+(*
+A comment across lines
+*)
 nonZeroDigit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
 digit = "0" | nonZeroDigit ;
 integer = "0" | nonZeroDigit, { digit } ;
