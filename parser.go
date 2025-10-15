@@ -121,18 +121,22 @@ func (p *Parser) parseRule() (Rule, error) {
 
 func (p *Parser) parseMetaIdentifier() string {
 	p.skipWhitespace()
-	// A meta identifier is a sequence of letters and digits starting with a letter.
+	// A meta identifier is a sequence of letters and digits and whitespace starting with a letter, but without any
+	// trailing whitespace.
 	// This assumes that first character has already checked to be a letter.
 	// Since this is internal to the parser this should be checked there to avoid unreachable error handling code here
 	startOffset := p.offset
+	var endOffset int
 	for {
 		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if !unicode.IsLetter(char) && !unicode.IsDigit(char) {
 			break
 		}
 		p.offset += width
+		endOffset = p.offset
+		p.skipWhitespace()
 	}
-	return p.source[startOffset:p.offset]
+	return p.source[startOffset:endOffset]
 }
 
 func (p *Parser) parseDefinitionsList() (DefinitionsList, error) {

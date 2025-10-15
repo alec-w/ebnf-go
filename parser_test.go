@@ -1249,6 +1249,31 @@ and gap-separator in Extended BNF.
 | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P'
 | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X'
 | 'Y' | 'Z';
+(* see 7.2 *) decimal digit
+= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7'
+| '8' | '9';
+(*
+The representation of the following
+terminal-characters is defined in clauses 7.3,
+7.4 and tables 1, 2.
+*)
+concatenate symbol = ',';
+defining symbol = '=';
+definition separator symbol = '|' | '/' | '!';
+end comment symbol = '*)';
+end group symbol = ')';
+end option symbol = ']' | '/)';
+end repeat symbol = '}' | ':)';
+except symbol = '-';
+first quote symbol = "'";
+repetition symbol = '*';
+second quote symbol = '"';
+special sequence symbol = '?';
+start comment symbol = '(*';
+start group symbol = '(';
+start option symbol = '[' | '(/';
+start repeat symbol = '{' | '(:';
+terminator symbol = ';' | '.';
 `,
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
@@ -1799,6 +1824,442 @@ and gap-separator in Extended BNF.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary:     ebnf.Primary{Terminal: "Z"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 7.2 "},
+						MetaIdentifier: "decimal digit",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "0"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "1"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "2"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "3"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "4"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "5"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "6"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "7"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "8"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "9"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments: []string{`
+The representation of the following
+terminal-characters is defined in clauses 7.3,
+7.4 and tables 1, 2.
+`},
+						MetaIdentifier: "concatenate symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: ","},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "defining symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "="},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "definition separator symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "|"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "/"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "!"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "end comment symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "*)"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "end group symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: ")"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "end option symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "]"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "/)"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "end repeat symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "}"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: ":)"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "except symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "-"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "first quote symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "'"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "repetition symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "*"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "second quote symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "\""},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "special sequence symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "?"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "start comment symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "(*"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "start group symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "("},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "start option symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "["},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "(/"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "start repeat symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "{"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "(:"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "terminator symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: ";"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "."},
 										},
 									},
 								},
