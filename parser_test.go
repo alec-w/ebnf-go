@@ -1348,6 +1348,25 @@ second quote symbol;
 = {gap separator},
 gap free symbol, {gap separator},
 {gap free symbol, {gap separator}};
+(*
+The third part of the syntax defines the
+removal of bracketed-textual-comments from
+gap-free-symbols that form a syntax.
+*)
+(* see 6.6 *) commentless symbol
+= terminal character
+- (letter
+| decimal digit
+| first quote symbol
+| second quote symbol
+| start comment symbol
+| end comment symbol
+| special sequence symbol
+| other character)
+| meta identifier
+| integer
+| terminal string
+| special sequence;
 `,
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
@@ -3229,6 +3248,172 @@ from a syntax.
 								},
 							},
 						}}},
+					},
+					{
+						Comments: []string{
+							`
+The third part of the syntax defines the
+removal of bracketed-textual-comments from
+gap-free-symbols that form a syntax.
+`,
+							" see 6.6 ",
+						},
+						MetaIdentifier: "commentless symbol",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary:     ebnf.Primary{MetaIdentifier: "terminal character"},
+								},
+								Exception: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{GroupedSequence: ebnf.DefinitionsList{
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "letter",
+														},
+													},
+												},
+											},
+										},
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "decimal digit",
+														},
+													},
+												},
+											},
+										},
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "first quote symbol",
+														},
+													},
+												},
+											},
+										},
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "second quote symbol",
+														},
+													},
+												},
+											},
+										},
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "start comment symbol",
+														},
+													},
+												},
+											},
+										},
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "end comment symbol",
+														},
+													},
+												},
+											},
+										},
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "special sequence symbol",
+														},
+													},
+												},
+											},
+										},
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "other character",
+														},
+													},
+												},
+											},
+										},
+									}},
+								},
+							}}},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "meta identifier",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "integer"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "terminal string",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "special sequence",
+											},
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
