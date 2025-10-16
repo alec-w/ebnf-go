@@ -3800,6 +3800,475 @@ gap-free-symbols that form a syntax.
 				},
 			},
 		},
+		{
+			name: "EBNF definition part 4",
+			grammar: `
+(*
+The final part of the syntax defines the
+abstract syntax of Extended BNF, i.e. the
+structure in terms of the commentless symbols.
+*)
+(* see 4.2 *) syntax
+= syntax rule, {syntax rule};
+(* see 4.3 *) syntax rule
+= meta identifier, defining symbol,
+definitions list, terminator symbol;
+(* see 4.4 *) definitions list
+= single definition,
+{definition separator symbol,
+single definition};
+(* see 4.5 *) single definition
+= syntactic term,
+{concatenate symbol, syntactic term};
+(* see 4.6 *) syntactic term
+= syntactic factor,
+[except symbol, syntactic exception];
+(* see 4.7 *) syntactic exception
+= ? a syntactic-factor that could be replaced
+by a syntactic-factor containing no
+meta-identifiers
+? ;
+(* see 4.8 *) syntactic factor
+= [integer, repetition symbol],
+syntactic primary;
+(* see 4.10 *) syntactic primary
+= optional sequence
+| repeated sequence
+| grouped sequence
+| meta identifier
+| terminal string
+| special sequence
+| empty sequence;
+(* see 4.11 *) optional sequence
+= start option symbol, definitions list,
+end option symbol;
+(* see 4.12 *) repeated sequence
+= start repeat symbol, definitions list,
+end repeat symbol;
+(* see 4.13 *) grouped sequence
+= start group symbol, definitions list,
+end group symbol;
+(* see 4.21 *) empty sequence
+= ;
+`,
+			expectedSyntax: ebnf.Syntax{Rules: []ebnf.Rule{
+				{
+					Comments: []string{
+						`
+The final part of the syntax defines the
+abstract syntax of Extended BNF, i.e. the
+structure in terms of the commentless symbols.
+`,
+						" see 4.2 ",
+					},
+					MetaIdentifier: "syntax",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "syntax rule"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary: ebnf.Primary{
+									RepeatedSequence: ebnf.DefinitionsList{
+										{
+											Terms: []ebnf.Term{
+												{
+													Factor: ebnf.Factor{
+														Repetitions: -1,
+														Primary: ebnf.Primary{
+															MetaIdentifier: "syntax rule",
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.3 "},
+					MetaIdentifier: "syntax rule",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "meta identifier"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "defining symbol"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "definitions list"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "terminator symbol"},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.4 "},
+					MetaIdentifier: "definitions list",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "single definition"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary: ebnf.Primary{
+									RepeatedSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+										{
+											Factor: ebnf.Factor{
+												Repetitions: -1,
+												Primary: ebnf.Primary{
+													MetaIdentifier: "definition separator symbol",
+												},
+											},
+										},
+										{
+											Factor: ebnf.Factor{
+												Repetitions: -1,
+												Primary: ebnf.Primary{
+													MetaIdentifier: "single definition",
+												},
+											},
+										},
+									}}},
+								},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.5 "},
+					MetaIdentifier: "single definition",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "syntactic term"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary: ebnf.Primary{
+									RepeatedSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+										{
+											Factor: ebnf.Factor{
+												Repetitions: -1,
+												Primary: ebnf.Primary{
+													MetaIdentifier: "concatenate symbol",
+												},
+											},
+										},
+										{
+											Factor: ebnf.Factor{
+												Repetitions: -1,
+												Primary: ebnf.Primary{
+													MetaIdentifier: "syntactic term",
+												},
+											},
+										},
+									}}},
+								},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.6 "},
+					MetaIdentifier: "syntactic term",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "syntactic factor"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary: ebnf.Primary{
+									OptionalSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+										{
+											Factor: ebnf.Factor{
+												Repetitions: -1,
+												Primary: ebnf.Primary{
+													MetaIdentifier: "except symbol",
+												},
+											},
+										},
+										{
+											Factor: ebnf.Factor{
+												Repetitions: -1,
+												Primary: ebnf.Primary{
+													MetaIdentifier: "syntactic exception",
+												},
+											},
+										},
+									}}},
+								},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.7 "},
+					MetaIdentifier: "syntactic exception",
+					Definitions: ebnf.DefinitionsList{
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											SpecialSequence: ` a syntactic-factor that could be replaced
+by a syntactic-factor containing no
+meta-identifiers
+`,
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					Comments:       []string{" see 4.8 "},
+					MetaIdentifier: "syntactic factor",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary: ebnf.Primary{
+									OptionalSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+										{
+											Factor: ebnf.Factor{
+												Repetitions: -1,
+												Primary: ebnf.Primary{
+													MetaIdentifier: "integer",
+												},
+											},
+										},
+										{
+											Factor: ebnf.Factor{
+												Repetitions: -1,
+												Primary: ebnf.Primary{
+													MetaIdentifier: "repetition symbol",
+												},
+											},
+										},
+									}}},
+								},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "syntactic primary"},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.10 "},
+					MetaIdentifier: "syntactic primary",
+					Definitions: ebnf.DefinitionsList{
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "optional sequence",
+										},
+									},
+								},
+							},
+						},
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "repeated sequence",
+										},
+									},
+								},
+							},
+						},
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "grouped sequence",
+										},
+									},
+								},
+							},
+						},
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "meta identifier",
+										},
+									},
+								},
+							},
+						},
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "terminal string",
+										},
+									},
+								},
+							},
+						},
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "special sequence",
+										},
+									},
+								},
+							},
+						},
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{MetaIdentifier: "empty sequence"},
+									},
+								},
+							},
+						},
+					},
+				},
+				{
+					Comments:       []string{" see 4.11 "},
+					MetaIdentifier: "optional sequence",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "start option symbol"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "definitions list"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "end option symbol"},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.12 "},
+					MetaIdentifier: "repeated sequence",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "start repeat symbol"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "definitions list"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "end repeat symbol"},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.13 "},
+					MetaIdentifier: "grouped sequence",
+					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "start group symbol"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "definitions list"},
+							},
+						},
+						{
+							Factor: ebnf.Factor{
+								Repetitions: -1,
+								Primary:     ebnf.Primary{MetaIdentifier: "end group symbol"},
+							},
+						},
+					}}},
+				},
+				{
+					Comments:       []string{" see 4.21 "},
+					MetaIdentifier: "empty sequence",
+					Definitions: ebnf.DefinitionsList{
+						{
+							Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{Empty: true},
+									},
+								},
+							},
+						},
+					},
+				},
+			}},
+		},
 	}
 
 	for _, tc := range tcs {
