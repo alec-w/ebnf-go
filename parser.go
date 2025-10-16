@@ -471,6 +471,8 @@ func (p *Parser) parseComment() string {
 	p.offset += width
 	_, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	p.offset += width
+	// Leading whitespace is ignored
+	p.skipWhitespace()
 	startOffset := p.offset
 	for {
 		p.skipWhitespace()
@@ -478,7 +480,16 @@ func (p *Parser) parseComment() string {
 			next, nextWidth := utf8.DecodeRuneInString(p.source[p.offset+width:])
 			if next == ')' {
 				p.offset += width + nextWidth
-				return p.source[startOffset : p.offset-(width+nextWidth)]
+				// Trailing whitespace is ignored
+				endOffset := p.offset - (width + nextWidth)
+				for {
+					char, width := utf8.DecodeLastRuneInString(p.source[startOffset:endOffset])
+					if !unicode.IsSpace(char) {
+						break
+					}
+					endOffset -= width
+				}
+				return p.source[startOffset:endOffset]
 			}
 		}
 		p.parseCommentSymbol()
