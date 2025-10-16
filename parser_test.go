@@ -425,35 +425,35 @@ integer = "0" | nonZeroDigit, { digit } ;
 		{
 			name: "Extended EBNF defined informally",
 			grammar: `
-SYNTAX = SYNTAXRULE, (: SYNTAXRULE :).
-SYNTAXRULE
-= METAIDENTIFIER, '=', DEFINITIONSLIST, '.'.
-DEFINITIONSLIST
-= SINGLEDEFINITION,
-(: '/', SINGLEDEFINITION :).
-SINGLEDEFINITION = TERM, (: ',', TERM :).
+SYNTAX = SYNTAX RULE, (: SYNTAX RULE :).
+SYNTAX RULE
+= META IDENTIFIER, '=', DEFINITIONS LIST, '.'.
+DEFINITIONS LIST
+= SINGLE DEFINITION,
+(: '/', SINGLE DEFINITION :).
+SINGLE DEFINITION = TERM, (: ',', TERM :).
 TERM = FACTOR, (/ '-', EXCEPTION /).
 EXCEPTION = FACTOR.
 FACTOR = (/ INTEGER, '*' /), PRIMARY.
 PRIMARY
-= OPTIONALSEQUENCE / REPEATEDSEQUENCE
-/ SPECIALSEQUENCE / GROUPEDSEQUENCE
-/ METAIDENTIFIER / TERMINAL / EMPTY.
+= OPTIONAL SEQUENCE / REPEATED SEQUENCE
+/ SPECIAL SEQUENCE / GROUPED SEQUENCE
+/ META IDENTIFIER / TERMINAL / EMPTY.
 EMPTY = .
-OPTIONALSEQUENCE = '(/', DEFINITIONSLIST, '/)'.
-REPEATEDSEQUENCE = '(:', DEFINITIONSLIST, ':)'.
-GROUPEDSEQUENCE = '(', DEFINITIONSLIST, ')'.
+OPTIONAL SEQUENCE = '(/', DEFINITIONS LIST, '/)'.
+REPEATED SEQUENCE = '(:', DEFINITIONS LIST, ':)'.
+GROUPED SEQUENCE = '(', DEFINITIONS LIST, ')'.
 TERMINAL
 = "'" , CHARACTER - "'",
 (: CHARACTER - "'" :), "'"
 / '"' , CHARACTER - '"',
 (: CHARACTER - '"' :), '"'.
-METAIDENTIFIER = LETTER, (: LETTER / DIGIT :).
+META IDENTIFIER = LETTER, (: LETTER / DIGIT :).
 INTEGER = DIGIT, (: DIGIT :).
-SPECIALSEQUENCE = '?', (: CHARACTER - '?' :), '?'.
-COMMENT = '(*', (: COMMENTSYMBOL :), '*)'.
-COMMENTSYMBOL
-= COMMENT / TERMINAL / SPECIALSEQUENCE
+SPECIAL SEQUENCE = '?', (: CHARACTER - '?' :), '?'.
+COMMENT = '(*', (: COMMENT SYMBOL :), '*)'.
+COMMENT SYMBOL
+= COMMENT / TERMINAL / SPECIAL SEQUENCE
 / CHARACTER.`,
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
@@ -465,7 +465,9 @@ COMMENTSYMBOL
 									{
 										Factor: ebnf.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "SYNTAXRULE"},
+											Primary: ebnf.Primary{
+												MetaIdentifier: "SYNTAX RULE",
+											},
 										},
 									},
 									{
@@ -479,7 +481,7 @@ COMMENTSYMBOL
 																Factor: ebnf.Factor{
 																	Repetitions: -1,
 																	Primary: ebnf.Primary{
-																		MetaIdentifier: "SYNTAXRULE",
+																		MetaIdentifier: "SYNTAX RULE",
 																	},
 																},
 															},
@@ -494,7 +496,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "SYNTAXRULE",
+						MetaIdentifier: "SYNTAX RULE",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -502,7 +504,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "METAIDENTIFIER",
+												MetaIdentifier: "META IDENTIFIER",
 											},
 										},
 									},
@@ -516,7 +518,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "DEFINITIONSLIST",
+												MetaIdentifier: "DEFINITIONS LIST",
 											},
 										},
 									},
@@ -531,7 +533,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "DEFINITIONSLIST",
+						MetaIdentifier: "DEFINITIONS LIST",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -539,7 +541,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "SINGLEDEFINITION",
+												MetaIdentifier: "SINGLE DEFINITION",
 											},
 										},
 									},
@@ -561,7 +563,7 @@ COMMENTSYMBOL
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	MetaIdentifier: "SINGLEDEFINITION",
+																	MetaIdentifier: "SINGLE DEFINITION",
 																},
 															},
 														},
@@ -575,7 +577,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "SINGLEDEFINITION",
+						MetaIdentifier: "SINGLE DEFINITION",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -724,7 +726,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "OPTIONALSEQUENCE",
+												MetaIdentifier: "OPTIONAL SEQUENCE",
 											},
 										},
 									},
@@ -736,7 +738,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "REPEATEDSEQUENCE",
+												MetaIdentifier: "REPEATED SEQUENCE",
 											},
 										},
 									},
@@ -748,7 +750,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "SPECIALSEQUENCE",
+												MetaIdentifier: "SPECIAL SEQUENCE",
 											},
 										},
 									},
@@ -760,7 +762,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "GROUPEDSEQUENCE",
+												MetaIdentifier: "GROUPED SEQUENCE",
 											},
 										},
 									},
@@ -772,7 +774,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "METAIDENTIFIER",
+												MetaIdentifier: "META IDENTIFIER",
 											},
 										},
 									},
@@ -816,7 +818,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "OPTIONALSEQUENCE",
+						MetaIdentifier: "OPTIONAL SEQUENCE",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -829,7 +831,7 @@ COMMENTSYMBOL
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "DEFINITIONSLIST",
+											MetaIdentifier: "DEFINITIONS LIST",
 										},
 									},
 								},
@@ -843,7 +845,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "REPEATEDSEQUENCE",
+						MetaIdentifier: "REPEATED SEQUENCE",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -856,7 +858,7 @@ COMMENTSYMBOL
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "DEFINITIONSLIST",
+											MetaIdentifier: "DEFINITIONS LIST",
 										},
 									},
 								},
@@ -870,7 +872,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "GROUPEDSEQUENCE",
+						MetaIdentifier: "GROUPED SEQUENCE",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -883,7 +885,7 @@ COMMENTSYMBOL
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "DEFINITIONSLIST",
+											MetaIdentifier: "DEFINITIONS LIST",
 										},
 									},
 								},
@@ -1004,7 +1006,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "METAIDENTIFIER",
+						MetaIdentifier: "META IDENTIFIER",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1084,7 +1086,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "SPECIALSEQUENCE",
+						MetaIdentifier: "SPECIAL SEQUENCE",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1150,7 +1152,7 @@ COMMENTSYMBOL
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	MetaIdentifier: "COMMENTSYMBOL",
+																	MetaIdentifier: "COMMENT SYMBOL",
 																},
 															},
 														},
@@ -1170,7 +1172,7 @@ COMMENTSYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "COMMENTSYMBOL",
+						MetaIdentifier: "COMMENT SYMBOL",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -1198,7 +1200,7 @@ COMMENTSYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "SPECIALSEQUENCE",
+												MetaIdentifier: "SPECIAL SEQUENCE",
 											},
 										},
 									},
