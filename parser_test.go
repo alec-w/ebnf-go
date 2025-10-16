@@ -1220,7 +1220,7 @@ COMMENTSYMBOL
 			},
 		},
 		{
-			name: "EBNF definition",
+			name: "EBNF definition part 1",
 			grammar: `
 (*
 The syntax of Extended BNF can be defined using
@@ -1297,76 +1297,6 @@ vertical tabulation character
 = ? IS0 6429 character Vertical Tabulation ? ;
 form feed
 = ? IS0 6429 character Form Feed ? ;
-(*
-The second part of the syntax defines the
-removal of unnecessary non-printing characters
-from a syntax.
-*)
-(* see 6.2 *) terminal character
-= letter
-| decimal digit
-| concatenate symbol
-| defining symbol
-| definition separator symbol
-| end comment symbol
-| end group symbol
-| end option symbol
-| end repeat symbol
-| except symbol
-| first quote symbol
-| repetition symbol
-| second quote symbol
-| special sequence symbol
-| start comment symbol
-| start group symbol
-| start option symbol
-| start repeat symbol
-| terminator symbol
-| other character;
-(* see 6.3 *) gap free symbol
-= terminal character
-- (first quote symbol | second quote symbol)
-| terminal string;
-(* see 4.16 *) terminal string
-= first quote symbol, first terminal character,
-{first terminal character},
-first quote symbol
-| second quote symbol, second terminal character,
-{second terminal character},
-second quote symbol;
-(* see 4.17 *) first terminal character
-= terminal character - first quote symbol;
-(* see 4.18 *) second terminal character
-= terminal character - second quote symbol;
-(* see 6.4 *) gap separator
-= space character
-| horizontal tabulation character
-| new line
-| vertical tabulation character
-| form feed;
-(* see 6.5 *) syntax
-= {gap separator},
-gap free symbol, {gap separator},
-{gap free symbol, {gap separator}};
-(*
-The third part of the syntax defines the
-removal of bracketed-textual-comments from
-gap-free-symbols that form a syntax.
-*)
-(* see 6.6 *) commentless symbol
-= terminal character
-- (letter
-| decimal digit
-| first quote symbol
-| second quote symbol
-| start comment symbol
-| end comment symbol
-| special sequence symbol
-| other character)
-| meta identifier
-| integer
-| terminal string
-| special sequence;
 `,
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
@@ -2639,6 +2569,66 @@ terminal-characters is defined in clauses 7.3,
 							},
 						},
 					},
+				},
+			},
+		},
+		{
+			name: "EBNF definition part 2",
+			grammar: `
+(*
+The second part of the syntax defines the
+removal of unnecessary non-printing characters
+from a syntax.
+*)
+(* see 6.2 *) terminal character
+= letter
+| decimal digit
+| concatenate symbol
+| defining symbol
+| definition separator symbol
+| end comment symbol
+| end group symbol
+| end option symbol
+| end repeat symbol
+| except symbol
+| first quote symbol
+| repetition symbol
+| second quote symbol
+| special sequence symbol
+| start comment symbol
+| start group symbol
+| start option symbol
+| start repeat symbol
+| terminator symbol
+| other character;
+(* see 6.3 *) gap free symbol
+= terminal character
+- (first quote symbol | second quote symbol)
+| terminal string;
+(* see 4.16 *) terminal string
+= first quote symbol, first terminal character,
+{first terminal character},
+first quote symbol
+| second quote symbol, second terminal character,
+{second terminal character},
+second quote symbol;
+(* see 4.17 *) first terminal character
+= terminal character - first quote symbol;
+(* see 4.18 *) second terminal character
+= terminal character - second quote symbol;
+(* see 6.4 *) gap separator
+= space character
+| horizontal tabulation character
+| new line
+| vertical tabulation character
+| form feed;
+(* see 6.5 *) syntax
+= {gap separator},
+gap free symbol, {gap separator},
+{gap free symbol, {gap separator}};
+`,
+			expectedSyntax: ebnf.Syntax{
+				Rules: []ebnf.Rule{
 					{
 						Comments: []string{
 							`
@@ -3249,6 +3239,60 @@ from a syntax.
 							},
 						}}},
 					},
+				},
+			},
+		},
+		{
+			name: "EBNF definition part 3",
+			grammar: `
+(*
+The third part of the syntax defines the
+removal of bracketed-textual-comments from
+gap-free-symbols that form a syntax.
+*)
+(* see 6.6 *) commentless symbol
+= terminal character
+- (letter
+| decimal digit
+| first quote symbol
+| second quote symbol
+| start comment symbol
+| end comment symbol
+| special sequence symbol
+| other character)
+| meta identifier
+| integer
+| terminal string
+| special sequence;
+(* see 4.9 *) integer
+= decimal digit, {decimal digit};
+(* see 4.14 *) meta identifier
+= letter, {meta identifier character};
+(* see 4.15 *) meta identifier character
+= letter
+| decimal digit;
+(* see 4.19 *) special sequence
+= special sequence symbol,
+{special sequence character},
+special sequence symbol;
+(* see 4.20 *) special sequence character
+= terminal character - special sequence symbol;
+(* see 6.7 *) comment symbol
+= bracketed textual comment
+| other character
+| commentless symbol;
+(* see 6.8 *) bracketed textual comment
+= start comment symbol, {comment symbol},
+end comment symbol;
+(* see 6.9 *) syntax
+= {bracketed textual comment},
+commentless symbol,
+{bracketed textual comment},
+{commentless symbol,
+{bracketed textual comment}};
+`,
+			expectedSyntax: ebnf.Syntax{
+				Rules: []ebnf.Rule{
 					{
 						Comments: []string{
 							`
@@ -3414,6 +3458,344 @@ gap-free-symbols that form a syntax.
 								},
 							},
 						},
+					},
+					{
+						Comments:       []string{" see 4.9 "},
+						MetaIdentifier: "integer",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary:     ebnf.Primary{MetaIdentifier: "decimal digit"},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "decimal digit",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							}},
+						},
+					},
+					{
+						Comments:       []string{" see 4.14 "},
+						MetaIdentifier: "meta identifier",
+						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary:     ebnf.Primary{MetaIdentifier: "letter"},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "meta identifier character",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						}}},
+					},
+					{
+						Comments:       []string{" see 4.15 "},
+						MetaIdentifier: "meta identifier character",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "letter"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "decimal digit",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 4.19 "},
+						MetaIdentifier: "special sequence",
+						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										MetaIdentifier: "special sequence symbol",
+									},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "special sequence character",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										MetaIdentifier: "special sequence symbol",
+									},
+								},
+							},
+						}}},
+					},
+					{
+						Comments:       []string{" see 4.20 "},
+						MetaIdentifier: "special sequence character",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "terminal character",
+											},
+										},
+										Exception: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "special sequence symbol",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 6.7 "},
+						MetaIdentifier: "comment symbol",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "bracketed textual comment",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "other character",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "commentless symbol",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 6.8 "},
+						MetaIdentifier: "bracketed textual comment",
+						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										MetaIdentifier: "start comment symbol",
+									},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "comment symbol",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary:     ebnf.Primary{MetaIdentifier: "end comment symbol"},
+								},
+							},
+						}}},
+					},
+					{
+						Comments:       []string{" see 6.9 "},
+						MetaIdentifier: "syntax",
+						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "bracketed textual comment",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary:     ebnf.Primary{MetaIdentifier: "commentless symbol"},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "bracketed textual comment",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+											{
+												Factor: ebnf.Factor{
+													Repetitions: -1,
+													Primary: ebnf.Primary{
+														MetaIdentifier: "commentless symbol",
+													},
+												},
+											},
+											{
+												Factor: ebnf.Factor{
+													Repetitions: -1,
+													Primary: ebnf.Primary{
+														RepeatedSequence: ebnf.DefinitionsList{
+															{
+																Terms: []ebnf.Term{
+																	{
+																		Factor: ebnf.Factor{
+																			Repetitions: -1,
+																			Primary: ebnf.Primary{
+																				MetaIdentifier: "bracketed textual comment",
+																			},
+																		},
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										}}},
+									},
+								},
+							},
+						}}},
 					},
 				},
 			},
