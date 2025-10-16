@@ -83,6 +83,22 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 		t.Fail()
 		failed = true
 	}
+	//nolint:godox // recording next work item
+	// TODO assert lines all the time
+	if expected.Line != 0 && expected.Line != actual.Line {
+		if expected.MetaIdentifier != "" && expected.MetaIdentifier == actual.MetaIdentifier {
+			t.Logf(
+				"Expected rule %q to be on line %d. Got %d.",
+				expected.MetaIdentifier,
+				expected.Line,
+				actual.Line,
+			)
+		} else {
+			t.Logf("Expected rule to be on line %d. Got %d.", expected.Line, actual.Line)
+		}
+		t.Fail()
+		failed = true
+	}
 	if assertSlicesEqual(
 		t,
 		expected.Definitions,
@@ -255,6 +271,7 @@ integer = "0" | nonZeroDigit, { digit } ;
 				Rules: []ebnf.Rule{
 					{
 						MetaIdentifier: "nonZeroDigit",
+						Line:           2,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -350,6 +367,7 @@ integer = "0" | nonZeroDigit, { digit } ;
 					},
 					{
 						MetaIdentifier: "digit",
+						Line:           3,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -377,6 +395,7 @@ integer = "0" | nonZeroDigit, { digit } ;
 					},
 					{
 						MetaIdentifier: "integer",
+						Line:           4,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -459,6 +478,7 @@ COMMENT SYMBOL
 				Rules: []ebnf.Rule{
 					{
 						MetaIdentifier: "SYNTAX",
+						Line:           2,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -497,6 +517,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "SYNTAXRULE",
+						Line:           3,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -534,6 +555,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "DEFINITIONSLIST",
+						Line:           5,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -578,6 +600,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "SINGLEDEFINITION",
+						Line:           8,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -620,6 +643,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "TERM",
+						Line:           9,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -662,6 +686,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "EXCEPTION",
+						Line:           10,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -677,6 +702,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "FACTOR",
+						Line:           11,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -719,6 +745,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "PRIMARY",
+						Line:           12,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -804,6 +831,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "EMPTY",
+						Line:           16,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -819,6 +847,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "OPTIONALSEQUENCE",
+						Line:           17,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -846,6 +875,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "REPEATEDSEQUENCE",
+						Line:           18,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -873,6 +903,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "GROUPEDSEQUENCE",
+						Line:           19,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -900,6 +931,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "TERMINAL",
+						Line:           20,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1007,6 +1039,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "METAIDENTIFIER",
+						Line:           25,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1053,6 +1086,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "INTEGER",
+						Line:           26,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1087,6 +1121,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "SPECIALSEQUENCE",
+						Line:           27,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1133,6 +1168,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "COMMENT",
+						Line:           28,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1173,6 +1209,7 @@ COMMENT SYMBOL
 					},
 					{
 						MetaIdentifier: "COMMENTSYMBOL",
+						Line:           29,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{

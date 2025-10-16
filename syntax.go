@@ -10,6 +10,7 @@ type Syntax struct {
 }
 
 type Rule struct {
+	Line           int             `json:"line"`
 	Comments       []string        `json:"comments,omitempty"`
 	MetaIdentifier string          `json:"metaIdentifier"`
 	Definitions    DefinitionsList `json:"definitions"`
@@ -18,16 +19,23 @@ type Rule struct {
 type DefinitionsList = []Definition
 
 type Definition struct {
+	//nolint:godox // recording next work item
+	// TODO populate line
+	Line  int    `json:"line"`
 	Terms []Term `json:"terms"`
 }
 
 type Term struct {
+	//nolint:godox // recording next work item
+	// TODO populate line
+	Line      int
 	Factor    Factor
 	Exception Factor
 }
 
 func (t Term) MarshalJSON() ([]byte, error) {
 	out := map[string]any{}
+	out["line"] = t.Line
 	out["factor"] = t.Factor
 	if !t.Exception.Primary.IsZero() {
 		out["exception"] = t.Exception
@@ -36,6 +44,9 @@ func (t Term) MarshalJSON() ([]byte, error) {
 }
 
 type Factor struct {
+	//nolint:godox // recording next work item
+	// TODO populate line
+	Line        int
 	Comments    []string
 	Repetitions int
 	Primary     Primary
@@ -43,6 +54,7 @@ type Factor struct {
 
 func (f Factor) MarshalJSON() ([]byte, error) {
 	out := map[string]any{}
+	out["line"] = f.Line
 	if len(f.Comments) > 0 {
 		out["comments"] = f.Comments
 	}
@@ -54,6 +66,9 @@ func (f Factor) MarshalJSON() ([]byte, error) {
 }
 
 type Primary struct {
+	//nolint:godox // recording next work item
+	// TODO populate line
+	Line             int             `json:"line"`
 	OptionalSequence DefinitionsList `json:"optionalSequence,omitempty"`
 	RepeatedSequence DefinitionsList `json:"repeatedSequence,omitempty"`
 	SpecialSequence  string          `json:"specialSequence,omitempty"`

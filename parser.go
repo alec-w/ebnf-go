@@ -10,6 +10,7 @@ import (
 type Parser struct {
 	source string
 	offset int
+	line   int
 }
 
 func New() Parser {
@@ -22,6 +23,7 @@ func New() Parser {
 func (p *Parser) Parse(source string) (Syntax, error) {
 	p.source = source
 	p.offset = 0
+	p.line = 1
 	return p.parseSyntax()
 }
 
@@ -81,8 +83,9 @@ func (p *Parser) parseRule() (Rule, error) {
 			char,
 		)
 	}
+	rule := Rule{Line: p.line}
 	// Parse the meta identifier
-	rule := Rule{MetaIdentifier: p.parseMetaIdentifier()}
+	rule.MetaIdentifier = p.parseMetaIdentifier()
 	for p.isCommentStart() {
 		rule.Comments = append(rule.Comments, p.parseComment())
 	}
@@ -278,8 +281,7 @@ func (p *Parser) parseInteger() (int, error) {
 	parsedInt, err := strconv.Atoi(p.source[startOffset:p.offset])
 	// The spec allows unsized integers, for simplicity this only allows up to 2^63-1, which should be enough for all
 	// practical grammars.
-	// The simplest example of a grammar that used a value larger than this (and doesn't arbitrarily define the empty
-	// string) would be
+	// The simplest example of a grammar that used a value larger than this would be
 	// root = 9223372036854775808 * "0" ;
 	// which (if encoding "0" in a single byte) would require exabytes of text to have required the 2^63 repetitions.
 	if err != nil {
@@ -386,6 +388,9 @@ func (p *Parser) parseSpecialSequence() string {
 		if char == '?' {
 			break
 		}
+		if char == '\n' {
+			p.line++
+		}
 	}
 	// Trailing whitespace is ignored
 	endOffset := p.offset - width
@@ -455,9 +460,15 @@ func (p *Parser) parseTerminal() string {
 	p.offset += width
 	startOffset := p.offset
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	if char == '\n' {
+		p.line++
+	}
 	p.offset += width
 	for ; char != terminatingChar; p.offset += width {
 		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+		if char == '\n' {
+			p.line++
+		}
 	}
 	return p.source[startOffset : p.offset-width]
 }
@@ -520,6 +531,9 @@ func (p *Parser) parseCommentSymbol() {
 	case '?':
 		p.parseSpecialSequence()
 	default:
+		if char == '\n' {
+			p.line++
+		}
 		p.offset += width
 	}
 }
@@ -544,6 +558,9 @@ func (p *Parser) isCommentStart() bool {
 func (p *Parser) skipWhitespace() {
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	for unicode.IsSpace(char) {
+		if char == '\n' {
+			p.line++
+		}
 		p.offset += width
 		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
