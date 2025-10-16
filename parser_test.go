@@ -75,7 +75,11 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 		"comment",
 		assertCommentsEqual,
 	) {
-		t.Log("Rule comments were not equal")
+		if expected.MetaIdentifier != "" && expected.MetaIdentifier == actual.MetaIdentifier {
+			t.Logf("Rule %q comments were not equal", expected.MetaIdentifier)
+		} else {
+			t.Log("Rule comments were not equal")
+		}
 		t.Fail()
 		failed = true
 	}
@@ -89,7 +93,11 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 	) {
 		return !failed
 	}
-	t.Log("Rule definitions were not equal")
+	if expected.MetaIdentifier != "" && expected.MetaIdentifier == actual.MetaIdentifier {
+		t.Logf("Rule %q definitions were not equal", expected.MetaIdentifier)
+	} else {
+		t.Log("Rule definitions were not equal")
+	}
 	t.Fail()
 	return false
 }
@@ -1315,6 +1323,31 @@ from a syntax.
 | start repeat symbol
 | terminator symbol
 | other character;
+(* see 6.3 *) gap free symbol
+= terminal character
+- (first quote symbol | second quote symbol)
+| terminal string;
+(* see 4.16 *) terminal string
+= first quote symbol, first terminal character,
+{first terminal character},
+first quote symbol
+| second quote symbol, second terminal character,
+{second terminal character},
+second quote symbol;
+(* see 4.17 *) first terminal character
+= terminal character - first quote symbol;
+(* see 4.18 *) second terminal character
+= terminal character - second quote symbol;
+(* see 6.4 *) gap separator
+= space character
+| horizontal tabulation character
+| new line
+| vertical tabulation character
+| form feed;
+(* see 6.5 *) syntax
+= {gap separator},
+gap free symbol, {gap separator},
+{gap free symbol, {gap separator}};
 `,
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
@@ -2837,6 +2870,365 @@ from a syntax.
 								},
 							},
 						},
+					},
+					{
+						Comments:       []string{" see 6.3 "},
+						MetaIdentifier: "gap free symbol",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "terminal character",
+										},
+									},
+									Exception: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{GroupedSequence: ebnf.DefinitionsList{
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "first quote symbol",
+															},
+														},
+													},
+												},
+											},
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "second quote symbol",
+															},
+														},
+													},
+												},
+											},
+										}},
+									},
+								},
+							}},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "terminal string",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 4.16 "},
+						MetaIdentifier: "terminal string",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "first quote symbol",
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "first terminal character",
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "first terminal character",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "first quote symbol",
+										},
+									},
+								},
+							}},
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "second quote symbol",
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "second terminal character",
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	MetaIdentifier: "second terminal character",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											MetaIdentifier: "second quote symbol",
+										},
+									},
+								},
+							}},
+						},
+					},
+					{
+						Comments:       []string{" see 4.17 "},
+						MetaIdentifier: "first terminal character",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "terminal character",
+											},
+										},
+										Exception: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "first quote symbol",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 4.18 "},
+						MetaIdentifier: "second terminal character",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "terminal character",
+											},
+										},
+										Exception: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "second quote symbol",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 6.4 "},
+						MetaIdentifier: "gap separator",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "space character",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "horizontal tabulation character",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "new line"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												MetaIdentifier: "vertical tabulation character",
+											},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{MetaIdentifier: "form feed"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 6.5 "},
+						MetaIdentifier: "syntax",
+						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "gap separator",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary:     ebnf.Primary{MetaIdentifier: "gap free symbol"},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{
+											{
+												Terms: []ebnf.Term{
+													{
+														Factor: ebnf.Factor{
+															Repetitions: -1,
+															Primary: ebnf.Primary{
+																MetaIdentifier: "gap separator",
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary: ebnf.Primary{
+										RepeatedSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+											{
+												Factor: ebnf.Factor{
+													Repetitions: -1,
+													Primary: ebnf.Primary{
+														MetaIdentifier: "gap free symbol",
+													},
+												},
+											},
+											{
+												Factor: ebnf.Factor{
+													Repetitions: -1,
+													Primary: ebnf.Primary{
+														RepeatedSequence: ebnf.DefinitionsList{
+															{
+																Terms: []ebnf.Term{
+																	{
+																		Factor: ebnf.Factor{
+																			Repetitions: -1,
+																			Primary: ebnf.Primary{
+																				MetaIdentifier: "gap separator",
+																			},
+																		},
+																	},
+																},
+															},
+														},
+													},
+												},
+											},
+										}}},
+									},
+								},
+							},
+						}}},
 					},
 				},
 			},
