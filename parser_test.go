@@ -466,7 +466,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "SYNTAX RULE",
+												MetaIdentifier: "SYNTAXRULE",
 											},
 										},
 									},
@@ -481,7 +481,7 @@ COMMENT SYMBOL
 																Factor: ebnf.Factor{
 																	Repetitions: -1,
 																	Primary: ebnf.Primary{
-																		MetaIdentifier: "SYNTAX RULE",
+																		MetaIdentifier: "SYNTAXRULE",
 																	},
 																},
 															},
@@ -496,7 +496,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "SYNTAX RULE",
+						MetaIdentifier: "SYNTAXRULE",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -504,7 +504,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "META IDENTIFIER",
+												MetaIdentifier: "METAIDENTIFIER",
 											},
 										},
 									},
@@ -518,7 +518,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "DEFINITIONS LIST",
+												MetaIdentifier: "DEFINITIONSLIST",
 											},
 										},
 									},
@@ -533,7 +533,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "DEFINITIONS LIST",
+						MetaIdentifier: "DEFINITIONSLIST",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -541,7 +541,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "SINGLE DEFINITION",
+												MetaIdentifier: "SINGLEDEFINITION",
 											},
 										},
 									},
@@ -563,7 +563,7 @@ COMMENT SYMBOL
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	MetaIdentifier: "SINGLE DEFINITION",
+																	MetaIdentifier: "SINGLEDEFINITION",
 																},
 															},
 														},
@@ -577,7 +577,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "SINGLE DEFINITION",
+						MetaIdentifier: "SINGLEDEFINITION",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -726,7 +726,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "OPTIONAL SEQUENCE",
+												MetaIdentifier: "OPTIONALSEQUENCE",
 											},
 										},
 									},
@@ -738,7 +738,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "REPEATED SEQUENCE",
+												MetaIdentifier: "REPEATEDSEQUENCE",
 											},
 										},
 									},
@@ -750,7 +750,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "SPECIAL SEQUENCE",
+												MetaIdentifier: "SPECIALSEQUENCE",
 											},
 										},
 									},
@@ -762,7 +762,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "GROUPED SEQUENCE",
+												MetaIdentifier: "GROUPEDSEQUENCE",
 											},
 										},
 									},
@@ -774,7 +774,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "META IDENTIFIER",
+												MetaIdentifier: "METAIDENTIFIER",
 											},
 										},
 									},
@@ -818,7 +818,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "OPTIONAL SEQUENCE",
+						MetaIdentifier: "OPTIONALSEQUENCE",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -831,7 +831,7 @@ COMMENT SYMBOL
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "DEFINITIONS LIST",
+											MetaIdentifier: "DEFINITIONSLIST",
 										},
 									},
 								},
@@ -845,7 +845,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "REPEATED SEQUENCE",
+						MetaIdentifier: "REPEATEDSEQUENCE",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -858,7 +858,7 @@ COMMENT SYMBOL
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "DEFINITIONS LIST",
+											MetaIdentifier: "DEFINITIONSLIST",
 										},
 									},
 								},
@@ -872,7 +872,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "GROUPED SEQUENCE",
+						MetaIdentifier: "GROUPEDSEQUENCE",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -885,7 +885,7 @@ COMMENT SYMBOL
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "DEFINITIONS LIST",
+											MetaIdentifier: "DEFINITIONSLIST",
 										},
 									},
 								},
@@ -1006,7 +1006,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "META IDENTIFIER",
+						MetaIdentifier: "METAIDENTIFIER",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1086,7 +1086,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "SPECIAL SEQUENCE",
+						MetaIdentifier: "SPECIALSEQUENCE",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -1152,7 +1152,7 @@ COMMENT SYMBOL
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	MetaIdentifier: "COMMENT SYMBOL",
+																	MetaIdentifier: "COMMENTSYMBOL",
 																},
 															},
 														},
@@ -1172,7 +1172,7 @@ COMMENT SYMBOL
 						},
 					},
 					{
-						MetaIdentifier: "COMMENT SYMBOL",
+						MetaIdentifier: "COMMENTSYMBOL",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -1200,7 +1200,7 @@ COMMENT SYMBOL
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "SPECIAL SEQUENCE",
+												MetaIdentifier: "SPECIALSEQUENCE",
 											},
 										},
 									},
@@ -1857,7 +1857,7 @@ and gap-separator in Extended BNF.
 					},
 					{
 						Comments:       []string{" see 7.2 "},
-						MetaIdentifier: "decimal digit",
+						MetaIdentifier: "decimaldigit",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -1967,7 +1967,7 @@ The representation of the following
 terminal-characters is defined in clauses 7.3,
 7.4 and tables 1, 2.
 `},
-						MetaIdentifier: "concatenate symbol",
+						MetaIdentifier: "concatenatesymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -1982,7 +1982,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "defining symbol",
+						MetaIdentifier: "definingsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -1997,7 +1997,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "definition separator symbol",
+						MetaIdentifier: "definitionseparatorsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2032,7 +2032,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "end comment symbol",
+						MetaIdentifier: "endcommentsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2047,7 +2047,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "end group symbol",
+						MetaIdentifier: "endgroupsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2062,7 +2062,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "end option symbol",
+						MetaIdentifier: "endoptionsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2087,7 +2087,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "end repeat symbol",
+						MetaIdentifier: "endrepeatsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2112,7 +2112,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "except symbol",
+						MetaIdentifier: "exceptsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2127,7 +2127,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "first quote symbol",
+						MetaIdentifier: "firstquotesymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2142,7 +2142,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "repetition symbol",
+						MetaIdentifier: "repetitionsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2157,7 +2157,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "second quote symbol",
+						MetaIdentifier: "secondquotesymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2172,7 +2172,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "special sequence symbol",
+						MetaIdentifier: "specialsequencesymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2187,7 +2187,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "start comment symbol",
+						MetaIdentifier: "startcommentsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2202,7 +2202,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "start group symbol",
+						MetaIdentifier: "startgroupsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2217,7 +2217,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "start option symbol",
+						MetaIdentifier: "startoptionsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2242,7 +2242,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "start repeat symbol",
+						MetaIdentifier: "startrepeatsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2267,7 +2267,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "terminator symbol",
+						MetaIdentifier: "terminatorsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2293,7 +2293,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						Comments:       []string{" see 7.5 "},
-						MetaIdentifier: "other character",
+						MetaIdentifier: "othercharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2449,7 +2449,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						Comments:       []string{" see 7.6 "},
-						MetaIdentifier: "space character",
+						MetaIdentifier: "spacecharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2464,7 +2464,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "horizontal tabulation character",
+						MetaIdentifier: "horizontaltabulationcharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2481,7 +2481,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "new line",
+						MetaIdentifier: "newline",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -2538,7 +2538,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "vertical tabulation character",
+						MetaIdentifier: "verticaltabulationcharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2555,7 +2555,7 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						MetaIdentifier: "form feed",
+						MetaIdentifier: "formfeed",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2640,7 +2640,7 @@ from a syntax.
 `,
 							" see 6.2 ",
 						},
-						MetaIdentifier: "terminal character",
+						MetaIdentifier: "terminalcharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2658,7 +2658,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "decimal digit",
+												MetaIdentifier: "decimaldigit",
 											},
 										},
 									},
@@ -2670,7 +2670,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "concatenate symbol",
+												MetaIdentifier: "concatenatesymbol",
 											},
 										},
 									},
@@ -2682,7 +2682,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "defining symbol",
+												MetaIdentifier: "definingsymbol",
 											},
 										},
 									},
@@ -2694,7 +2694,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "definition separator symbol",
+												MetaIdentifier: "definitionseparatorsymbol",
 											},
 										},
 									},
@@ -2706,7 +2706,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "end comment symbol",
+												MetaIdentifier: "endcommentsymbol",
 											},
 										},
 									},
@@ -2718,7 +2718,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "end group symbol",
+												MetaIdentifier: "endgroupsymbol",
 											},
 										},
 									},
@@ -2730,7 +2730,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "end option symbol",
+												MetaIdentifier: "endoptionsymbol",
 											},
 										},
 									},
@@ -2742,7 +2742,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "end repeat symbol",
+												MetaIdentifier: "endrepeatsymbol",
 											},
 										},
 									},
@@ -2754,7 +2754,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "except symbol",
+												MetaIdentifier: "exceptsymbol",
 											},
 										},
 									},
@@ -2766,7 +2766,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "first quote symbol",
+												MetaIdentifier: "firstquotesymbol",
 											},
 										},
 									},
@@ -2778,7 +2778,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "repetition symbol",
+												MetaIdentifier: "repetitionsymbol",
 											},
 										},
 									},
@@ -2790,7 +2790,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "second quote symbol",
+												MetaIdentifier: "secondquotesymbol",
 											},
 										},
 									},
@@ -2802,7 +2802,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "special sequence symbol",
+												MetaIdentifier: "specialsequencesymbol",
 											},
 										},
 									},
@@ -2814,7 +2814,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "start comment symbol",
+												MetaIdentifier: "startcommentsymbol",
 											},
 										},
 									},
@@ -2826,7 +2826,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "start group symbol",
+												MetaIdentifier: "startgroupsymbol",
 											},
 										},
 									},
@@ -2838,7 +2838,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "start option symbol",
+												MetaIdentifier: "startoptionsymbol",
 											},
 										},
 									},
@@ -2850,7 +2850,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "start repeat symbol",
+												MetaIdentifier: "startrepeatsymbol",
 											},
 										},
 									},
@@ -2862,7 +2862,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "terminator symbol",
+												MetaIdentifier: "terminatorsymbol",
 											},
 										},
 									},
@@ -2874,7 +2874,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "other character",
+												MetaIdentifier: "othercharacter",
 											},
 										},
 									},
@@ -2884,14 +2884,14 @@ from a syntax.
 					},
 					{
 						Comments:       []string{" see 6.3 "},
-						MetaIdentifier: "gap free symbol",
+						MetaIdentifier: "gapfreesymbol",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "terminal character",
+											MetaIdentifier: "terminalcharacter",
 										},
 									},
 									Exception: ebnf.Factor{
@@ -2903,7 +2903,7 @@ from a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "first quote symbol",
+																MetaIdentifier: "firstquotesymbol",
 															},
 														},
 													},
@@ -2915,7 +2915,7 @@ from a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "second quote symbol",
+																MetaIdentifier: "secondquotesymbol",
 															},
 														},
 													},
@@ -2931,7 +2931,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "terminal string",
+												MetaIdentifier: "terminalstring",
 											},
 										},
 									},
@@ -2941,14 +2941,14 @@ from a syntax.
 					},
 					{
 						Comments:       []string{" see 4.16 "},
-						MetaIdentifier: "terminal string",
+						MetaIdentifier: "terminalstring",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "first quote symbol",
+											MetaIdentifier: "firstquotesymbol",
 										},
 									},
 								},
@@ -2956,7 +2956,7 @@ from a syntax.
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "first terminal character",
+											MetaIdentifier: "firstterminalcharacter",
 										},
 									},
 								},
@@ -2971,7 +2971,7 @@ from a syntax.
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	MetaIdentifier: "first terminal character",
+																	MetaIdentifier: "firstterminalcharacter",
 																},
 															},
 														},
@@ -2985,7 +2985,7 @@ from a syntax.
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "first quote symbol",
+											MetaIdentifier: "firstquotesymbol",
 										},
 									},
 								},
@@ -2995,7 +2995,7 @@ from a syntax.
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "second quote symbol",
+											MetaIdentifier: "secondquotesymbol",
 										},
 									},
 								},
@@ -3003,7 +3003,7 @@ from a syntax.
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "second terminal character",
+											MetaIdentifier: "secondterminalcharacter",
 										},
 									},
 								},
@@ -3018,7 +3018,7 @@ from a syntax.
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	MetaIdentifier: "second terminal character",
+																	MetaIdentifier: "secondterminalcharacter",
 																},
 															},
 														},
@@ -3032,7 +3032,7 @@ from a syntax.
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "second quote symbol",
+											MetaIdentifier: "secondquotesymbol",
 										},
 									},
 								},
@@ -3041,7 +3041,7 @@ from a syntax.
 					},
 					{
 						Comments:       []string{" see 4.17 "},
-						MetaIdentifier: "first terminal character",
+						MetaIdentifier: "firstterminalcharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3049,13 +3049,13 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "terminal character",
+												MetaIdentifier: "terminalcharacter",
 											},
 										},
 										Exception: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "first quote symbol",
+												MetaIdentifier: "firstquotesymbol",
 											},
 										},
 									},
@@ -3065,7 +3065,7 @@ from a syntax.
 					},
 					{
 						Comments:       []string{" see 4.18 "},
-						MetaIdentifier: "second terminal character",
+						MetaIdentifier: "secondterminalcharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3073,13 +3073,13 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "terminal character",
+												MetaIdentifier: "terminalcharacter",
 											},
 										},
 										Exception: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "second quote symbol",
+												MetaIdentifier: "secondquotesymbol",
 											},
 										},
 									},
@@ -3089,7 +3089,7 @@ from a syntax.
 					},
 					{
 						Comments:       []string{" see 6.4 "},
-						MetaIdentifier: "gap separator",
+						MetaIdentifier: "gapseparator",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3097,7 +3097,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "space character",
+												MetaIdentifier: "spacecharacter",
 											},
 										},
 									},
@@ -3109,7 +3109,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "horizontal tabulation character",
+												MetaIdentifier: "horizontaltabulationcharacter",
 											},
 										},
 									},
@@ -3120,7 +3120,7 @@ from a syntax.
 									{
 										Factor: ebnf.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "new line"},
+											Primary:     ebnf.Primary{MetaIdentifier: "newline"},
 										},
 									},
 								},
@@ -3131,7 +3131,7 @@ from a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "vertical tabulation character",
+												MetaIdentifier: "verticaltabulationcharacter",
 											},
 										},
 									},
@@ -3142,7 +3142,7 @@ from a syntax.
 									{
 										Factor: ebnf.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "form feed"},
+											Primary:     ebnf.Primary{MetaIdentifier: "formfeed"},
 										},
 									},
 								},
@@ -3164,7 +3164,7 @@ from a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "gap separator",
+																MetaIdentifier: "gapseparator",
 															},
 														},
 													},
@@ -3177,7 +3177,7 @@ from a syntax.
 							{
 								Factor: ebnf.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "gap free symbol"},
+									Primary:     ebnf.Primary{MetaIdentifier: "gapfreesymbol"},
 								},
 							},
 							{
@@ -3191,7 +3191,7 @@ from a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "gap separator",
+																MetaIdentifier: "gapseparator",
 															},
 														},
 													},
@@ -3210,7 +3210,7 @@ from a syntax.
 												Factor: ebnf.Factor{
 													Repetitions: -1,
 													Primary: ebnf.Primary{
-														MetaIdentifier: "gap free symbol",
+														MetaIdentifier: "gapfreesymbol",
 													},
 												},
 											},
@@ -3225,7 +3225,7 @@ from a syntax.
 																		Factor: ebnf.Factor{
 																			Repetitions: -1,
 																			Primary: ebnf.Primary{
-																				MetaIdentifier: "gap separator",
+																				MetaIdentifier: "gapseparator",
 																			},
 																		},
 																	},
@@ -3304,12 +3304,12 @@ gap-free-symbols that form a syntax.
 `,
 							" see 6.6 ",
 						},
-						MetaIdentifier: "commentless symbol",
+						MetaIdentifier: "commentlesssymbol",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{{
 								Factor: ebnf.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "terminal character"},
+									Primary:     ebnf.Primary{MetaIdentifier: "terminalcharacter"},
 								},
 								Exception: ebnf.Factor{
 									Repetitions: -1,
@@ -3332,7 +3332,7 @@ gap-free-symbols that form a syntax.
 													Factor: ebnf.Factor{
 														Repetitions: -1,
 														Primary: ebnf.Primary{
-															MetaIdentifier: "decimal digit",
+															MetaIdentifier: "decimaldigit",
 														},
 													},
 												},
@@ -3344,7 +3344,7 @@ gap-free-symbols that form a syntax.
 													Factor: ebnf.Factor{
 														Repetitions: -1,
 														Primary: ebnf.Primary{
-															MetaIdentifier: "first quote symbol",
+															MetaIdentifier: "firstquotesymbol",
 														},
 													},
 												},
@@ -3356,7 +3356,7 @@ gap-free-symbols that form a syntax.
 													Factor: ebnf.Factor{
 														Repetitions: -1,
 														Primary: ebnf.Primary{
-															MetaIdentifier: "second quote symbol",
+															MetaIdentifier: "secondquotesymbol",
 														},
 													},
 												},
@@ -3368,7 +3368,7 @@ gap-free-symbols that form a syntax.
 													Factor: ebnf.Factor{
 														Repetitions: -1,
 														Primary: ebnf.Primary{
-															MetaIdentifier: "start comment symbol",
+															MetaIdentifier: "startcommentsymbol",
 														},
 													},
 												},
@@ -3380,7 +3380,7 @@ gap-free-symbols that form a syntax.
 													Factor: ebnf.Factor{
 														Repetitions: -1,
 														Primary: ebnf.Primary{
-															MetaIdentifier: "end comment symbol",
+															MetaIdentifier: "endcommentsymbol",
 														},
 													},
 												},
@@ -3392,7 +3392,7 @@ gap-free-symbols that form a syntax.
 													Factor: ebnf.Factor{
 														Repetitions: -1,
 														Primary: ebnf.Primary{
-															MetaIdentifier: "special sequence symbol",
+															MetaIdentifier: "specialsequencesymbol",
 														},
 													},
 												},
@@ -3404,7 +3404,7 @@ gap-free-symbols that form a syntax.
 													Factor: ebnf.Factor{
 														Repetitions: -1,
 														Primary: ebnf.Primary{
-															MetaIdentifier: "other character",
+															MetaIdentifier: "othercharacter",
 														},
 													},
 												},
@@ -3419,7 +3419,7 @@ gap-free-symbols that form a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "meta identifier",
+												MetaIdentifier: "metaidentifier",
 											},
 										},
 									},
@@ -3441,7 +3441,7 @@ gap-free-symbols that form a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "terminal string",
+												MetaIdentifier: "terminalstring",
 											},
 										},
 									},
@@ -3453,7 +3453,7 @@ gap-free-symbols that form a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "special sequence",
+												MetaIdentifier: "specialsequence",
 											},
 										},
 									},
@@ -3469,7 +3469,7 @@ gap-free-symbols that form a syntax.
 								{
 									Factor: ebnf.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "decimal digit"},
+										Primary:     ebnf.Primary{MetaIdentifier: "decimaldigit"},
 									},
 								},
 								{
@@ -3483,7 +3483,7 @@ gap-free-symbols that form a syntax.
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	MetaIdentifier: "decimal digit",
+																	MetaIdentifier: "decimaldigit",
 																},
 															},
 														},
@@ -3498,7 +3498,7 @@ gap-free-symbols that form a syntax.
 					},
 					{
 						Comments:       []string{" see 4.14 "},
-						MetaIdentifier: "meta identifier",
+						MetaIdentifier: "metaidentifier",
 						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 							{
 								Factor: ebnf.Factor{
@@ -3517,7 +3517,7 @@ gap-free-symbols that form a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "meta identifier character",
+																MetaIdentifier: "metaidentifiercharacter",
 															},
 														},
 													},
@@ -3531,7 +3531,7 @@ gap-free-symbols that form a syntax.
 					},
 					{
 						Comments:       []string{" see 4.15 "},
-						MetaIdentifier: "meta identifier character",
+						MetaIdentifier: "metaidentifiercharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3549,7 +3549,7 @@ gap-free-symbols that form a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "decimal digit",
+												MetaIdentifier: "decimaldigit",
 											},
 										},
 									},
@@ -3559,13 +3559,13 @@ gap-free-symbols that form a syntax.
 					},
 					{
 						Comments:       []string{" see 4.19 "},
-						MetaIdentifier: "special sequence",
+						MetaIdentifier: "specialsequence",
 						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 							{
 								Factor: ebnf.Factor{
 									Repetitions: -1,
 									Primary: ebnf.Primary{
-										MetaIdentifier: "special sequence symbol",
+										MetaIdentifier: "specialsequencesymbol",
 									},
 								},
 							},
@@ -3580,7 +3580,7 @@ gap-free-symbols that form a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "special sequence character",
+																MetaIdentifier: "specialsequencecharacter",
 															},
 														},
 													},
@@ -3594,7 +3594,7 @@ gap-free-symbols that form a syntax.
 								Factor: ebnf.Factor{
 									Repetitions: -1,
 									Primary: ebnf.Primary{
-										MetaIdentifier: "special sequence symbol",
+										MetaIdentifier: "specialsequencesymbol",
 									},
 								},
 							},
@@ -3602,7 +3602,7 @@ gap-free-symbols that form a syntax.
 					},
 					{
 						Comments:       []string{" see 4.20 "},
-						MetaIdentifier: "special sequence character",
+						MetaIdentifier: "specialsequencecharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3610,13 +3610,13 @@ gap-free-symbols that form a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "terminal character",
+												MetaIdentifier: "terminalcharacter",
 											},
 										},
 										Exception: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "special sequence symbol",
+												MetaIdentifier: "specialsequencesymbol",
 											},
 										},
 									},
@@ -3626,7 +3626,7 @@ gap-free-symbols that form a syntax.
 					},
 					{
 						Comments:       []string{" see 6.7 "},
-						MetaIdentifier: "comment symbol",
+						MetaIdentifier: "commentsymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3634,7 +3634,7 @@ gap-free-symbols that form a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "bracketed textual comment",
+												MetaIdentifier: "bracketedtextualcomment",
 											},
 										},
 									},
@@ -3646,7 +3646,7 @@ gap-free-symbols that form a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "other character",
+												MetaIdentifier: "othercharacter",
 											},
 										},
 									},
@@ -3658,7 +3658,7 @@ gap-free-symbols that form a syntax.
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												MetaIdentifier: "commentless symbol",
+												MetaIdentifier: "commentlesssymbol",
 											},
 										},
 									},
@@ -3668,13 +3668,13 @@ gap-free-symbols that form a syntax.
 					},
 					{
 						Comments:       []string{" see 6.8 "},
-						MetaIdentifier: "bracketed textual comment",
+						MetaIdentifier: "bracketedtextualcomment",
 						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 							{
 								Factor: ebnf.Factor{
 									Repetitions: -1,
 									Primary: ebnf.Primary{
-										MetaIdentifier: "start comment symbol",
+										MetaIdentifier: "startcommentsymbol",
 									},
 								},
 							},
@@ -3689,7 +3689,7 @@ gap-free-symbols that form a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "comment symbol",
+																MetaIdentifier: "commentsymbol",
 															},
 														},
 													},
@@ -3702,7 +3702,7 @@ gap-free-symbols that form a syntax.
 							{
 								Factor: ebnf.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "end comment symbol"},
+									Primary:     ebnf.Primary{MetaIdentifier: "endcommentsymbol"},
 								},
 							},
 						}}},
@@ -3722,7 +3722,7 @@ gap-free-symbols that form a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "bracketed textual comment",
+																MetaIdentifier: "bracketedtextualcomment",
 															},
 														},
 													},
@@ -3735,7 +3735,7 @@ gap-free-symbols that form a syntax.
 							{
 								Factor: ebnf.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "commentless symbol"},
+									Primary:     ebnf.Primary{MetaIdentifier: "commentlesssymbol"},
 								},
 							},
 							{
@@ -3749,7 +3749,7 @@ gap-free-symbols that form a syntax.
 														Factor: ebnf.Factor{
 															Repetitions: -1,
 															Primary: ebnf.Primary{
-																MetaIdentifier: "bracketed textual comment",
+																MetaIdentifier: "bracketedtextualcomment",
 															},
 														},
 													},
@@ -3768,7 +3768,7 @@ gap-free-symbols that form a syntax.
 												Factor: ebnf.Factor{
 													Repetitions: -1,
 													Primary: ebnf.Primary{
-														MetaIdentifier: "commentless symbol",
+														MetaIdentifier: "commentlesssymbol",
 													},
 												},
 											},
@@ -3783,7 +3783,7 @@ gap-free-symbols that form a syntax.
 																		Factor: ebnf.Factor{
 																			Repetitions: -1,
 																			Primary: ebnf.Primary{
-																				MetaIdentifier: "bracketed textual comment",
+																				MetaIdentifier: "bracketedtextualcomment",
 																			},
 																		},
 																	},
@@ -3868,7 +3868,7 @@ structure in terms of the commentless symbols.
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "syntax rule"},
+								Primary:     ebnf.Primary{MetaIdentifier: "syntaxrule"},
 							},
 						},
 						{
@@ -3882,7 +3882,7 @@ structure in terms of the commentless symbols.
 													Factor: ebnf.Factor{
 														Repetitions: -1,
 														Primary: ebnf.Primary{
-															MetaIdentifier: "syntax rule",
+															MetaIdentifier: "syntaxrule",
 														},
 													},
 												},
@@ -3896,42 +3896,42 @@ structure in terms of the commentless symbols.
 				},
 				{
 					Comments:       []string{" see 4.3 "},
-					MetaIdentifier: "syntax rule",
+					MetaIdentifier: "syntaxrule",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "meta identifier"},
+								Primary:     ebnf.Primary{MetaIdentifier: "metaidentifier"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "defining symbol"},
+								Primary:     ebnf.Primary{MetaIdentifier: "definingsymbol"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definitions list"},
+								Primary:     ebnf.Primary{MetaIdentifier: "definitionslist"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "terminator symbol"},
+								Primary:     ebnf.Primary{MetaIdentifier: "terminatorsymbol"},
 							},
 						},
 					}}},
 				},
 				{
 					Comments:       []string{" see 4.4 "},
-					MetaIdentifier: "definitions list",
+					MetaIdentifier: "definitionslist",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "single definition"},
+								Primary:     ebnf.Primary{MetaIdentifier: "singledefinition"},
 							},
 						},
 						{
@@ -3943,7 +3943,7 @@ structure in terms of the commentless symbols.
 											Factor: ebnf.Factor{
 												Repetitions: -1,
 												Primary: ebnf.Primary{
-													MetaIdentifier: "definition separator symbol",
+													MetaIdentifier: "definitionseparatorsymbol",
 												},
 											},
 										},
@@ -3951,7 +3951,7 @@ structure in terms of the commentless symbols.
 											Factor: ebnf.Factor{
 												Repetitions: -1,
 												Primary: ebnf.Primary{
-													MetaIdentifier: "single definition",
+													MetaIdentifier: "singledefinition",
 												},
 											},
 										},
@@ -3963,12 +3963,12 @@ structure in terms of the commentless symbols.
 				},
 				{
 					Comments:       []string{" see 4.5 "},
-					MetaIdentifier: "single definition",
+					MetaIdentifier: "singledefinition",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "syntactic term"},
+								Primary:     ebnf.Primary{MetaIdentifier: "syntacticterm"},
 							},
 						},
 						{
@@ -3980,7 +3980,7 @@ structure in terms of the commentless symbols.
 											Factor: ebnf.Factor{
 												Repetitions: -1,
 												Primary: ebnf.Primary{
-													MetaIdentifier: "concatenate symbol",
+													MetaIdentifier: "concatenatesymbol",
 												},
 											},
 										},
@@ -3988,7 +3988,7 @@ structure in terms of the commentless symbols.
 											Factor: ebnf.Factor{
 												Repetitions: -1,
 												Primary: ebnf.Primary{
-													MetaIdentifier: "syntactic term",
+													MetaIdentifier: "syntacticterm",
 												},
 											},
 										},
@@ -4000,12 +4000,12 @@ structure in terms of the commentless symbols.
 				},
 				{
 					Comments:       []string{" see 4.6 "},
-					MetaIdentifier: "syntactic term",
+					MetaIdentifier: "syntacticterm",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "syntactic factor"},
+								Primary:     ebnf.Primary{MetaIdentifier: "syntacticfactor"},
 							},
 						},
 						{
@@ -4017,7 +4017,7 @@ structure in terms of the commentless symbols.
 											Factor: ebnf.Factor{
 												Repetitions: -1,
 												Primary: ebnf.Primary{
-													MetaIdentifier: "except symbol",
+													MetaIdentifier: "exceptsymbol",
 												},
 											},
 										},
@@ -4025,7 +4025,7 @@ structure in terms of the commentless symbols.
 											Factor: ebnf.Factor{
 												Repetitions: -1,
 												Primary: ebnf.Primary{
-													MetaIdentifier: "syntactic exception",
+													MetaIdentifier: "syntacticexception",
 												},
 											},
 										},
@@ -4037,7 +4037,7 @@ structure in terms of the commentless symbols.
 				},
 				{
 					Comments:       []string{" see 4.7 "},
-					MetaIdentifier: "syntactic exception",
+					MetaIdentifier: "syntacticexception",
 					Definitions: ebnf.DefinitionsList{
 						{
 							Terms: []ebnf.Term{
@@ -4058,7 +4058,7 @@ meta-identifiers
 				},
 				{
 					Comments:       []string{" see 4.8 "},
-					MetaIdentifier: "syntactic factor",
+					MetaIdentifier: "syntacticfactor",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -4077,7 +4077,7 @@ meta-identifiers
 											Factor: ebnf.Factor{
 												Repetitions: -1,
 												Primary: ebnf.Primary{
-													MetaIdentifier: "repetition symbol",
+													MetaIdentifier: "repetitionsymbol",
 												},
 											},
 										},
@@ -4088,14 +4088,14 @@ meta-identifiers
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "syntactic primary"},
+								Primary:     ebnf.Primary{MetaIdentifier: "syntacticprimary"},
 							},
 						},
 					}}},
 				},
 				{
 					Comments:       []string{" see 4.10 "},
-					MetaIdentifier: "syntactic primary",
+					MetaIdentifier: "syntacticprimary",
 					Definitions: ebnf.DefinitionsList{
 						{
 							Terms: []ebnf.Term{
@@ -4103,7 +4103,7 @@ meta-identifiers
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "optional sequence",
+											MetaIdentifier: "optionalsequence",
 										},
 									},
 								},
@@ -4115,7 +4115,7 @@ meta-identifiers
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "repeated sequence",
+											MetaIdentifier: "repeatedsequence",
 										},
 									},
 								},
@@ -4127,7 +4127,7 @@ meta-identifiers
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "grouped sequence",
+											MetaIdentifier: "groupedsequence",
 										},
 									},
 								},
@@ -4139,7 +4139,7 @@ meta-identifiers
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "meta identifier",
+											MetaIdentifier: "metaidentifier",
 										},
 									},
 								},
@@ -4151,7 +4151,7 @@ meta-identifiers
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "terminal string",
+											MetaIdentifier: "terminalstring",
 										},
 									},
 								},
@@ -4163,7 +4163,7 @@ meta-identifiers
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											MetaIdentifier: "special sequence",
+											MetaIdentifier: "specialsequence",
 										},
 									},
 								},
@@ -4174,7 +4174,7 @@ meta-identifiers
 								{
 									Factor: ebnf.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "empty sequence"},
+										Primary:     ebnf.Primary{MetaIdentifier: "emptysequence"},
 									},
 								},
 							},
@@ -4183,79 +4183,79 @@ meta-identifiers
 				},
 				{
 					Comments:       []string{" see 4.11 "},
-					MetaIdentifier: "optional sequence",
+					MetaIdentifier: "optionalsequence",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "start option symbol"},
+								Primary:     ebnf.Primary{MetaIdentifier: "startoptionsymbol"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definitions list"},
+								Primary:     ebnf.Primary{MetaIdentifier: "definitionslist"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "end option symbol"},
+								Primary:     ebnf.Primary{MetaIdentifier: "endoptionsymbol"},
 							},
 						},
 					}}},
 				},
 				{
 					Comments:       []string{" see 4.12 "},
-					MetaIdentifier: "repeated sequence",
+					MetaIdentifier: "repeatedsequence",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "start repeat symbol"},
+								Primary:     ebnf.Primary{MetaIdentifier: "startrepeatsymbol"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definitions list"},
+								Primary:     ebnf.Primary{MetaIdentifier: "definitionslist"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "end repeat symbol"},
+								Primary:     ebnf.Primary{MetaIdentifier: "endrepeatsymbol"},
 							},
 						},
 					}}},
 				},
 				{
 					Comments:       []string{" see 4.13 "},
-					MetaIdentifier: "grouped sequence",
+					MetaIdentifier: "groupedsequence",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "start group symbol"},
+								Primary:     ebnf.Primary{MetaIdentifier: "startgroupsymbol"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definitions list"},
+								Primary:     ebnf.Primary{MetaIdentifier: "definitionslist"},
 							},
 						},
 						{
 							Factor: ebnf.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "end group symbol"},
+								Primary:     ebnf.Primary{MetaIdentifier: "endgroupsymbol"},
 							},
 						},
 					}}},
 				},
 				{
 					Comments:       []string{" see 4.21 "},
-					MetaIdentifier: "empty sequence",
+					MetaIdentifier: "emptysequence",
 					Definitions: ebnf.DefinitionsList{
 						{
 							Terms: []ebnf.Term{
