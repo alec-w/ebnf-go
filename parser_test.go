@@ -2472,7 +2472,7 @@ terminal-characters is defined in clauses 7.3,
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												SpecialSequence: " IS0 6429 character Horizontal Tabulation ",
+												SpecialSequence: "IS0 6429 character Horizontal Tabulation",
 											},
 										},
 									},
@@ -2495,7 +2495,7 @@ terminal-characters is defined in clauses 7.3,
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	SpecialSequence: " IS0 6429 character Carriage Return ",
+																	SpecialSequence: "IS0 6429 character Carriage Return",
 																},
 															},
 														},
@@ -2509,7 +2509,7 @@ terminal-characters is defined in clauses 7.3,
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											SpecialSequence: " IS0 6429 character Line Feed ",
+											SpecialSequence: "IS0 6429 character Line Feed",
 										},
 									},
 								},
@@ -2524,7 +2524,7 @@ terminal-characters is defined in clauses 7.3,
 															Factor: ebnf.Factor{
 																Repetitions: -1,
 																Primary: ebnf.Primary{
-																	SpecialSequence: " IS0 6429 character Carriage Return ",
+																	SpecialSequence: "IS0 6429 character Carriage Return",
 																},
 															},
 														},
@@ -2546,7 +2546,7 @@ terminal-characters is defined in clauses 7.3,
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												SpecialSequence: " IS0 6429 character Vertical Tabulation ",
+												SpecialSequence: "IS0 6429 character Vertical Tabulation",
 											},
 										},
 									},
@@ -2563,7 +2563,7 @@ terminal-characters is defined in clauses 7.3,
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary: ebnf.Primary{
-												SpecialSequence: " IS0 6429 character Form Feed ",
+												SpecialSequence: "IS0 6429 character Form Feed",
 											},
 										},
 									},
@@ -4045,10 +4045,9 @@ structure in terms of the commentless symbols.
 									Factor: ebnf.Factor{
 										Repetitions: -1,
 										Primary: ebnf.Primary{
-											SpecialSequence: ` a syntactic-factor that could be replaced
+											SpecialSequence: `a syntactic-factor that could be replaced
 by a syntactic-factor containing no
-meta-identifiers
-`,
+meta-identifiers`,
 										},
 									},
 								},

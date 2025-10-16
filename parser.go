@@ -376,6 +376,8 @@ func (p *Parser) parseSpecialSequence() string {
 	// function. As this is internal to the parser this allows the removal of unreachable error handling code.
 	_, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	p.offset += width
+	// Leading whitespace is ignored
+	p.skipWhitespace()
 	startOffset := p.offset
 	for {
 		var char rune
@@ -385,7 +387,16 @@ func (p *Parser) parseSpecialSequence() string {
 			break
 		}
 	}
-	return p.source[startOffset : p.offset-width]
+	// Trailing whitespace is ignored
+	endOffset := p.offset - width
+	for {
+		char, width := utf8.DecodeLastRuneInString(p.source[startOffset:endOffset])
+		if !unicode.IsSpace(char) {
+			break
+		}
+		endOffset -= width
+	}
+	return p.source[startOffset:endOffset]
 }
 
 func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
