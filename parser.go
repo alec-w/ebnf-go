@@ -379,13 +379,14 @@ func (p *Parser) parseSpecialSequence() string {
 	p.offset += width
 	startOffset := p.offset
 	for {
-		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+		var char rune
+		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+		p.offset += width
 		if char == '?' {
 			break
 		}
-		p.offset += width
 	}
-	return p.source[startOffset:p.offset]
+	return p.source[startOffset : p.offset-width]
 }
 
 func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {

@@ -1274,6 +1274,21 @@ start group symbol = '(';
 start option symbol = '[' | '(/';
 start repeat symbol = '{' | '(:';
 terminator symbol = ';' | '.';
+(* see 7.5 *) other character
+= ' ' | ';' | '+' | '_' | '%' | '@'
+| '&' | '#' | '$' | '<' | '>' | '\'
+| '^' | '` + "`" + `' | '~';
+(* see 7.6 *) space character = ' ';
+horizontal tabulation character
+= ? IS0 6429 character Horizontal Tabulation ? ;
+new line
+= { ? IS0 6429 character Carriage Return ? },
+? IS0 6429 character Line Feed ?,
+{ ? IS0 6429 character Carriage Return ? };
+vertical tabulation character
+= ? IS0 6429 character Vertical Tabulation ? ;
+form feed
+= ? IS0 6429 character Form Feed ? ;
 `,
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
@@ -2260,6 +2275,286 @@ terminal-characters is defined in clauses 7.3,
 										Factor: ebnf.Factor{
 											Repetitions: -1,
 											Primary:     ebnf.Primary{Terminal: "."},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 7.5 "},
+						MetaIdentifier: "other character",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: " "},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: ";"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "+"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "_"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "%"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "@"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "&"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "#"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "$"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "<"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: ">"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "\\"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "^"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "`"},
+										},
+									},
+								},
+							},
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "~"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						Comments:       []string{" see 7.6 "},
+						MetaIdentifier: "space character",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: " "},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "horizontal tabulation character",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												SpecialSequence: " IS0 6429 character Horizontal Tabulation ",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "new line",
+						Definitions: ebnf.DefinitionsList{
+							{Terms: []ebnf.Term{
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	SpecialSequence: " IS0 6429 character Carriage Return ",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											SpecialSequence: " IS0 6429 character Line Feed ",
+										},
+									},
+								},
+								{
+									Factor: ebnf.Factor{
+										Repetitions: -1,
+										Primary: ebnf.Primary{
+											RepeatedSequence: ebnf.DefinitionsList{
+												{
+													Terms: []ebnf.Term{
+														{
+															Factor: ebnf.Factor{
+																Repetitions: -1,
+																Primary: ebnf.Primary{
+																	SpecialSequence: " IS0 6429 character Carriage Return ",
+																},
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							}},
+						},
+					},
+					{
+						MetaIdentifier: "vertical tabulation character",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												SpecialSequence: " IS0 6429 character Vertical Tabulation ",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "form feed",
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary: ebnf.Primary{
+												SpecialSequence: " IS0 6429 character Form Feed ",
+											},
 										},
 									},
 								},
