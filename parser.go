@@ -79,15 +79,15 @@ func (p *Parser) parseRule() (Rule, error) {
 	// A rule is made up of a meta identifier followed by a literal "=" then a list of definitions, then a terminating
 	// symbol (";" or ".")
 	p.skipWhitespace()
+	rule := Rule{Line: p.line}
 	// Look for start of meta identifier (letter)
 	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
 	if !unicode.IsLetter(char) {
-		return Rule{}, &ParseError{
+		return Rule{}, &ParseRuleError{Line: rule.Line, Wrapped: &ParseError{
 			Msg:    "expected rule meta identifier start character (letter)",
 			Offset: p.offset,
-		}
+		}}
 	}
-	rule := Rule{Line: p.line}
 	// Parse the meta identifier
 	rule.MetaIdentifier = p.parseMetaIdentifier()
 	for p.isCommentStart() {
@@ -98,20 +98,26 @@ func (p *Parser) parseRule() (Rule, error) {
 	// Look for "=" character
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != '=' {
-		return Rule{}, &ParseError{Msg: "expected defining symbol ('=')", Offset: p.offset}
+		return Rule{}, &ParseRuleError{Line: rule.Line, Wrapped: &ParseError{
+			Msg:    "expected defining symbol ('=')",
+			Offset: p.offset,
+		}}
 	}
 	p.offset += width
 	// Parse a definitions list
 	defintitionsList, err := p.parseDefinitionsList()
 	if err != nil {
-		return Rule{}, err
+		return Rule{}, &ParseRuleError{Line: rule.Line, Wrapped: err}
 	}
 	rule.Definitions = defintitionsList
 	// Look for terminating character
 	p.skipWhitespace()
 	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != ';' && char != '.' {
-		return Rule{}, &ParseError{Msg: "expected terminator symbol ('.' or ';')", Offset: p.offset}
+		return Rule{}, &ParseRuleError{Line: rule.Line, Wrapped: &ParseError{
+			Msg:    "expected terminator symbol ('.' or ';')",
+			Offset: p.offset,
+		}}
 	}
 	p.offset += width
 
@@ -138,7 +144,7 @@ func (p *Parser) parseMetaIdentifier() string {
 	return string(metaIdentifier)
 }
 
-func (p *Parser) parseDefinitionsList() (DefinitionsList, error) {
+func (p *Parser) parseDefinitionsList() (DefinitionsList, *ParseError) {
 	// A defintions list is a sequence of one or more definitions separated by "|", "/" or "!".
 	// So parse the first definition...
 	definition, err := p.parseDefinition()
@@ -170,7 +176,7 @@ func (p *Parser) parseDefinitionsList() (DefinitionsList, error) {
 	return definitionsList, nil
 }
 
-func (p *Parser) parseDefinition() (Definition, error) {
+func (p *Parser) parseDefinition() (Definition, *ParseError) {
 	// A definition is a sequence of one or more terms separated by ","
 	// So parse one term...
 	term, err := p.parseTerm()
@@ -194,7 +200,7 @@ func (p *Parser) parseDefinition() (Definition, error) {
 	return definition, nil
 }
 
-func (p *Parser) parseTerm() (Term, error) {
+func (p *Parser) parseTerm() (Term, *ParseError) {
 	// A term is a factor, then with an optional exception (also a factor) preceded by a literal "-"
 	// So parse a factor...
 	factor, err := p.parseFactor()
@@ -219,7 +225,7 @@ func (p *Parser) parseTerm() (Term, error) {
 	return term, nil
 }
 
-func (p *Parser) parseFactor() (Factor, error) {
+func (p *Parser) parseFactor() (Factor, *ParseError) {
 	// A factor is a primary preceded by an optional integer number of repetitions (followed by a literal "*")
 	// By the spec, a repetitions of 0 is allowed (although pointless), so default (unspecified) to -1 to distinguish
 	// that case.
@@ -262,7 +268,7 @@ func (p *Parser) parseFactor() (Factor, error) {
 	return factor, nil
 }
 
-func (p *Parser) parseInteger() (int, error) {
+func (p *Parser) parseInteger() (int, *ParseError) {
 	// An integer is a sequence of one of more digits.
 	// This assumes the first character is a digit as this is internal to the parser so this should have
 	// already been checked to avoid unrreachable error handling code here.
@@ -292,13 +298,13 @@ func (p *Parser) parseInteger() (int, error) {
 	return parsedInt, nil
 }
 
-func (p *Parser) parsePrimary() (Primary, error) {
+func (p *Parser) parsePrimary() (Primary, *ParseError) {
 	// A primary is one of an optional sequence, a repeated sequence, a special sequence, a grouped sequence, a meta
 	// identifier, a terminal, or empty.
 	// To determine which one should be matched the next character is inspected
 	p.skipWhitespace()
 	primary := Primary{}
-	var err error
+	var err *ParseError
 	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
 	switch {
 	case char == '[':
@@ -326,7 +332,7 @@ func (p *Parser) parsePrimary() (Primary, error) {
 	return primary, err
 }
 
-func (p *Parser) parseParenthisedSequence() (Primary, error) {
+func (p *Parser) parseParenthisedSequence() (Primary, *ParseError) {
 	// This assumes the character at offset is "(", which should have already been checked by the caller as this is
 	// internal to the parser.
 	var primary Primary
@@ -358,7 +364,7 @@ func (p *Parser) parseParenthisedSequence() (Primary, error) {
 	return primary, nil
 }
 
-func (p *Parser) parseOptionalSequence() (DefinitionsList, error) {
+func (p *Parser) parseOptionalSequence() (DefinitionsList, *ParseError) {
 	// An optional sequence is a definitions list wrapped in either [...] or (/.../)
 	// The spec says that grammars should only use one of these throughout, but the parser is more lenient
 	// as it is possible to support that without changing the parsing behaviour for grammars that use one set of symbols.
@@ -368,7 +374,7 @@ func (p *Parser) parseOptionalSequence() (DefinitionsList, error) {
 	)
 }
 
-func (p *Parser) parseRepeatedSequence() (DefinitionsList, error) {
+func (p *Parser) parseRepeatedSequence() (DefinitionsList, *ParseError) {
 	// A repeated sequence is a definitions list wrapped in either {...} or (:...:)
 	// The spec says that grammars should only use one of these throughout, but the parser is more lenient
 	// as it is possible to support that without changing the parsing behaviour for grammars that use one set of symbols.
@@ -412,7 +418,7 @@ func (p *Parser) parseSpecialSequence() string {
 	return p.source[startOffset:endOffset]
 }
 
-func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
+func (p *Parser) parseGroupedSequence() (DefinitionsList, *ParseError) {
 	// A grouped sequence is a definitions list wrapped in parentheses (...)
 	return p.parseWrappedDefinitionsList(
 		[][]rune{{'('}},
@@ -424,7 +430,7 @@ func (p *Parser) parseGroupedSequence() (DefinitionsList, error) {
 // logic is the same for each because they are just definitions lists wrapped in different enclosing characters.
 func (p *Parser) parseWrappedDefinitionsList(
 	startIdentifiers, endIdentifiers [][]rune,
-) (DefinitionsList, error) {
+) (DefinitionsList, *ParseError) {
 	// This assumes that the source at the current offset already starts with the one of the given start identifier#
 	// sequences (after whitespace is ignored) since this is internal to the parser this avoids unreachable error
 	// handling code.
