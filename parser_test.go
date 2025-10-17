@@ -5,8 +5,6 @@ import (
 	"testing"
 
 	"github.com/alec-w/ebnf-go"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 func assertSlicesEqual[T any](
@@ -27,7 +25,7 @@ func assertSlicesEqual[T any](
 		if !itemComparison(t, expectedItem, actual[i]) {
 			t.Logf(
 				"%s %d did not match expected",
-				cases.Title(language.BritishEnglish).String(itemSingular),
+				strings.ToTitle(itemSingular[0:1])+itemSingular[1:],
 				i+1,
 			)
 			t.Fail()
