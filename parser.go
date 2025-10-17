@@ -24,6 +24,7 @@ func (p *Parser) Parse(source string) (Syntax, error) {
 	p.source = source
 	p.offset = 0
 	p.line = 1
+
 	return p.parseSyntax()
 }
 
@@ -57,6 +58,7 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 		// ...then see if we've reached the end (so these were trailing comments)...
 		if p.source[p.offset:] == "" {
 			syntax.TrailingComments = comments
+
 			break
 		}
 		// ...otherwise those were the comments preceding the next rule
@@ -68,6 +70,7 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 		syntax.Rules = append(syntax.Rules, rule)
 		p.skipWhitespace()
 	}
+
 	return syntax, nil
 }
 
@@ -119,6 +122,7 @@ func (p *Parser) parseRule() (Rule, error) {
 		)
 	}
 	p.offset += width
+
 	return rule, nil
 }
 
@@ -138,6 +142,7 @@ func (p *Parser) parseMetaIdentifier() string {
 		metaIdentifier = append(metaIdentifier, char)
 		p.skipWhitespace()
 	}
+
 	return string(metaIdentifier)
 }
 
@@ -169,6 +174,7 @@ func (p *Parser) parseDefinitionsList() (DefinitionsList, error) {
 		p.skipWhitespace()
 		next, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
+
 	return definitionsList, nil
 }
 
@@ -192,6 +198,7 @@ func (p *Parser) parseDefinition() (Definition, error) {
 		definition.Terms = append(definition.Terms, term)
 		next, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	}
+
 	return definition, nil
 }
 
@@ -216,6 +223,7 @@ func (p *Parser) parseTerm() (Term, error) {
 		}
 		term.Exception = exception
 	}
+
 	return term, nil
 }
 
@@ -262,6 +270,7 @@ func (p *Parser) parseFactor() (Factor, error) {
 		return Factor{}, err
 	}
 	factor.Primary = primary
+
 	return factor, nil
 }
 
@@ -290,6 +299,7 @@ func (p *Parser) parseInteger() (int, error) {
 			startOffset,
 		)
 	}
+
 	return parsedInt, nil
 }
 
@@ -348,6 +358,7 @@ func (p *Parser) parsePrimary() (Primary, error) {
 	default:
 		primary.Empty = true
 	}
+
 	return primary, nil
 }
 
@@ -401,6 +412,7 @@ func (p *Parser) parseSpecialSequence() string {
 		}
 		endOffset -= width
 	}
+
 	return p.source[startOffset:endOffset]
 }
 
@@ -436,6 +448,7 @@ func (p *Parser) parseWrappedDefinitionsList(
 			}
 			if chars == len(identifier) {
 				p.offset += totalWidth
+
 				break
 			}
 		}
@@ -446,6 +459,7 @@ func (p *Parser) parseWrappedDefinitionsList(
 		return nil, err
 	}
 	parseEnclosingCharacters(endIdentifiers)
+
 	return definitionsList, nil
 }
 
@@ -470,6 +484,7 @@ func (p *Parser) parseTerminal() string {
 			p.line++
 		}
 	}
+
 	return p.source[startOffset : p.offset-width]
 }
 
@@ -500,6 +515,7 @@ func (p *Parser) parseComment() string {
 					}
 					endOffset -= width
 				}
+
 				return p.source[startOffset:endOffset]
 			}
 		}
@@ -548,6 +564,7 @@ func (p *Parser) isCommentStart() bool {
 			return true
 		}
 	}
+
 	return false
 }
 

@@ -19,6 +19,7 @@ func assertSlicesEqual[T any](
 	if len(expected) != len(actual) {
 		t.Logf("Expected %d %s. Got %d.", len(expected), itemPlural, len(actual))
 		t.Fail()
+
 		return false
 	}
 	for i, expectedItem := range expected {
@@ -32,6 +33,7 @@ func assertSlicesEqual[T any](
 			failed = true
 		}
 	}
+
 	return !failed
 }
 
@@ -42,6 +44,7 @@ func assertSyntaxesEqual(t *testing.T, expected, actual ebnf.Syntax) bool {
 	}
 	t.Log("Syntax rules were not equal")
 	t.Fail()
+
 	return false
 }
 
@@ -52,6 +55,7 @@ func assertCommentsEqual(t *testing.T, expected, actual string) bool {
 	}
 	t.Logf("Expected comment %q. Got %q.", expected, actual)
 	t.Fail()
+
 	return false
 }
 
@@ -113,6 +117,7 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 		t.Log("Rule definitions were not equal")
 	}
 	t.Fail()
+
 	return false
 }
 
@@ -123,6 +128,7 @@ func assertDefinitionsEqual(t *testing.T, expected, actual ebnf.Definition) bool
 	}
 	t.Log("Definition terms were not equal")
 	t.Fail()
+
 	return false
 }
 
@@ -139,6 +145,7 @@ func assertTermsEqual(t *testing.T, expected, actual ebnf.Term) bool {
 	}
 	t.Log("Term exceptions were not equal")
 	t.Fail()
+
 	return false
 }
 
@@ -248,6 +255,7 @@ func assertFactorsEqual(t *testing.T, expected, actual ebnf.Factor) bool {
 		}
 	default:
 	}
+
 	return !failed
 }
 

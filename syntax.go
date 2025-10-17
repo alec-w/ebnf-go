@@ -33,6 +33,7 @@ func (t Term) MarshalJSON() ([]byte, error) {
 	if !t.Exception.Primary.IsZero() {
 		out["exception"] = t.Exception
 	}
+
 	return json.Marshal(out)
 }
 
@@ -51,6 +52,7 @@ func (f Factor) MarshalJSON() ([]byte, error) {
 	if f.Repetitions >= 0 {
 		out["repetitions"] = f.Repetitions
 	}
+
 	return json.Marshal(out)
 }
 
