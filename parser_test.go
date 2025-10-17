@@ -4329,6 +4329,247 @@ meta-identifiers`,
 				},
 			}},
 		},
+		{
+			name: "Syntax with trailing comments",
+			grammar: `
+a = ;
+(* a trailing comment *)`,
+			expectedSyntax: ebnf.Syntax{
+				TrailingComments: []string{"a trailing comment"},
+				Rules: []ebnf.Rule{
+					{
+						MetaIdentifier: "a",
+						Line:           2,
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Empty: true},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:    "Syntax with comment before defining symbol",
+			grammar: `a (* comment before defining symbol*) = ;`,
+			expectedSyntax: ebnf.Syntax{
+				Rules: []ebnf.Rule{
+					{
+						MetaIdentifier: "a",
+						Comments:       []string{"comment before defining symbol"},
+						Line:           1,
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Empty: true},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:    "Syntax with comments on factor",
+			grammar: `a = (* comment on factor *) ;`,
+			expectedSyntax: ebnf.Syntax{
+				Rules: []ebnf.Rule{
+					{
+						MetaIdentifier: "a",
+						Line:           1,
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Comments:    []string{"comment on factor"},
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Empty: true},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:    "Syntax with repetitions",
+			grammar: `a = 1 * "a" ;`,
+			expectedSyntax: ebnf.Syntax{
+				Rules: []ebnf.Rule{
+					{
+						MetaIdentifier: "a",
+						Line:           1,
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: 1,
+											Primary:     ebnf.Primary{Terminal: "a"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Syntax with comment after factor repetitions",
+			grammar: `
+a = 1 * (* comment after repetitions symbol *) "a" ;
+b = 2 (* comment after repetitions integer *) * "b" ;
+`,
+			expectedSyntax: ebnf.Syntax{
+				Rules: []ebnf.Rule{
+					{
+						MetaIdentifier: "a",
+						Line:           2,
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Comments: []string{
+												"comment after repetitions symbol",
+											},
+											Repetitions: 1,
+											Primary:     ebnf.Primary{Terminal: "a"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "b",
+						Line:           3,
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Comments: []string{
+												"comment after repetitions integer",
+											},
+											Repetitions: 2,
+											Primary:     ebnf.Primary{Terminal: "b"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Syntax with newlines in terminal strings",
+			grammar: `
+(* terminal string beginning with newline *) a = "
+stuff" ;
+(* terminal string containing newline *) b = "word
+second" ;
+c = ;
+`,
+			expectedSyntax: ebnf.Syntax{
+				Rules: []ebnf.Rule{
+					{
+						MetaIdentifier: "a",
+						Line:           2,
+						Comments:       []string{"terminal string beginning with newline"},
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "\nstuff"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "b",
+						Line:           4,
+						Comments:       []string{"terminal string containing newline"},
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Terminal: "word\nsecond"},
+										},
+									},
+								},
+							},
+						},
+					},
+					{
+						MetaIdentifier: "c",
+						Line:           6,
+						Definitions: ebnf.DefinitionsList{
+							{
+								Terms: []ebnf.Term{
+									{
+										Factor: ebnf.Factor{
+											Repetitions: -1,
+											Primary:     ebnf.Primary{Empty: true},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "Syntax with comments containing other symbols",
+			grammar: `
+(*
+(* "double quoted terminal" 'single quoted terminal' ? special sequence ? *)
+*)
+a = ;`,
+			expectedSyntax: ebnf.Syntax{Rules: []ebnf.Rule{{
+				Comments: []string{
+					"(* \"double quoted terminal\" 'single quoted terminal' ? special sequence ? *)",
+				},
+				Line:           5,
+				MetaIdentifier: "a",
+				Definitions: ebnf.DefinitionsList{
+					{
+						Terms: []ebnf.Term{
+							{
+								Factor: ebnf.Factor{
+									Repetitions: -1,
+									Primary:     ebnf.Primary{Empty: true},
+								},
+							},
+						},
+					},
+				},
+			}}},
+		},
 	}
 
 	for _, tc := range tcs {

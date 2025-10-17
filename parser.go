@@ -44,7 +44,7 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 	if err != nil {
 		return Syntax{}, err
 	}
-	rule.Comments = comments
+	rule.Comments = append(rule.Comments, comments...)
 	syntax.Rules = append(syntax.Rules, rule)
 	p.skipWhitespace()
 	// ...then optionally parse more if the entire grammar has not been parsed.
@@ -67,7 +67,7 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 		if err != nil {
 			return Syntax{}, err
 		}
-		rule.Comments = comments
+		rule.Comments = append(rule.Comments, comments...)
 		syntax.Rules = append(syntax.Rules, rule)
 		p.skipWhitespace()
 	}
@@ -549,9 +549,6 @@ func (p *Parser) parseCommentSymbol() {
 	case '?':
 		p.parseSpecialSequence()
 	default:
-		if char == '\n' {
-			p.line++
-		}
 		p.offset += width
 	}
 }
