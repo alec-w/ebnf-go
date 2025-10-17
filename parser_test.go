@@ -83,9 +83,7 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 		t.Fail()
 		failed = true
 	}
-	//nolint:godox // recording next work item
-	// TODO assert lines all the time
-	if expected.Line != 0 && expected.Line != actual.Line {
+	if expected.Line != actual.Line {
 		if expected.MetaIdentifier != "" && expected.MetaIdentifier == actual.MetaIdentifier {
 			t.Logf(
 				"Expected rule %q to be on line %d. Got %d.",
@@ -1340,6 +1338,8 @@ form feed
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
 					{
+						MetaIdentifier: "letter",
+						Line:           28,
 						Comments: []string{
 							`The syntax of Extended BNF can be defined using
 itself. There are four parts in this example,
@@ -1365,7 +1365,6 @@ characters in the 7-bit character set (ISO/IEC
 and gap-separator in Extended BNF.`,
 							"see 7.2",
 						},
-						MetaIdentifier: "letter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -1890,8 +1889,9 @@ and gap-separator in Extended BNF.`,
 						},
 					},
 					{
-						Comments:       []string{"see 7.2"},
 						MetaIdentifier: "decimaldigit",
+						Line:           37,
+						Comments:       []string{"see 7.2"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -1996,12 +1996,13 @@ and gap-separator in Extended BNF.`,
 						},
 					},
 					{
+						MetaIdentifier: "concatenatesymbol",
+						Line:           45,
 						Comments: []string{
 							`The representation of the following
 terminal-characters is defined in clauses 7.3,
 7.4 and tables 1, 2.`,
 						},
-						MetaIdentifier: "concatenatesymbol",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2017,6 +2018,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "definingsymbol",
+						Line:           46,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2032,6 +2034,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "definitionseparatorsymbol",
+						Line:           47,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2067,6 +2070,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "endcommentsymbol",
+						Line:           48,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2082,6 +2086,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "endgroupsymbol",
+						Line:           49,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2097,6 +2102,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "endoptionsymbol",
+						Line:           50,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2122,6 +2128,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "endrepeatsymbol",
+						Line:           51,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2147,6 +2154,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "exceptsymbol",
+						Line:           52,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2162,6 +2170,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "firstquotesymbol",
+						Line:           53,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2177,6 +2186,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "repetitionsymbol",
+						Line:           54,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2192,6 +2202,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "secondquotesymbol",
+						Line:           55,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2207,6 +2218,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "specialsequencesymbol",
+						Line:           56,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2222,6 +2234,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "startcommentsymbol",
+						Line:           57,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2237,6 +2250,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "startgroupsymbol",
+						Line:           58,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2252,6 +2266,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "startoptionsymbol",
+						Line:           59,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2277,6 +2292,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "startrepeatsymbol",
+						Line:           60,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2302,6 +2318,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "terminatorsymbol",
+						Line:           61,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2326,8 +2343,9 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						Comments:       []string{"see 7.5"},
 						MetaIdentifier: "othercharacter",
+						Line:           62,
+						Comments:       []string{"see 7.5"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2482,8 +2500,9 @@ terminal-characters is defined in clauses 7.3,
 						},
 					},
 					{
-						Comments:       []string{"see 7.6"},
 						MetaIdentifier: "spacecharacter",
+						Line:           66,
+						Comments:       []string{"see 7.6"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2499,6 +2518,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "horizontaltabulationcharacter",
+						Line:           67,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2516,6 +2536,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "newline",
+						Line:           69,
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -2573,6 +2594,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "verticaltabulationcharacter",
+						Line:           73,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2590,6 +2612,7 @@ terminal-characters is defined in clauses 7.3,
 					},
 					{
 						MetaIdentifier: "formfeed",
+						Line:           75,
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2666,13 +2689,14 @@ gap free symbol, {gap separator},
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
 					{
+						MetaIdentifier: "terminalcharacter",
+						Line:           7,
 						Comments: []string{
 							`The second part of the syntax defines the
 removal of unnecessary non-printing characters
 from a syntax.`,
 							"see 6.2",
 						},
-						MetaIdentifier: "terminalcharacter",
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -2915,8 +2939,9 @@ from a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 6.3"},
 						MetaIdentifier: "gapfreesymbol",
+						Line:           28,
+						Comments:       []string{"see 6.3"},
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -2972,8 +2997,9 @@ from a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 4.16"},
 						MetaIdentifier: "terminalstring",
+						Line:           32,
+						Comments:       []string{"see 4.16"},
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -3072,8 +3098,9 @@ from a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 4.17"},
 						MetaIdentifier: "firstterminalcharacter",
+						Line:           39,
+						Comments:       []string{"see 4.17"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3096,8 +3123,9 @@ from a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 4.18"},
 						MetaIdentifier: "secondterminalcharacter",
+						Line:           41,
+						Comments:       []string{"see 4.18"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3120,8 +3148,9 @@ from a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 6.4"},
 						MetaIdentifier: "gapseparator",
+						Line:           43,
+						Comments:       []string{"see 6.4"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3182,8 +3211,9 @@ from a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 6.5"},
 						MetaIdentifier: "syntax",
+						Line:           49,
+						Comments:       []string{"see 6.5"},
 						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 							{
 								Factor: ebnf.Factor{
@@ -3328,13 +3358,14 @@ commentless symbol,
 			expectedSyntax: ebnf.Syntax{
 				Rules: []ebnf.Rule{
 					{
+						MetaIdentifier: "commentlesssymbol",
+						Line:           7,
 						Comments: []string{
 							`The third part of the syntax defines the
 removal of bracketed-textual-comments from
 gap-free-symbols that form a syntax.`,
 							"see 6.6",
 						},
-						MetaIdentifier: "commentlesssymbol",
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{{
 								Factor: ebnf.Factor{
@@ -3492,8 +3523,9 @@ gap-free-symbols that form a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 4.9"},
 						MetaIdentifier: "integer",
+						Line:           21,
+						Comments:       []string{"see 4.9"},
 						Definitions: ebnf.DefinitionsList{
 							{Terms: []ebnf.Term{
 								{
@@ -3527,8 +3559,9 @@ gap-free-symbols that form a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 4.14"},
 						MetaIdentifier: "metaidentifier",
+						Line:           23,
+						Comments:       []string{"see 4.14"},
 						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 							{
 								Factor: ebnf.Factor{
@@ -3560,8 +3593,9 @@ gap-free-symbols that form a syntax.`,
 						}}},
 					},
 					{
-						Comments:       []string{"see 4.15"},
 						MetaIdentifier: "metaidentifiercharacter",
+						Line:           25,
+						Comments:       []string{"see 4.15"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3588,8 +3622,9 @@ gap-free-symbols that form a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 4.19"},
 						MetaIdentifier: "specialsequence",
+						Line:           28,
+						Comments:       []string{"see 4.19"},
 						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 							{
 								Factor: ebnf.Factor{
@@ -3631,8 +3666,9 @@ gap-free-symbols that form a syntax.`,
 						}}},
 					},
 					{
-						Comments:       []string{"see 4.20"},
 						MetaIdentifier: "specialsequencecharacter",
+						Line:           32,
+						Comments:       []string{"see 4.20"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3655,8 +3691,9 @@ gap-free-symbols that form a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 6.7"},
 						MetaIdentifier: "commentsymbol",
+						Line:           34,
+						Comments:       []string{"see 6.7"},
 						Definitions: ebnf.DefinitionsList{
 							{
 								Terms: []ebnf.Term{
@@ -3697,8 +3734,9 @@ gap-free-symbols that form a syntax.`,
 						},
 					},
 					{
-						Comments:       []string{"see 6.8"},
 						MetaIdentifier: "bracketedtextualcomment",
+						Line:           38,
+						Comments:       []string{"see 6.8"},
 						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 							{
 								Factor: ebnf.Factor{
@@ -3738,8 +3776,9 @@ gap-free-symbols that form a syntax.`,
 						}}},
 					},
 					{
-						Comments:       []string{"see 6.9"},
 						MetaIdentifier: "syntax",
+						Line:           41,
+						Comments:       []string{"see 6.9"},
 						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 							{
 								Factor: ebnf.Factor{
@@ -3885,13 +3924,14 @@ end group symbol;
 `,
 			expectedSyntax: ebnf.Syntax{Rules: []ebnf.Rule{
 				{
+					MetaIdentifier: "syntax",
+					Line:           7,
 					Comments: []string{
 						`The final part of the syntax defines the
 abstract syntax of Extended BNF, i.e. the
 structure in terms of the commentless symbols.`,
 						"see 4.2",
 					},
-					MetaIdentifier: "syntax",
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -3923,8 +3963,9 @@ structure in terms of the commentless symbols.`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.3"},
 					MetaIdentifier: "syntaxrule",
+					Line:           9,
+					Comments:       []string{"see 4.3"},
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -3953,8 +3994,9 @@ structure in terms of the commentless symbols.`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.4"},
 					MetaIdentifier: "definitionslist",
+					Line:           12,
+					Comments:       []string{"see 4.4"},
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -3990,8 +4032,9 @@ structure in terms of the commentless symbols.`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.5"},
 					MetaIdentifier: "singledefinition",
+					Line:           16,
+					Comments:       []string{"see 4.5"},
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -4027,8 +4070,9 @@ structure in terms of the commentless symbols.`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.6"},
 					MetaIdentifier: "syntacticterm",
+					Line:           19,
+					Comments:       []string{"see 4.6"},
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -4064,8 +4108,9 @@ structure in terms of the commentless symbols.`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.7"},
 					MetaIdentifier: "syntacticexception",
+					Line:           22,
+					Comments:       []string{"see 4.7"},
 					Definitions: ebnf.DefinitionsList{
 						{
 							Terms: []ebnf.Term{
@@ -4084,8 +4129,9 @@ meta-identifiers`,
 					},
 				},
 				{
-					Comments:       []string{"see 4.8"},
 					MetaIdentifier: "syntacticfactor",
+					Line:           27,
+					Comments:       []string{"see 4.8"},
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -4121,8 +4167,9 @@ meta-identifiers`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.10"},
 					MetaIdentifier: "syntacticprimary",
+					Line:           30,
+					Comments:       []string{"see 4.10"},
 					Definitions: ebnf.DefinitionsList{
 						{
 							Terms: []ebnf.Term{
@@ -4209,8 +4256,9 @@ meta-identifiers`,
 					},
 				},
 				{
-					Comments:       []string{"see 4.11"},
 					MetaIdentifier: "optionalsequence",
+					Line:           38,
+					Comments:       []string{"see 4.11"},
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -4233,8 +4281,9 @@ meta-identifiers`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.12"},
 					MetaIdentifier: "repeatedsequence",
+					Line:           41,
+					Comments:       []string{"see 4.12"},
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -4257,8 +4306,9 @@ meta-identifiers`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.13"},
 					MetaIdentifier: "groupedsequence",
+					Line:           44,
+					Comments:       []string{"see 4.13"},
 					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
 						{
 							Factor: ebnf.Factor{
@@ -4281,8 +4331,9 @@ meta-identifiers`,
 					}}},
 				},
 				{
-					Comments:       []string{"see 4.21"},
 					MetaIdentifier: "emptysequence",
+					Line:           47,
+					Comments:       []string{"see 4.21"},
 					Definitions: ebnf.DefinitionsList{
 						{
 							Terms: []ebnf.Term{
