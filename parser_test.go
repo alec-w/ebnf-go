@@ -1,6 +1,7 @@
 package ebnf_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/alec-w/ebnf-go"
@@ -71,6 +72,10 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 		t.Fail()
 		failed = true
 	}
+	ruleName := "Rule"
+	if expected.MetaIdentifier != "" && expected.MetaIdentifier == actual.MetaIdentifier {
+		ruleName += " \"" + expected.MetaIdentifier + "\""
+	}
 	if !assertSlicesEqual(
 		t,
 		expected.Comments,
@@ -79,25 +84,17 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 		"comment",
 		assertCommentsEqual,
 	) {
-		if expected.MetaIdentifier != "" && expected.MetaIdentifier == actual.MetaIdentifier {
-			t.Logf("Rule %q comments were not equal", expected.MetaIdentifier)
-		} else {
-			t.Log("Rule comments were not equal")
-		}
+		t.Logf("%s comments were not equal", ruleName)
 		t.Fail()
 		failed = true
 	}
 	if expected.Line != actual.Line {
-		if expected.MetaIdentifier != "" && expected.MetaIdentifier == actual.MetaIdentifier {
-			t.Logf(
-				"Expected rule %q to be on line %d. Got %d.",
-				expected.MetaIdentifier,
-				expected.Line,
-				actual.Line,
-			)
-		} else {
-			t.Logf("Expected rule to be on line %d. Got %d.", expected.Line, actual.Line)
-		}
+		t.Logf(
+			"Expected %s to be on line %d. Got %d.",
+			strings.ToLower(ruleName[0:1])+ruleName[1:],
+			expected.Line,
+			actual.Line,
+		)
 		t.Fail()
 		failed = true
 	}
@@ -111,11 +108,7 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 	) {
 		return !failed
 	}
-	if expected.MetaIdentifier != "" && expected.MetaIdentifier == actual.MetaIdentifier {
-		t.Logf("Rule %q definitions were not equal", expected.MetaIdentifier)
-	} else {
-		t.Log("Rule definitions were not equal")
-	}
+	t.Logf("%s definitions were not equal", ruleName)
 	t.Fail()
 
 	return false
@@ -173,87 +166,89 @@ func assertFactorsEqual(t *testing.T, expected, actual ebnf.Factor) bool {
 		t.Fail()
 		failed = true
 	}
-	switch {
-	case expected.Primary.OptionalSequence != nil:
-		if !assertSlicesEqual(
-			t,
-			expected.Primary.OptionalSequence,
-			actual.Primary.OptionalSequence,
-			"definitions",
-			"definition",
-			assertDefinitionsEqual,
-		) {
-			t.Log("Factor primary optional sequences not equal")
-			t.Fail()
-			failed = true
-		}
-	case expected.Primary.RepeatedSequence != nil:
-		if !assertSlicesEqual(
-			t,
-			expected.Primary.RepeatedSequence,
-			actual.Primary.RepeatedSequence,
-			"definitions",
-			"definition",
-			assertDefinitionsEqual,
-		) {
-			t.Log("Factor primary repeated sequences not equal")
-			t.Fail()
-			failed = true
-		}
-	case expected.Primary.SpecialSequence != "":
-		if expected.Primary.SpecialSequence != actual.Primary.SpecialSequence {
-			t.Logf(
-				"Expected factor primary special sequence %q. Got %q.",
-				expected.Primary.SpecialSequence,
-				actual.Primary.SpecialSequence,
-			)
-			t.Fail()
-			failed = true
-		}
-	case expected.Primary.GroupedSequence != nil:
-		if !assertSlicesEqual(
-			t,
-			expected.Primary.GroupedSequence,
-			actual.Primary.GroupedSequence,
-			"definitions",
-			"definition",
-			assertDefinitionsEqual,
-		) {
-			t.Log("Factor primary grouped sequences not equal")
-			t.Fail()
-			failed = true
-		}
-	case expected.Primary.MetaIdentifier != "":
-		if expected.Primary.MetaIdentifier != actual.Primary.MetaIdentifier {
-			t.Logf(
-				"Expected factor primary meta identifier %q. Got %q.",
-				expected.Primary.MetaIdentifier,
-				actual.Primary.MetaIdentifier,
-			)
-			t.Fail()
-			failed = true
-		}
-	case expected.Primary.Terminal != "":
-		if expected.Primary.Terminal != actual.Primary.Terminal {
-			t.Logf(
-				"Expected factor primary terminal %q. Got %q.",
-				expected.Primary.Terminal,
-				actual.Primary.Terminal,
-			)
-			t.Fail()
-			failed = true
-		}
-	case expected.Primary.Empty:
-		if expected.Primary.Empty != actual.Primary.Empty {
-			t.Logf(
-				"Expected factor primary empty %t. Got %t.",
-				expected.Primary.Empty,
-				actual.Primary.Empty,
-			)
-			t.Fail()
-			failed = true
-		}
-	default:
+	if !assertPrimariesEqual(t, expected.Primary, actual.Primary) {
+		t.Log("Factor primaries were not equal")
+		t.Fail()
+		failed = true
+	}
+
+	return !failed
+}
+
+func assertPrimariesEqual(t *testing.T, expected, actual ebnf.Primary) bool {
+	t.Helper()
+	var failed bool
+	if !assertSlicesEqual(
+		t,
+		expected.OptionalSequence,
+		actual.OptionalSequence,
+		"definitions",
+		"definition",
+		assertDefinitionsEqual,
+	) {
+		t.Log("Primary optional sequences not equal")
+		t.Fail()
+		failed = true
+	}
+	if !assertSlicesEqual(
+		t,
+		expected.RepeatedSequence,
+		actual.RepeatedSequence,
+		"definitions",
+		"definition",
+		assertDefinitionsEqual,
+	) {
+		t.Log("Primary repeated sequences not equal")
+		t.Fail()
+		failed = true
+	}
+	if expected.SpecialSequence != actual.SpecialSequence {
+		t.Logf(
+			"Expected primary special sequence %q. Got %q.",
+			expected.SpecialSequence,
+			actual.SpecialSequence,
+		)
+		t.Fail()
+		failed = true
+	}
+	if !assertSlicesEqual(
+		t,
+		expected.GroupedSequence,
+		actual.GroupedSequence,
+		"definitions",
+		"definition",
+		assertDefinitionsEqual,
+	) {
+		t.Log("Primary grouped sequences not equal")
+		t.Fail()
+		failed = true
+	}
+	if expected.MetaIdentifier != actual.MetaIdentifier {
+		t.Logf(
+			"Expected primary meta identifier %q. Got %q.",
+			expected.MetaIdentifier,
+			actual.MetaIdentifier,
+		)
+		t.Fail()
+		failed = true
+	}
+	if expected.Terminal != actual.Terminal {
+		t.Logf(
+			"Expected primary terminal %q. Got %q.",
+			expected.Terminal,
+			actual.Terminal,
+		)
+		t.Fail()
+		failed = true
+	}
+	if expected.Empty != actual.Empty {
+		t.Logf(
+			"Expected primary empty %t. Got %t.",
+			expected.Empty,
+			actual.Empty,
+		)
+		t.Fail()
+		failed = true
 	}
 
 	return !failed

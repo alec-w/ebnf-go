@@ -8,7 +8,6 @@ linters:
     - varnamelen # Overly opinionated
     - noinlineerr # Inline errs is idiomatic
     - err113 # To be enabled later
-    - cyclop # Will look to reenable after setting up parsers fully
     - revive # To be enabled later
     - funlen # Will look to re-enable in the future
     - dupl # To be enabled later (easier to setup parsers with some duplication)

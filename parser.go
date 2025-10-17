@@ -309,46 +309,21 @@ func (p *Parser) parsePrimary() (Primary, error) {
 	// To determine which one should be matched the next character is inspected
 	p.skipWhitespace()
 	primary := Primary{}
-	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	var err error
+	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
 	switch {
 	case char == '[':
-		optionalSequence, err := p.parseOptionalSequence()
-		if err != nil {
-			return Primary{}, err
-		}
+		var optionalSequence DefinitionsList
+		optionalSequence, err = p.parseOptionalSequence()
 		primary.OptionalSequence = optionalSequence
 	case char == '{':
-		repeatedSequence, err := p.parseRepeatedSequence()
-		if err != nil {
-			return Primary{}, err
-		}
+		var repeatedSequence DefinitionsList
+		repeatedSequence, err = p.parseRepeatedSequence()
 		primary.RepeatedSequence = repeatedSequence
 	case char == '?':
 		primary.SpecialSequence = p.parseSpecialSequence()
 	case char == '(':
-		// "(" can denote the start of an optional sequence, repeated sequence or grouped sequence depending on the
-		// next character
-		next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
-		switch next {
-		case '/':
-			optionalSequence, err := p.parseOptionalSequence()
-			if err != nil {
-				return Primary{}, err
-			}
-			primary.OptionalSequence = optionalSequence
-		case ':':
-			repeatedSequence, err := p.parseRepeatedSequence()
-			if err != nil {
-				return Primary{}, err
-			}
-			primary.RepeatedSequence = repeatedSequence
-		default:
-			groupedSequence, err := p.parseGroupedSequence()
-			if err != nil {
-				return Primary{}, err
-			}
-			primary.GroupedSequence = groupedSequence
-		}
+		primary, err = p.parseParenthisedSequence()
 	case unicode.IsLetter(char):
 		primary.MetaIdentifier = p.parseMetaIdentifier()
 	case char == '\'':
@@ -357,6 +332,38 @@ func (p *Parser) parsePrimary() (Primary, error) {
 		primary.Terminal = p.parseTerminal()
 	default:
 		primary.Empty = true
+	}
+
+	return primary, err
+}
+
+func (p *Parser) parseParenthisedSequence() (Primary, error) {
+	// This assumes the character at offset is "(", which should have already been checked by the caller as this is
+	// internal to the parser.
+	var primary Primary
+	_, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	// "(" can denote the start of an optional sequence, repeated sequence or grouped sequence depending on the
+	// next character
+	next, _ := utf8.DecodeRuneInString(p.source[p.offset+width:])
+	switch next {
+	case '/':
+		optionalSequence, err := p.parseOptionalSequence()
+		if err != nil {
+			return Primary{}, err
+		}
+		primary.OptionalSequence = optionalSequence
+	case ':':
+		repeatedSequence, err := p.parseRepeatedSequence()
+		if err != nil {
+			return Primary{}, err
+		}
+		primary.RepeatedSequence = repeatedSequence
+	default:
+		groupedSequence, err := p.parseGroupedSequence()
+		if err != nil {
+			return Primary{}, err
+		}
+		primary.GroupedSequence = groupedSequence
 	}
 
 	return primary, nil
