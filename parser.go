@@ -1,7 +1,6 @@
 package ebnf
 
 import (
-	"fmt"
 	"strconv"
 	"unicode"
 	"unicode/utf8"
@@ -81,10 +80,10 @@ func (p *Parser) parseRule() (Rule, error) {
 	// Look for start of meta identifier (letter)
 	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
 	if !unicode.IsLetter(char) {
-		return Rule{}, fmt.Errorf(
-			"rule meta identifier does not start with letter, starts with %q",
-			char,
-		)
+		return Rule{}, &ParseError{
+			Msg:    "expected rule meta identifier start character (letter)",
+			Offset: p.offset,
+		}
 	}
 	rule := Rule{Line: p.line}
 	// Parse the meta identifier
@@ -97,11 +96,7 @@ func (p *Parser) parseRule() (Rule, error) {
 	// Look for "=" character
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != '=' {
-		return Rule{}, fmt.Errorf(
-			"next non-whitespace character after rule meta identifier should be %q but character at offset %d was not",
-			'=',
-			p.offset,
-		)
+		return Rule{}, &ParseError{Msg: "expected defining symbol ('=')", Offset: p.offset}
 	}
 	p.offset += width
 	// Parse a definitions list
@@ -114,12 +109,7 @@ func (p *Parser) parseRule() (Rule, error) {
 	p.skipWhitespace()
 	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != ';' && char != '.' {
-		return Rule{}, fmt.Errorf(
-			"no terminator symbol (one of %q or %q) found at end of syntax rule at offset %d",
-			'.',
-			';',
-			p.offset,
-		)
+		return Rule{}, &ParseError{Msg: "expected terminator symbol ('.' or ';')", Offset: p.offset}
 	}
 	p.offset += width
 
@@ -252,11 +242,7 @@ func (p *Parser) parseFactor() (Factor, error) {
 		p.skipWhitespace()
 		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != '*' {
-			return Factor{}, fmt.Errorf(
-				"parsing factor had integer for repetitions but non-whitespace character after was not %q at offset %d",
-				'*',
-				p.offset,
-			)
+			return Factor{}, &ParseError{Msg: "expected repetition symbol ('*')", Offset: p.offset}
 		}
 		p.offset += width
 		// Optionally parse any comments after the repetitions
@@ -294,10 +280,11 @@ func (p *Parser) parseInteger() (int, error) {
 	// root = 9223372036854775808 * "0" ;
 	// which (if encoding "0" in a single byte) would require exabytes of text to have required the 2^63 repetitions.
 	if err != nil {
-		return 0, fmt.Errorf(
-			"parsed integer could not be converted to integer type at offset %d",
-			startOffset,
-		)
+		return 0, &ParseError{
+			Msg:     "integer could not be parsed (max integer size is 2^63-1)",
+			Offset:  p.offset,
+			wrapped: err,
+		}
 	}
 
 	return parsedInt, nil

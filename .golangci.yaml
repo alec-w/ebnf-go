@@ -7,7 +7,6 @@ linters:
     - exhaustruct # Overly opinionated
     - varnamelen # Overly opinionated
     - noinlineerr # Inline errs is idiomatic
-    - err113 # To be enabled later
     - revive # To be enabled later
     - dupl # To be enabled later (easier to setup parsers with some duplication)
     - maintidx # To be enabled later (getting long tests in place before refactors)
