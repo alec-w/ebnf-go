@@ -8,7 +8,6 @@ linters:
     - varnamelen # Overly opinionated
     - noinlineerr # Inline errs is idiomatic
     - err113 # To be enabled later
-    - wrapcheck # To be enabled later
     - forbidigo # To be enabled after main no longer printing for debugging
     - cyclop # Will look to reenable after setting up parsers fully
     - revive # To be enabled later

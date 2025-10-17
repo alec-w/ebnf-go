@@ -33,8 +33,12 @@ func (t Term) MarshalJSON() ([]byte, error) {
 	if !t.Exception.Primary.IsZero() {
 		out["exception"] = t.Exception
 	}
+	marshalled, err := json.Marshal(out)
+	if err != nil {
+		return nil, &JsonError{wrapped: err}
+	}
 
-	return json.Marshal(out)
+	return marshalled, nil
 }
 
 type Factor struct {
@@ -52,8 +56,12 @@ func (f Factor) MarshalJSON() ([]byte, error) {
 	if f.Repetitions >= 0 {
 		out["repetitions"] = f.Repetitions
 	}
+	marshalled, err := json.Marshal(out)
+	if err != nil {
+		return nil, &JsonError{wrapped: err}
+	}
 
-	return json.Marshal(out)
+	return marshalled, nil
 }
 
 type Primary struct {
