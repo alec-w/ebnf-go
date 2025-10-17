@@ -38,6 +38,19 @@ func assertSlicesEqual[T any](
 	return !failed
 }
 
+func assertDefinitionsListsEqual(t *testing.T, expected, actual ebnf.DefinitionsList) bool {
+	t.Helper()
+
+	return assertSlicesEqual(
+		t,
+		expected,
+		actual,
+		"definitions",
+		"definition",
+		assertDefinitionsEqual,
+	)
+}
+
 func assertSyntaxesEqual(t *testing.T, expected, actual ebnf.Syntax) bool {
 	t.Helper()
 	if assertSlicesEqual(t, expected.Rules, actual.Rules, "rules", "rule", assertRulesEqual) {
@@ -98,14 +111,7 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 		t.Fail()
 		failed = true
 	}
-	if assertSlicesEqual(
-		t,
-		expected.Definitions,
-		actual.Definitions,
-		"definitions",
-		"definition",
-		assertDefinitionsEqual,
-	) {
+	if assertDefinitionsListsEqual(t, expected.Definitions, actual.Definitions) {
 		return !failed
 	}
 	t.Logf("%s definitions were not equal", ruleName)
@@ -178,28 +184,12 @@ func assertFactorsEqual(t *testing.T, expected, actual ebnf.Factor) bool {
 func assertPrimariesEqual(t *testing.T, expected, actual ebnf.Primary) bool {
 	t.Helper()
 	var failed bool
-	if !assertSlicesEqual(
-		t,
-		expected.OptionalSequence,
-		actual.OptionalSequence,
-		"definitions",
-		"definition",
-		assertDefinitionsEqual,
-	) {
+	if !assertDefinitionsListsEqual(t, expected.OptionalSequence, actual.OptionalSequence) {
 		t.Log("Primary optional sequences not equal")
-		t.Fail()
 		failed = true
 	}
-	if !assertSlicesEqual(
-		t,
-		expected.RepeatedSequence,
-		actual.RepeatedSequence,
-		"definitions",
-		"definition",
-		assertDefinitionsEqual,
-	) {
+	if !assertDefinitionsListsEqual(t, expected.RepeatedSequence, actual.RepeatedSequence) {
 		t.Log("Primary repeated sequences not equal")
-		t.Fail()
 		failed = true
 	}
 	if expected.SpecialSequence != actual.SpecialSequence {
@@ -208,19 +198,10 @@ func assertPrimariesEqual(t *testing.T, expected, actual ebnf.Primary) bool {
 			expected.SpecialSequence,
 			actual.SpecialSequence,
 		)
-		t.Fail()
 		failed = true
 	}
-	if !assertSlicesEqual(
-		t,
-		expected.GroupedSequence,
-		actual.GroupedSequence,
-		"definitions",
-		"definition",
-		assertDefinitionsEqual,
-	) {
+	if !assertDefinitionsListsEqual(t, expected.GroupedSequence, actual.GroupedSequence) {
 		t.Log("Primary grouped sequences not equal")
-		t.Fail()
 		failed = true
 	}
 	if expected.MetaIdentifier != actual.MetaIdentifier {
@@ -229,31 +210,27 @@ func assertPrimariesEqual(t *testing.T, expected, actual ebnf.Primary) bool {
 			expected.MetaIdentifier,
 			actual.MetaIdentifier,
 		)
-		t.Fail()
 		failed = true
 	}
 	if expected.Terminal != actual.Terminal {
-		t.Logf(
-			"Expected primary terminal %q. Got %q.",
-			expected.Terminal,
-			actual.Terminal,
-		)
-		t.Fail()
+		t.Logf("Expected primary terminal %q. Got %q.", expected.Terminal, actual.Terminal)
 		failed = true
 	}
 	if expected.Empty != actual.Empty {
-		t.Logf(
-			"Expected primary empty %t. Got %t.",
-			expected.Empty,
-			actual.Empty,
-		)
-		t.Fail()
+		t.Logf("Expected primary empty %t. Got %t.", expected.Empty, actual.Empty)
 		failed = true
+	}
+	if failed {
+		t.Fail()
 	}
 
 	return !failed
 }
 
+//nolint:godox // todo is tracking work to be done
+// TODO restructure test
+
+//nolint:funlen // test to be restructured
 func TestParseSyntax(t *testing.T) {
 	t.Parallel()
 	tcs := []struct {
