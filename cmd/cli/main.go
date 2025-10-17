@@ -24,6 +24,7 @@ func main() {
 	parser := ebnf.New()
 	syntax, err := parser.Parse(sample)
 	if err != nil {
+		//nolint:forbidigo // cmd/cli is for manual testing currently
 		fmt.Printf("Error: %s.\n", err)
 		os.Exit(1)
 	}
@@ -31,8 +32,10 @@ func main() {
 	encoder := json.NewEncoder(out)
 	encoder.SetIndent("", "  ")
 	if err := encoder.Encode(syntax); err != nil {
+		//nolint:forbidigo // cmd/cli is for manual testing currently
 		fmt.Printf("Error: %s.\n", err)
 		os.Exit(1)
 	}
+	//nolint:forbidigo // cmd/cli is for manual testing currently
 	fmt.Println(out.String())
 }
