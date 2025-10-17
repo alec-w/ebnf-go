@@ -1,3 +1,4 @@
+// Package main is for manual testing of the ebnf package.
 package main
 
 import (

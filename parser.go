@@ -6,12 +6,14 @@ import (
 	"unicode/utf8"
 )
 
+// Parser is used to parse an EBNF grammar.
 type Parser struct {
 	source string
 	offset int
 	line   int
 }
 
+// New instantiates a new Parser.
 func New() Parser {
 	return Parser{}
 }

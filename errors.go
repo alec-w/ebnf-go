@@ -2,18 +2,20 @@ package ebnf
 
 import "fmt"
 
-type JsonError struct {
+// JSONError is returned if there is an error marshalling a Syntax as JSON.
+type JSONError struct {
 	wrapped error
 }
 
-func (j *JsonError) Error() string {
+func (j *JSONError) Error() string {
 	return j.wrapped.Error()
 }
 
-func (j *JsonError) Unwrap() error {
+func (j *JSONError) Unwrap() error {
 	return j.wrapped
 }
 
+// ParseError is returned if there is an error parsing an EBNF grammar.
 type ParseError struct {
 	Msg     string
 	wrapped error
