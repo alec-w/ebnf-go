@@ -1,4 +1,4 @@
-// Package main is for manual testing of the ebnf package.
+// Package main is for manual testing of the iso package.
 package main
 
 import (
@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	ebnf "github.com/alec-w/ebnf-go"
+	"github.com/alec-w/ebnf-go/iso"
 )
 
 const sample = `
@@ -22,7 +22,7 @@ integer = "0" | nonZeroDigit, { digit } ;
 `
 
 func main() {
-	parser := ebnf.New()
+	parser := iso.New()
 	syntax, err := parser.Parse(sample)
 	if err != nil {
 		//nolint:forbidigo // cmd/cli is for manual testing currently

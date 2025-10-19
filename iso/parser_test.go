@@ -1,10 +1,10 @@
-package ebnf_test
+package iso_test
 
 import (
 	"strings"
 	"testing"
 
-	"github.com/alec-w/ebnf-go"
+	"github.com/alec-w/ebnf-go/iso"
 )
 
 func assertSlicesEqual[T any](
@@ -36,7 +36,7 @@ func assertSlicesEqual[T any](
 	return !failed
 }
 
-func assertDefinitionsListsEqual(t *testing.T, expected, actual ebnf.DefinitionsList) bool {
+func assertDefinitionsListsEqual(t *testing.T, expected, actual iso.DefinitionsList) bool {
 	t.Helper()
 
 	return assertSlicesEqual(
@@ -49,7 +49,7 @@ func assertDefinitionsListsEqual(t *testing.T, expected, actual ebnf.Definitions
 	)
 }
 
-func assertSyntaxesEqual(t *testing.T, expected, actual ebnf.Syntax) bool {
+func assertSyntaxesEqual(t *testing.T, expected, actual iso.Syntax) bool {
 	t.Helper()
 	if assertSlicesEqual(t, expected.Rules, actual.Rules, "rules", "rule", assertRulesEqual) {
 		return true
@@ -71,7 +71,7 @@ func assertCommentsEqual(t *testing.T, expected, actual string) bool {
 	return false
 }
 
-func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
+func assertRulesEqual(t *testing.T, expected, actual iso.Rule) bool {
 	t.Helper()
 	var failed bool
 	if expected.MetaIdentifier != actual.MetaIdentifier {
@@ -118,7 +118,7 @@ func assertRulesEqual(t *testing.T, expected, actual ebnf.Rule) bool {
 	return false
 }
 
-func assertDefinitionsEqual(t *testing.T, expected, actual ebnf.Definition) bool {
+func assertDefinitionsEqual(t *testing.T, expected, actual iso.Definition) bool {
 	t.Helper()
 	if assertSlicesEqual(t, expected.Terms, actual.Terms, "terms", "term", assertTermsEqual) {
 		return true
@@ -129,7 +129,7 @@ func assertDefinitionsEqual(t *testing.T, expected, actual ebnf.Definition) bool
 	return false
 }
 
-func assertTermsEqual(t *testing.T, expected, actual ebnf.Term) bool {
+func assertTermsEqual(t *testing.T, expected, actual iso.Term) bool {
 	t.Helper()
 	var failed bool
 	if !assertFactorsEqual(t, expected.Factor, actual.Factor) {
@@ -146,7 +146,7 @@ func assertTermsEqual(t *testing.T, expected, actual ebnf.Term) bool {
 	return false
 }
 
-func assertFactorsEqual(t *testing.T, expected, actual ebnf.Factor) bool {
+func assertFactorsEqual(t *testing.T, expected, actual iso.Factor) bool {
 	t.Helper()
 	var failed bool
 	if expected.Repetitions != actual.Repetitions {
@@ -179,7 +179,7 @@ func assertFactorsEqual(t *testing.T, expected, actual ebnf.Factor) bool {
 	return !failed
 }
 
-func assertPrimariesEqual(t *testing.T, expected, actual ebnf.Primary) bool {
+func assertPrimariesEqual(t *testing.T, expected, actual iso.Primary) bool {
 	t.Helper()
 	var failed bool
 	if !assertDefinitionsListsEqual(t, expected.OptionalSequence, actual.OptionalSequence) {
@@ -234,7 +234,7 @@ func TestParseSyntax(t *testing.T) {
 	tcs := []struct {
 		name           string
 		grammar        string
-		expectedSyntax ebnf.Syntax
+		expectedSyntax iso.Syntax
 	}{
 		{
 			name: "Positive integer definition",
@@ -243,98 +243,98 @@ nonZeroDigit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
 digit = "0" | nonZeroDigit ;
 integer = "0" | nonZeroDigit, { digit } ;
 `,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "nonZeroDigit",
 						Line:           2,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "1"},
+											Primary:     iso.Primary{Terminal: "1"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "2"},
+											Primary:     iso.Primary{Terminal: "2"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "3"},
+											Primary:     iso.Primary{Terminal: "3"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "4"},
+											Primary:     iso.Primary{Terminal: "4"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "5"},
+											Primary:     iso.Primary{Terminal: "5"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "6"},
+											Primary:     iso.Primary{Terminal: "6"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "7"},
+											Primary:     iso.Primary{Terminal: "7"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "8"},
+											Primary:     iso.Primary{Terminal: "8"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "9"},
+											Primary:     iso.Primary{Terminal: "9"},
 										},
 									},
 								},
@@ -344,23 +344,23 @@ integer = "0" | nonZeroDigit, { digit } ;
 					{
 						MetaIdentifier: "digit",
 						Line:           3,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "0"},
+											Primary:     iso.Primary{Terminal: "0"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "nonZeroDigit",
 											},
 										},
@@ -372,35 +372,35 @@ integer = "0" | nonZeroDigit, { digit } ;
 					{
 						MetaIdentifier: "integer",
 						Line:           4,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "0"},
+											Primary:     iso.Primary{Terminal: "0"},
 										},
 									},
 								},
 							},
-							{Terms: []ebnf.Term{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "nonZeroDigit"},
+										Primary:     iso.Primary{MetaIdentifier: "nonZeroDigit"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "digit",
 																},
 															},
@@ -450,33 +450,33 @@ COMMENT = '(*', (: COMMENT SYMBOL :), '*)'.
 COMMENT SYMBOL
 = COMMENT / TERMINAL / SPECIAL SEQUENCE
 / CHARACTER.`,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "SYNTAX",
 						Line:           2,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "SYNTAXRULE",
 											},
 										},
 									},
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
-												RepeatedSequence: ebnf.DefinitionsList{
+											Primary: iso.Primary{
+												RepeatedSequence: iso.DefinitionsList{
 													{
-														Terms: []ebnf.Term{
+														Terms: []iso.Term{
 															{
-																Factor: ebnf.Factor{
+																Factor: iso.Factor{
 																	Repetitions: -1,
-																	Primary: ebnf.Primary{
+																	Primary: iso.Primary{
 																		MetaIdentifier: "SYNTAXRULE",
 																	},
 																},
@@ -494,35 +494,35 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "SYNTAXRULE",
 						Line:           3,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "METAIDENTIFIER",
 											},
 										},
 									},
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "="},
+											Primary:     iso.Primary{Terminal: "="},
 										},
 									},
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "DEFINITIONSLIST",
 											},
 										},
 									},
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "."},
+											Primary:     iso.Primary{Terminal: "."},
 										},
 									},
 								},
@@ -532,35 +532,35 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "DEFINITIONSLIST",
 						Line:           5,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "SINGLEDEFINITION",
 											},
 										},
 									},
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
-												RepeatedSequence: ebnf.DefinitionsList{
-													{Terms: []ebnf.Term{
+											Primary: iso.Primary{
+												RepeatedSequence: iso.DefinitionsList{
+													{Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	Terminal: "/",
 																},
 															},
 														},
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "SINGLEDEFINITION",
 																},
 															},
@@ -577,33 +577,33 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "SINGLEDEFINITION",
 						Line:           8,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "TERM"},
+											Primary:     iso.Primary{MetaIdentifier: "TERM"},
 										},
 									},
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
-												RepeatedSequence: ebnf.DefinitionsList{
-													{Terms: []ebnf.Term{
+											Primary: iso.Primary{
+												RepeatedSequence: iso.DefinitionsList{
+													{Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	Terminal: ",",
 																},
 															},
 														},
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "TERM",
 																},
 															},
@@ -620,33 +620,33 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "TERM",
 						Line:           9,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "FACTOR"},
+											Primary:     iso.Primary{MetaIdentifier: "FACTOR"},
 										},
 									},
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
-												OptionalSequence: ebnf.DefinitionsList{
-													{Terms: []ebnf.Term{
+											Primary: iso.Primary{
+												OptionalSequence: iso.DefinitionsList{
+													{Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	Terminal: "-",
 																},
 															},
 														},
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "EXCEPTION",
 																},
 															},
@@ -663,13 +663,13 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "EXCEPTION",
 						Line:           10,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "FACTOR"},
+											Primary:     iso.Primary{MetaIdentifier: "FACTOR"},
 										},
 									},
 								},
@@ -679,27 +679,27 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "FACTOR",
 						Line:           11,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
-												OptionalSequence: ebnf.DefinitionsList{
-													{Terms: []ebnf.Term{
+											Primary: iso.Primary{
+												OptionalSequence: iso.DefinitionsList{
+													{Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "INTEGER",
 																},
 															},
 														},
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	Terminal: "*",
 																},
 															},
@@ -710,9 +710,9 @@ COMMENT SYMBOL
 										},
 									},
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "PRIMARY"},
+											Primary:     iso.Primary{MetaIdentifier: "PRIMARY"},
 										},
 									},
 								},
@@ -722,13 +722,13 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "PRIMARY",
 						Line:           12,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "OPTIONALSEQUENCE",
 											},
 										},
@@ -736,11 +736,11 @@ COMMENT SYMBOL
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "REPEATEDSEQUENCE",
 											},
 										},
@@ -748,11 +748,11 @@ COMMENT SYMBOL
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "SPECIALSEQUENCE",
 											},
 										},
@@ -760,11 +760,11 @@ COMMENT SYMBOL
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "GROUPEDSEQUENCE",
 											},
 										},
@@ -772,11 +772,11 @@ COMMENT SYMBOL
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "METAIDENTIFIER",
 											},
 										},
@@ -784,21 +784,21 @@ COMMENT SYMBOL
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "TERMINAL"},
+											Primary:     iso.Primary{MetaIdentifier: "TERMINAL"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "EMPTY"},
+											Primary:     iso.Primary{MetaIdentifier: "EMPTY"},
 										},
 									},
 								},
@@ -808,13 +808,13 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "EMPTY",
 						Line:           16,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Empty: true},
+											Primary:     iso.Primary{Empty: true},
 										},
 									},
 								},
@@ -824,26 +824,26 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "OPTIONALSEQUENCE",
 						Line:           17,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "(/"},
+										Primary:     iso.Primary{Terminal: "(/"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "DEFINITIONSLIST",
 										},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "/)"},
+										Primary:     iso.Primary{Terminal: "/)"},
 									},
 								},
 							}},
@@ -852,26 +852,26 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "REPEATEDSEQUENCE",
 						Line:           18,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "(:"},
+										Primary:     iso.Primary{Terminal: "(:"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "DEFINITIONSLIST",
 										},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: ":)"},
+										Primary:     iso.Primary{Terminal: ":)"},
 									},
 								},
 							}},
@@ -880,26 +880,26 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "GROUPEDSEQUENCE",
 						Line:           19,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "("},
+										Primary:     iso.Primary{Terminal: "("},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "DEFINITIONSLIST",
 										},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: ")"},
+										Primary:     iso.Primary{Terminal: ")"},
 									},
 								},
 							}},
@@ -908,41 +908,41 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "TERMINAL",
 						Line:           20,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "'"},
+										Primary:     iso.Primary{Terminal: "'"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "CHARACTER"},
+										Primary:     iso.Primary{MetaIdentifier: "CHARACTER"},
 									},
-									Exception: ebnf.Factor{
+									Exception: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "'"},
+										Primary:     iso.Primary{Terminal: "'"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "CHARACTER",
 																},
 															},
-															Exception: ebnf.Factor{
+															Exception: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	Terminal: "'",
 																},
 															},
@@ -954,46 +954,46 @@ COMMENT SYMBOL
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "'"},
+										Primary:     iso.Primary{Terminal: "'"},
 									},
 								},
 							}},
-							{Terms: []ebnf.Term{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "\""},
+										Primary:     iso.Primary{Terminal: "\""},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "CHARACTER"},
+										Primary:     iso.Primary{MetaIdentifier: "CHARACTER"},
 									},
-									Exception: ebnf.Factor{
+									Exception: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "\""},
+										Primary:     iso.Primary{Terminal: "\""},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "CHARACTER",
 																},
 															},
-															Exception: ebnf.Factor{
+															Exception: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	Terminal: "\"",
 																},
 															},
@@ -1005,9 +1005,9 @@ COMMENT SYMBOL
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "\""},
+										Primary:     iso.Primary{Terminal: "\""},
 									},
 								},
 							}},
@@ -1016,25 +1016,25 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "METAIDENTIFIER",
 						Line:           25,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "LETTER"},
+										Primary:     iso.Primary{MetaIdentifier: "LETTER"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "LETTER",
 																},
 															},
@@ -1042,11 +1042,11 @@ COMMENT SYMBOL
 													},
 												},
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "DIGIT",
 																},
 															},
@@ -1063,25 +1063,25 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "INTEGER",
 						Line:           26,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "DIGIT"},
+										Primary:     iso.Primary{MetaIdentifier: "DIGIT"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "DIGIT",
 																},
 															},
@@ -1098,31 +1098,31 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "SPECIALSEQUENCE",
 						Line:           27,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "?"},
+										Primary:     iso.Primary{Terminal: "?"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Exception: ebnf.Factor{
+															Exception: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	Terminal: "?",
 																},
 															},
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "CHARACTER",
 																},
 															},
@@ -1134,9 +1134,9 @@ COMMENT SYMBOL
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "?"},
+										Primary:     iso.Primary{Terminal: "?"},
 									},
 								},
 							}},
@@ -1145,25 +1145,25 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "COMMENT",
 						Line:           28,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "(*"},
+										Primary:     iso.Primary{Terminal: "(*"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "COMMENTSYMBOL",
 																},
 															},
@@ -1175,9 +1175,9 @@ COMMENT SYMBOL
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Terminal: "*)"},
+										Primary:     iso.Primary{Terminal: "*)"},
 									},
 								},
 							}},
@@ -1186,33 +1186,33 @@ COMMENT SYMBOL
 					{
 						MetaIdentifier: "COMMENTSYMBOL",
 						Line:           29,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "COMMENT"},
+											Primary:     iso.Primary{MetaIdentifier: "COMMENT"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "TERMINAL"},
+											Primary:     iso.Primary{MetaIdentifier: "TERMINAL"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "SPECIALSEQUENCE",
 											},
 										},
@@ -1220,11 +1220,11 @@ COMMENT SYMBOL
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "CHARACTER"},
+											Primary:     iso.Primary{MetaIdentifier: "CHARACTER"},
 										},
 									},
 								},
@@ -1313,8 +1313,8 @@ vertical tabulation character
 form feed
 = ? IS0 6429 character Form Feed ? ;
 `,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "letter",
 						Line:           28,
@@ -1343,523 +1343,523 @@ characters in the 7-bit character set (ISO/IEC
 and gap-separator in Extended BNF.`,
 							"see 7.2",
 						},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "a"},
+											Primary:     iso.Primary{Terminal: "a"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "b"},
+											Primary:     iso.Primary{Terminal: "b"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "c"},
+											Primary:     iso.Primary{Terminal: "c"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "d"},
+											Primary:     iso.Primary{Terminal: "d"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "e"},
+											Primary:     iso.Primary{Terminal: "e"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "f"},
+											Primary:     iso.Primary{Terminal: "f"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "g"},
+											Primary:     iso.Primary{Terminal: "g"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "h"},
+											Primary:     iso.Primary{Terminal: "h"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "i"},
+											Primary:     iso.Primary{Terminal: "i"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "j"},
+											Primary:     iso.Primary{Terminal: "j"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "k"},
+											Primary:     iso.Primary{Terminal: "k"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "l"},
+											Primary:     iso.Primary{Terminal: "l"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "m"},
+											Primary:     iso.Primary{Terminal: "m"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "n"},
+											Primary:     iso.Primary{Terminal: "n"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "o"},
+											Primary:     iso.Primary{Terminal: "o"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "p"},
+											Primary:     iso.Primary{Terminal: "p"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "q"},
+											Primary:     iso.Primary{Terminal: "q"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "r"},
+											Primary:     iso.Primary{Terminal: "r"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "s"},
+											Primary:     iso.Primary{Terminal: "s"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "t"},
+											Primary:     iso.Primary{Terminal: "t"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "u"},
+											Primary:     iso.Primary{Terminal: "u"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "v"},
+											Primary:     iso.Primary{Terminal: "v"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "w"},
+											Primary:     iso.Primary{Terminal: "w"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "x"},
+											Primary:     iso.Primary{Terminal: "x"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "y"},
+											Primary:     iso.Primary{Terminal: "y"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "z"},
+											Primary:     iso.Primary{Terminal: "z"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "A"},
+											Primary:     iso.Primary{Terminal: "A"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "B"},
+											Primary:     iso.Primary{Terminal: "B"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "C"},
+											Primary:     iso.Primary{Terminal: "C"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "D"},
+											Primary:     iso.Primary{Terminal: "D"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "E"},
+											Primary:     iso.Primary{Terminal: "E"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "F"},
+											Primary:     iso.Primary{Terminal: "F"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "G"},
+											Primary:     iso.Primary{Terminal: "G"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "H"},
+											Primary:     iso.Primary{Terminal: "H"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "I"},
+											Primary:     iso.Primary{Terminal: "I"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "J"},
+											Primary:     iso.Primary{Terminal: "J"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "K"},
+											Primary:     iso.Primary{Terminal: "K"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "L"},
+											Primary:     iso.Primary{Terminal: "L"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "M"},
+											Primary:     iso.Primary{Terminal: "M"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "N"},
+											Primary:     iso.Primary{Terminal: "N"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "O"},
+											Primary:     iso.Primary{Terminal: "O"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "P"},
+											Primary:     iso.Primary{Terminal: "P"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "Q"},
+											Primary:     iso.Primary{Terminal: "Q"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "R"},
+											Primary:     iso.Primary{Terminal: "R"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "S"},
+											Primary:     iso.Primary{Terminal: "S"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "T"},
+											Primary:     iso.Primary{Terminal: "T"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "U"},
+											Primary:     iso.Primary{Terminal: "U"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "V"},
+											Primary:     iso.Primary{Terminal: "V"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "W"},
+											Primary:     iso.Primary{Terminal: "W"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "X"},
+											Primary:     iso.Primary{Terminal: "X"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "Y"},
+											Primary:     iso.Primary{Terminal: "Y"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "Z"},
+											Primary:     iso.Primary{Terminal: "Z"},
 										},
 									},
 								},
@@ -1870,103 +1870,103 @@ and gap-separator in Extended BNF.`,
 						MetaIdentifier: "decimaldigit",
 						Line:           37,
 						Comments:       []string{"see 7.2"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "0"},
+											Primary:     iso.Primary{Terminal: "0"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "1"},
+											Primary:     iso.Primary{Terminal: "1"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "2"},
+											Primary:     iso.Primary{Terminal: "2"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "3"},
+											Primary:     iso.Primary{Terminal: "3"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "4"},
+											Primary:     iso.Primary{Terminal: "4"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "5"},
+											Primary:     iso.Primary{Terminal: "5"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "6"},
+											Primary:     iso.Primary{Terminal: "6"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "7"},
+											Primary:     iso.Primary{Terminal: "7"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "8"},
+											Primary:     iso.Primary{Terminal: "8"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "9"},
+											Primary:     iso.Primary{Terminal: "9"},
 										},
 									},
 								},
@@ -1981,13 +1981,13 @@ and gap-separator in Extended BNF.`,
 terminal-characters is defined in clauses 7.3,
 7.4 and tables 1, 2.`,
 						},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: ","},
+											Primary:     iso.Primary{Terminal: ","},
 										},
 									},
 								},
@@ -1997,13 +1997,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "definingsymbol",
 						Line:           46,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "="},
+											Primary:     iso.Primary{Terminal: "="},
 										},
 									},
 								},
@@ -2013,33 +2013,33 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "definitionseparatorsymbol",
 						Line:           47,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "|"},
+											Primary:     iso.Primary{Terminal: "|"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "/"},
+											Primary:     iso.Primary{Terminal: "/"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "!"},
+											Primary:     iso.Primary{Terminal: "!"},
 										},
 									},
 								},
@@ -2049,13 +2049,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "endcommentsymbol",
 						Line:           48,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "*)"},
+											Primary:     iso.Primary{Terminal: "*)"},
 										},
 									},
 								},
@@ -2065,13 +2065,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "endgroupsymbol",
 						Line:           49,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: ")"},
+											Primary:     iso.Primary{Terminal: ")"},
 										},
 									},
 								},
@@ -2081,23 +2081,23 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "endoptionsymbol",
 						Line:           50,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "]"},
+											Primary:     iso.Primary{Terminal: "]"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "/)"},
+											Primary:     iso.Primary{Terminal: "/)"},
 										},
 									},
 								},
@@ -2107,23 +2107,23 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "endrepeatsymbol",
 						Line:           51,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "}"},
+											Primary:     iso.Primary{Terminal: "}"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: ":)"},
+											Primary:     iso.Primary{Terminal: ":)"},
 										},
 									},
 								},
@@ -2133,13 +2133,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "exceptsymbol",
 						Line:           52,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "-"},
+											Primary:     iso.Primary{Terminal: "-"},
 										},
 									},
 								},
@@ -2149,13 +2149,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "firstquotesymbol",
 						Line:           53,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "'"},
+											Primary:     iso.Primary{Terminal: "'"},
 										},
 									},
 								},
@@ -2165,13 +2165,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "repetitionsymbol",
 						Line:           54,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "*"},
+											Primary:     iso.Primary{Terminal: "*"},
 										},
 									},
 								},
@@ -2181,13 +2181,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "secondquotesymbol",
 						Line:           55,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "\""},
+											Primary:     iso.Primary{Terminal: "\""},
 										},
 									},
 								},
@@ -2197,13 +2197,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "specialsequencesymbol",
 						Line:           56,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "?"},
+											Primary:     iso.Primary{Terminal: "?"},
 										},
 									},
 								},
@@ -2213,13 +2213,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "startcommentsymbol",
 						Line:           57,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "(*"},
+											Primary:     iso.Primary{Terminal: "(*"},
 										},
 									},
 								},
@@ -2229,13 +2229,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "startgroupsymbol",
 						Line:           58,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "("},
+											Primary:     iso.Primary{Terminal: "("},
 										},
 									},
 								},
@@ -2245,23 +2245,23 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "startoptionsymbol",
 						Line:           59,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "["},
+											Primary:     iso.Primary{Terminal: "["},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "(/"},
+											Primary:     iso.Primary{Terminal: "(/"},
 										},
 									},
 								},
@@ -2271,23 +2271,23 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "startrepeatsymbol",
 						Line:           60,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "{"},
+											Primary:     iso.Primary{Terminal: "{"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "(:"},
+											Primary:     iso.Primary{Terminal: "(:"},
 										},
 									},
 								},
@@ -2297,23 +2297,23 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "terminatorsymbol",
 						Line:           61,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: ";"},
+											Primary:     iso.Primary{Terminal: ";"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "."},
+											Primary:     iso.Primary{Terminal: "."},
 										},
 									},
 								},
@@ -2324,153 +2324,153 @@ terminal-characters is defined in clauses 7.3,
 						MetaIdentifier: "othercharacter",
 						Line:           62,
 						Comments:       []string{"see 7.5"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: " "},
+											Primary:     iso.Primary{Terminal: " "},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: ";"},
+											Primary:     iso.Primary{Terminal: ";"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "+"},
+											Primary:     iso.Primary{Terminal: "+"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "_"},
+											Primary:     iso.Primary{Terminal: "_"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "%"},
+											Primary:     iso.Primary{Terminal: "%"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "@"},
+											Primary:     iso.Primary{Terminal: "@"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "&"},
+											Primary:     iso.Primary{Terminal: "&"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "#"},
+											Primary:     iso.Primary{Terminal: "#"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "$"},
+											Primary:     iso.Primary{Terminal: "$"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "<"},
+											Primary:     iso.Primary{Terminal: "<"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: ">"},
+											Primary:     iso.Primary{Terminal: ">"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "\\"},
+											Primary:     iso.Primary{Terminal: "\\"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "^"},
+											Primary:     iso.Primary{Terminal: "^"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "`"},
+											Primary:     iso.Primary{Terminal: "`"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "~"},
+											Primary:     iso.Primary{Terminal: "~"},
 										},
 									},
 								},
@@ -2481,13 +2481,13 @@ terminal-characters is defined in clauses 7.3,
 						MetaIdentifier: "spacecharacter",
 						Line:           66,
 						Comments:       []string{"see 7.6"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: " "},
+											Primary:     iso.Primary{Terminal: " "},
 										},
 									},
 								},
@@ -2497,13 +2497,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "horizontaltabulationcharacter",
 						Line:           67,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												SpecialSequence: "IS0 6429 character Horizontal Tabulation",
 											},
 										},
@@ -2515,19 +2515,19 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "newline",
 						Line:           69,
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	SpecialSequence: "IS0 6429 character Carriage Return",
 																},
 															},
@@ -2539,24 +2539,24 @@ terminal-characters is defined in clauses 7.3,
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											SpecialSequence: "IS0 6429 character Line Feed",
 										},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	SpecialSequence: "IS0 6429 character Carriage Return",
 																},
 															},
@@ -2573,13 +2573,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "verticaltabulationcharacter",
 						Line:           73,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												SpecialSequence: "IS0 6429 character Vertical Tabulation",
 											},
 										},
@@ -2591,13 +2591,13 @@ terminal-characters is defined in clauses 7.3,
 					{
 						MetaIdentifier: "formfeed",
 						Line:           75,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												SpecialSequence: "IS0 6429 character Form Feed",
 											},
 										},
@@ -2664,8 +2664,8 @@ second quote symbol;
 gap free symbol, {gap separator},
 {gap free symbol, {gap separator}};
 `,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "terminalcharacter",
 						Line:           7,
@@ -2675,23 +2675,23 @@ removal of unnecessary non-printing characters
 from a syntax.`,
 							"see 6.2",
 						},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "letter"},
+											Primary:     iso.Primary{MetaIdentifier: "letter"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "decimaldigit",
 											},
 										},
@@ -2699,11 +2699,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "concatenatesymbol",
 											},
 										},
@@ -2711,11 +2711,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "definingsymbol",
 											},
 										},
@@ -2723,11 +2723,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "definitionseparatorsymbol",
 											},
 										},
@@ -2735,11 +2735,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "endcommentsymbol",
 											},
 										},
@@ -2747,11 +2747,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "endgroupsymbol",
 											},
 										},
@@ -2759,11 +2759,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "endoptionsymbol",
 											},
 										},
@@ -2771,11 +2771,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "endrepeatsymbol",
 											},
 										},
@@ -2783,11 +2783,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "exceptsymbol",
 											},
 										},
@@ -2795,11 +2795,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "firstquotesymbol",
 											},
 										},
@@ -2807,11 +2807,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "repetitionsymbol",
 											},
 										},
@@ -2819,11 +2819,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "secondquotesymbol",
 											},
 										},
@@ -2831,11 +2831,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "specialsequencesymbol",
 											},
 										},
@@ -2843,11 +2843,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "startcommentsymbol",
 											},
 										},
@@ -2855,11 +2855,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "startgroupsymbol",
 											},
 										},
@@ -2867,11 +2867,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "startoptionsymbol",
 											},
 										},
@@ -2879,11 +2879,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "startrepeatsymbol",
 											},
 										},
@@ -2891,11 +2891,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "terminatorsymbol",
 											},
 										},
@@ -2903,11 +2903,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "othercharacter",
 											},
 										},
@@ -2920,24 +2920,24 @@ from a syntax.`,
 						MetaIdentifier: "gapfreesymbol",
 						Line:           28,
 						Comments:       []string{"see 6.3"},
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "terminalcharacter",
 										},
 									},
-									Exception: ebnf.Factor{
+									Exception: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{GroupedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{GroupedSequence: iso.DefinitionsList{
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "firstquotesymbol",
 															},
 														},
@@ -2945,11 +2945,11 @@ from a syntax.`,
 												},
 											},
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "secondquotesymbol",
 															},
 														},
@@ -2961,11 +2961,11 @@ from a syntax.`,
 								},
 							}},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "terminalstring",
 											},
 										},
@@ -2978,35 +2978,35 @@ from a syntax.`,
 						MetaIdentifier: "terminalstring",
 						Line:           32,
 						Comments:       []string{"see 4.16"},
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "firstquotesymbol",
 										},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "firstterminalcharacter",
 										},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "firstterminalcharacter",
 																},
 															},
@@ -3018,42 +3018,42 @@ from a syntax.`,
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "firstquotesymbol",
 										},
 									},
 								},
 							}},
-							{Terms: []ebnf.Term{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "secondquotesymbol",
 										},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "secondterminalcharacter",
 										},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "secondterminalcharacter",
 																},
 															},
@@ -3065,9 +3065,9 @@ from a syntax.`,
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "secondquotesymbol",
 										},
 									},
@@ -3079,19 +3079,19 @@ from a syntax.`,
 						MetaIdentifier: "firstterminalcharacter",
 						Line:           39,
 						Comments:       []string{"see 4.17"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "terminalcharacter",
 											},
 										},
-										Exception: ebnf.Factor{
+										Exception: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "firstquotesymbol",
 											},
 										},
@@ -3104,19 +3104,19 @@ from a syntax.`,
 						MetaIdentifier: "secondterminalcharacter",
 						Line:           41,
 						Comments:       []string{"see 4.18"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "terminalcharacter",
 											},
 										},
-										Exception: ebnf.Factor{
+										Exception: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "secondquotesymbol",
 											},
 										},
@@ -3129,13 +3129,13 @@ from a syntax.`,
 						MetaIdentifier: "gapseparator",
 						Line:           43,
 						Comments:       []string{"see 6.4"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "spacecharacter",
 											},
 										},
@@ -3143,11 +3143,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "horizontaltabulationcharacter",
 											},
 										},
@@ -3155,21 +3155,21 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "newline"},
+											Primary:     iso.Primary{MetaIdentifier: "newline"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "verticaltabulationcharacter",
 											},
 										},
@@ -3177,11 +3177,11 @@ from a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "formfeed"},
+											Primary:     iso.Primary{MetaIdentifier: "formfeed"},
 										},
 									},
 								},
@@ -3192,18 +3192,18 @@ from a syntax.`,
 						MetaIdentifier: "syntax",
 						Line:           49,
 						Comments:       []string{"see 6.5"},
-						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "gapseparator",
 															},
 														},
@@ -3215,22 +3215,22 @@ from a syntax.`,
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "gapfreesymbol"},
+									Primary:     iso.Primary{MetaIdentifier: "gapfreesymbol"},
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "gapseparator",
 															},
 														},
@@ -3242,29 +3242,29 @@ from a syntax.`,
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{{Terms: []iso.Term{
 											{
-												Factor: ebnf.Factor{
+												Factor: iso.Factor{
 													Repetitions: -1,
-													Primary: ebnf.Primary{
+													Primary: iso.Primary{
 														MetaIdentifier: "gapfreesymbol",
 													},
 												},
 											},
 											{
-												Factor: ebnf.Factor{
+												Factor: iso.Factor{
 													Repetitions: -1,
-													Primary: ebnf.Primary{
-														RepeatedSequence: ebnf.DefinitionsList{
+													Primary: iso.Primary{
+														RepeatedSequence: iso.DefinitionsList{
 															{
-																Terms: []ebnf.Term{
+																Terms: []iso.Term{
 																	{
-																		Factor: ebnf.Factor{
+																		Factor: iso.Factor{
 																			Repetitions: -1,
-																			Primary: ebnf.Primary{
+																			Primary: iso.Primary{
 																				MetaIdentifier: "gapseparator",
 																			},
 																		},
@@ -3333,8 +3333,8 @@ commentless symbol,
 {commentless symbol,
 {bracketed textual comment}};
 `,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "commentlesssymbol",
 						Line:           7,
@@ -3344,21 +3344,21 @@ removal of bracketed-textual-comments from
 gap-free-symbols that form a syntax.`,
 							"see 6.6",
 						},
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{{
-								Factor: ebnf.Factor{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "terminalcharacter"},
+									Primary:     iso.Primary{MetaIdentifier: "terminalcharacter"},
 								},
-								Exception: ebnf.Factor{
+								Exception: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{GroupedSequence: ebnf.DefinitionsList{
+									Primary: iso.Primary{GroupedSequence: iso.DefinitionsList{
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "letter",
 														},
 													},
@@ -3366,11 +3366,11 @@ gap-free-symbols that form a syntax.`,
 											},
 										},
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "decimaldigit",
 														},
 													},
@@ -3378,11 +3378,11 @@ gap-free-symbols that form a syntax.`,
 											},
 										},
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "firstquotesymbol",
 														},
 													},
@@ -3390,11 +3390,11 @@ gap-free-symbols that form a syntax.`,
 											},
 										},
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "secondquotesymbol",
 														},
 													},
@@ -3402,11 +3402,11 @@ gap-free-symbols that form a syntax.`,
 											},
 										},
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "startcommentsymbol",
 														},
 													},
@@ -3414,11 +3414,11 @@ gap-free-symbols that form a syntax.`,
 											},
 										},
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "endcommentsymbol",
 														},
 													},
@@ -3426,11 +3426,11 @@ gap-free-symbols that form a syntax.`,
 											},
 										},
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "specialsequencesymbol",
 														},
 													},
@@ -3438,11 +3438,11 @@ gap-free-symbols that form a syntax.`,
 											},
 										},
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "othercharacter",
 														},
 													},
@@ -3453,11 +3453,11 @@ gap-free-symbols that form a syntax.`,
 								},
 							}}},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "metaidentifier",
 											},
 										},
@@ -3465,21 +3465,21 @@ gap-free-symbols that form a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "integer"},
+											Primary:     iso.Primary{MetaIdentifier: "integer"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "terminalstring",
 											},
 										},
@@ -3487,11 +3487,11 @@ gap-free-symbols that form a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "specialsequence",
 											},
 										},
@@ -3504,25 +3504,25 @@ gap-free-symbols that form a syntax.`,
 						MetaIdentifier: "integer",
 						Line:           21,
 						Comments:       []string{"see 4.9"},
-						Definitions: ebnf.DefinitionsList{
-							{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{
+							{Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "decimaldigit"},
+										Primary:     iso.Primary{MetaIdentifier: "decimaldigit"},
 									},
 								},
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
-											RepeatedSequence: ebnf.DefinitionsList{
+										Primary: iso.Primary{
+											RepeatedSequence: iso.DefinitionsList{
 												{
-													Terms: []ebnf.Term{
+													Terms: []iso.Term{
 														{
-															Factor: ebnf.Factor{
+															Factor: iso.Factor{
 																Repetitions: -1,
-																Primary: ebnf.Primary{
+																Primary: iso.Primary{
 																	MetaIdentifier: "decimaldigit",
 																},
 															},
@@ -3540,24 +3540,24 @@ gap-free-symbols that form a syntax.`,
 						MetaIdentifier: "metaidentifier",
 						Line:           23,
 						Comments:       []string{"see 4.14"},
-						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "letter"},
+									Primary:     iso.Primary{MetaIdentifier: "letter"},
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "metaidentifiercharacter",
 															},
 														},
@@ -3574,23 +3574,23 @@ gap-free-symbols that form a syntax.`,
 						MetaIdentifier: "metaidentifiercharacter",
 						Line:           25,
 						Comments:       []string{"see 4.15"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{MetaIdentifier: "letter"},
+											Primary:     iso.Primary{MetaIdentifier: "letter"},
 										},
 									},
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "decimaldigit",
 											},
 										},
@@ -3603,26 +3603,26 @@ gap-free-symbols that form a syntax.`,
 						MetaIdentifier: "specialsequence",
 						Line:           28,
 						Comments:       []string{"see 4.19"},
-						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
+									Primary: iso.Primary{
 										MetaIdentifier: "specialsequencesymbol",
 									},
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "specialsequencecharacter",
 															},
 														},
@@ -3634,9 +3634,9 @@ gap-free-symbols that form a syntax.`,
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
+									Primary: iso.Primary{
 										MetaIdentifier: "specialsequencesymbol",
 									},
 								},
@@ -3647,19 +3647,19 @@ gap-free-symbols that form a syntax.`,
 						MetaIdentifier: "specialsequencecharacter",
 						Line:           32,
 						Comments:       []string{"see 4.20"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "terminalcharacter",
 											},
 										},
-										Exception: ebnf.Factor{
+										Exception: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "specialsequencesymbol",
 											},
 										},
@@ -3672,13 +3672,13 @@ gap-free-symbols that form a syntax.`,
 						MetaIdentifier: "commentsymbol",
 						Line:           34,
 						Comments:       []string{"see 6.7"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "bracketedtextualcomment",
 											},
 										},
@@ -3686,11 +3686,11 @@ gap-free-symbols that form a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "othercharacter",
 											},
 										},
@@ -3698,11 +3698,11 @@ gap-free-symbols that form a syntax.`,
 								},
 							},
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary: ebnf.Primary{
+											Primary: iso.Primary{
 												MetaIdentifier: "commentlesssymbol",
 											},
 										},
@@ -3715,26 +3715,26 @@ gap-free-symbols that form a syntax.`,
 						MetaIdentifier: "bracketedtextualcomment",
 						Line:           38,
 						Comments:       []string{"see 6.8"},
-						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
+									Primary: iso.Primary{
 										MetaIdentifier: "startcommentsymbol",
 									},
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "commentsymbol",
 															},
 														},
@@ -3746,9 +3746,9 @@ gap-free-symbols that form a syntax.`,
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "endcommentsymbol"},
+									Primary:     iso.Primary{MetaIdentifier: "endcommentsymbol"},
 								},
 							},
 						}}},
@@ -3757,18 +3757,18 @@ gap-free-symbols that form a syntax.`,
 						MetaIdentifier: "syntax",
 						Line:           41,
 						Comments:       []string{"see 6.9"},
-						Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+						Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "bracketedtextualcomment",
 															},
 														},
@@ -3780,22 +3780,22 @@ gap-free-symbols that form a syntax.`,
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{MetaIdentifier: "commentlesssymbol"},
+									Primary:     iso.Primary{MetaIdentifier: "commentlesssymbol"},
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{
 											{
-												Terms: []ebnf.Term{
+												Terms: []iso.Term{
 													{
-														Factor: ebnf.Factor{
+														Factor: iso.Factor{
 															Repetitions: -1,
-															Primary: ebnf.Primary{
+															Primary: iso.Primary{
 																MetaIdentifier: "bracketedtextualcomment",
 															},
 														},
@@ -3807,29 +3807,29 @@ gap-free-symbols that form a syntax.`,
 								},
 							},
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary: ebnf.Primary{
-										RepeatedSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+									Primary: iso.Primary{
+										RepeatedSequence: iso.DefinitionsList{{Terms: []iso.Term{
 											{
-												Factor: ebnf.Factor{
+												Factor: iso.Factor{
 													Repetitions: -1,
-													Primary: ebnf.Primary{
+													Primary: iso.Primary{
 														MetaIdentifier: "commentlesssymbol",
 													},
 												},
 											},
 											{
-												Factor: ebnf.Factor{
+												Factor: iso.Factor{
 													Repetitions: -1,
-													Primary: ebnf.Primary{
-														RepeatedSequence: ebnf.DefinitionsList{
+													Primary: iso.Primary{
+														RepeatedSequence: iso.DefinitionsList{
 															{
-																Terms: []ebnf.Term{
+																Terms: []iso.Term{
 																	{
-																		Factor: ebnf.Factor{
+																		Factor: iso.Factor{
 																			Repetitions: -1,
-																			Primary: ebnf.Primary{
+																			Primary: iso.Primary{
 																				MetaIdentifier: "bracketedtextualcomment",
 																			},
 																		},
@@ -3900,7 +3900,7 @@ end group symbol;
 (* see 4.21 *) empty sequence
 = ;
 `,
-			expectedSyntax: ebnf.Syntax{Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{Rules: []iso.Rule{
 				{
 					MetaIdentifier: "syntax",
 					Line:           7,
@@ -3910,24 +3910,24 @@ abstract syntax of Extended BNF, i.e. the
 structure in terms of the commentless symbols.`,
 						"see 4.2",
 					},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "syntaxrule"},
+								Primary:     iso.Primary{MetaIdentifier: "syntaxrule"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary: ebnf.Primary{
-									RepeatedSequence: ebnf.DefinitionsList{
+								Primary: iso.Primary{
+									RepeatedSequence: iso.DefinitionsList{
 										{
-											Terms: []ebnf.Term{
+											Terms: []iso.Term{
 												{
-													Factor: ebnf.Factor{
+													Factor: iso.Factor{
 														Repetitions: -1,
-														Primary: ebnf.Primary{
+														Primary: iso.Primary{
 															MetaIdentifier: "syntaxrule",
 														},
 													},
@@ -3944,29 +3944,29 @@ structure in terms of the commentless symbols.`,
 					MetaIdentifier: "syntaxrule",
 					Line:           9,
 					Comments:       []string{"see 4.3"},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "metaidentifier"},
+								Primary:     iso.Primary{MetaIdentifier: "metaidentifier"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definingsymbol"},
+								Primary:     iso.Primary{MetaIdentifier: "definingsymbol"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definitionslist"},
+								Primary:     iso.Primary{MetaIdentifier: "definitionslist"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "terminatorsymbol"},
+								Primary:     iso.Primary{MetaIdentifier: "terminatorsymbol"},
 							},
 						},
 					}}},
@@ -3975,30 +3975,30 @@ structure in terms of the commentless symbols.`,
 					MetaIdentifier: "definitionslist",
 					Line:           12,
 					Comments:       []string{"see 4.4"},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "singledefinition"},
+								Primary:     iso.Primary{MetaIdentifier: "singledefinition"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary: ebnf.Primary{
-									RepeatedSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+								Primary: iso.Primary{
+									RepeatedSequence: iso.DefinitionsList{{Terms: []iso.Term{
 										{
-											Factor: ebnf.Factor{
+											Factor: iso.Factor{
 												Repetitions: -1,
-												Primary: ebnf.Primary{
+												Primary: iso.Primary{
 													MetaIdentifier: "definitionseparatorsymbol",
 												},
 											},
 										},
 										{
-											Factor: ebnf.Factor{
+											Factor: iso.Factor{
 												Repetitions: -1,
-												Primary: ebnf.Primary{
+												Primary: iso.Primary{
 													MetaIdentifier: "singledefinition",
 												},
 											},
@@ -4013,30 +4013,30 @@ structure in terms of the commentless symbols.`,
 					MetaIdentifier: "singledefinition",
 					Line:           16,
 					Comments:       []string{"see 4.5"},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "syntacticterm"},
+								Primary:     iso.Primary{MetaIdentifier: "syntacticterm"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary: ebnf.Primary{
-									RepeatedSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+								Primary: iso.Primary{
+									RepeatedSequence: iso.DefinitionsList{{Terms: []iso.Term{
 										{
-											Factor: ebnf.Factor{
+											Factor: iso.Factor{
 												Repetitions: -1,
-												Primary: ebnf.Primary{
+												Primary: iso.Primary{
 													MetaIdentifier: "concatenatesymbol",
 												},
 											},
 										},
 										{
-											Factor: ebnf.Factor{
+											Factor: iso.Factor{
 												Repetitions: -1,
-												Primary: ebnf.Primary{
+												Primary: iso.Primary{
 													MetaIdentifier: "syntacticterm",
 												},
 											},
@@ -4051,30 +4051,30 @@ structure in terms of the commentless symbols.`,
 					MetaIdentifier: "syntacticterm",
 					Line:           19,
 					Comments:       []string{"see 4.6"},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "syntacticfactor"},
+								Primary:     iso.Primary{MetaIdentifier: "syntacticfactor"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary: ebnf.Primary{
-									OptionalSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+								Primary: iso.Primary{
+									OptionalSequence: iso.DefinitionsList{{Terms: []iso.Term{
 										{
-											Factor: ebnf.Factor{
+											Factor: iso.Factor{
 												Repetitions: -1,
-												Primary: ebnf.Primary{
+												Primary: iso.Primary{
 													MetaIdentifier: "exceptsymbol",
 												},
 											},
 										},
 										{
-											Factor: ebnf.Factor{
+											Factor: iso.Factor{
 												Repetitions: -1,
-												Primary: ebnf.Primary{
+												Primary: iso.Primary{
 													MetaIdentifier: "syntacticexception",
 												},
 											},
@@ -4089,13 +4089,13 @@ structure in terms of the commentless symbols.`,
 					MetaIdentifier: "syntacticexception",
 					Line:           22,
 					Comments:       []string{"see 4.7"},
-					Definitions: ebnf.DefinitionsList{
+					Definitions: iso.DefinitionsList{
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											SpecialSequence: `a syntactic-factor that could be replaced
 by a syntactic-factor containing no
 meta-identifiers`,
@@ -4110,24 +4110,24 @@ meta-identifiers`,
 					MetaIdentifier: "syntacticfactor",
 					Line:           27,
 					Comments:       []string{"see 4.8"},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary: ebnf.Primary{
-									OptionalSequence: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+								Primary: iso.Primary{
+									OptionalSequence: iso.DefinitionsList{{Terms: []iso.Term{
 										{
-											Factor: ebnf.Factor{
+											Factor: iso.Factor{
 												Repetitions: -1,
-												Primary: ebnf.Primary{
+												Primary: iso.Primary{
 													MetaIdentifier: "integer",
 												},
 											},
 										},
 										{
-											Factor: ebnf.Factor{
+											Factor: iso.Factor{
 												Repetitions: -1,
-												Primary: ebnf.Primary{
+												Primary: iso.Primary{
 													MetaIdentifier: "repetitionsymbol",
 												},
 											},
@@ -4137,9 +4137,9 @@ meta-identifiers`,
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "syntacticprimary"},
+								Primary:     iso.Primary{MetaIdentifier: "syntacticprimary"},
 							},
 						},
 					}}},
@@ -4148,13 +4148,13 @@ meta-identifiers`,
 					MetaIdentifier: "syntacticprimary",
 					Line:           30,
 					Comments:       []string{"see 4.10"},
-					Definitions: ebnf.DefinitionsList{
+					Definitions: iso.DefinitionsList{
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "optionalsequence",
 										},
 									},
@@ -4162,11 +4162,11 @@ meta-identifiers`,
 							},
 						},
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "repeatedsequence",
 										},
 									},
@@ -4174,11 +4174,11 @@ meta-identifiers`,
 							},
 						},
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "groupedsequence",
 										},
 									},
@@ -4186,11 +4186,11 @@ meta-identifiers`,
 							},
 						},
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "metaidentifier",
 										},
 									},
@@ -4198,11 +4198,11 @@ meta-identifiers`,
 							},
 						},
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "terminalstring",
 										},
 									},
@@ -4210,11 +4210,11 @@ meta-identifiers`,
 							},
 						},
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary: ebnf.Primary{
+										Primary: iso.Primary{
 											MetaIdentifier: "specialsequence",
 										},
 									},
@@ -4222,11 +4222,11 @@ meta-identifiers`,
 							},
 						},
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{MetaIdentifier: "emptysequence"},
+										Primary:     iso.Primary{MetaIdentifier: "emptysequence"},
 									},
 								},
 							},
@@ -4237,23 +4237,23 @@ meta-identifiers`,
 					MetaIdentifier: "optionalsequence",
 					Line:           38,
 					Comments:       []string{"see 4.11"},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "startoptionsymbol"},
+								Primary:     iso.Primary{MetaIdentifier: "startoptionsymbol"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definitionslist"},
+								Primary:     iso.Primary{MetaIdentifier: "definitionslist"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "endoptionsymbol"},
+								Primary:     iso.Primary{MetaIdentifier: "endoptionsymbol"},
 							},
 						},
 					}}},
@@ -4262,23 +4262,23 @@ meta-identifiers`,
 					MetaIdentifier: "repeatedsequence",
 					Line:           41,
 					Comments:       []string{"see 4.12"},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "startrepeatsymbol"},
+								Primary:     iso.Primary{MetaIdentifier: "startrepeatsymbol"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definitionslist"},
+								Primary:     iso.Primary{MetaIdentifier: "definitionslist"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "endrepeatsymbol"},
+								Primary:     iso.Primary{MetaIdentifier: "endrepeatsymbol"},
 							},
 						},
 					}}},
@@ -4287,23 +4287,23 @@ meta-identifiers`,
 					MetaIdentifier: "groupedsequence",
 					Line:           44,
 					Comments:       []string{"see 4.13"},
-					Definitions: ebnf.DefinitionsList{{Terms: []ebnf.Term{
+					Definitions: iso.DefinitionsList{{Terms: []iso.Term{
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "startgroupsymbol"},
+								Primary:     iso.Primary{MetaIdentifier: "startgroupsymbol"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "definitionslist"},
+								Primary:     iso.Primary{MetaIdentifier: "definitionslist"},
 							},
 						},
 						{
-							Factor: ebnf.Factor{
+							Factor: iso.Factor{
 								Repetitions: -1,
-								Primary:     ebnf.Primary{MetaIdentifier: "endgroupsymbol"},
+								Primary:     iso.Primary{MetaIdentifier: "endgroupsymbol"},
 							},
 						},
 					}}},
@@ -4312,13 +4312,13 @@ meta-identifiers`,
 					MetaIdentifier: "emptysequence",
 					Line:           47,
 					Comments:       []string{"see 4.21"},
-					Definitions: ebnf.DefinitionsList{
+					Definitions: iso.DefinitionsList{
 						{
-							Terms: []ebnf.Term{
+							Terms: []iso.Term{
 								{
-									Factor: ebnf.Factor{
+									Factor: iso.Factor{
 										Repetitions: -1,
-										Primary:     ebnf.Primary{Empty: true},
+										Primary:     iso.Primary{Empty: true},
 									},
 								},
 							},
@@ -4332,19 +4332,19 @@ meta-identifiers`,
 			grammar: `
 a = ;
 (* a trailing comment *)`,
-			expectedSyntax: ebnf.Syntax{
+			expectedSyntax: iso.Syntax{
 				TrailingComments: []string{"a trailing comment"},
-				Rules: []ebnf.Rule{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "a",
 						Line:           2,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Empty: true},
+											Primary:     iso.Primary{Empty: true},
 										},
 									},
 								},
@@ -4357,19 +4357,19 @@ a = ;
 		{
 			name:    "Syntax with comment before defining symbol",
 			grammar: `a (* comment before defining symbol*) = ;`,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "a",
 						Comments:       []string{"comment before defining symbol"},
 						Line:           1,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Empty: true},
+											Primary:     iso.Primary{Empty: true},
 										},
 									},
 								},
@@ -4382,19 +4382,19 @@ a = ;
 		{
 			name:    "Syntax with comments on factor",
 			grammar: `a = (* comment on factor *) ;`,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "a",
 						Line:           1,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Comments:    []string{"comment on factor"},
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Empty: true},
+											Primary:     iso.Primary{Empty: true},
 										},
 									},
 								},
@@ -4407,18 +4407,18 @@ a = ;
 		{
 			name:    "Syntax with repetitions",
 			grammar: `a = 1 * "a" ;`,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "a",
 						Line:           1,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: 1,
-											Primary:     ebnf.Primary{Terminal: "a"},
+											Primary:     iso.Primary{Terminal: "a"},
 										},
 									},
 								},
@@ -4434,21 +4434,21 @@ a = ;
 a = 1 * (* comment after repetitions symbol *) "a" ;
 b = 2 (* comment after repetitions integer *) * "b" ;
 `,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "a",
 						Line:           2,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Comments: []string{
 												"comment after repetitions symbol",
 											},
 											Repetitions: 1,
-											Primary:     ebnf.Primary{Terminal: "a"},
+											Primary:     iso.Primary{Terminal: "a"},
 										},
 									},
 								},
@@ -4458,16 +4458,16 @@ b = 2 (* comment after repetitions integer *) * "b" ;
 					{
 						MetaIdentifier: "b",
 						Line:           3,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Comments: []string{
 												"comment after repetitions integer",
 											},
 											Repetitions: 2,
-											Primary:     ebnf.Primary{Terminal: "b"},
+											Primary:     iso.Primary{Terminal: "b"},
 										},
 									},
 								},
@@ -4486,19 +4486,19 @@ stuff" ;
 second" ;
 c = ;
 `,
-			expectedSyntax: ebnf.Syntax{
-				Rules: []ebnf.Rule{
+			expectedSyntax: iso.Syntax{
+				Rules: []iso.Rule{
 					{
 						MetaIdentifier: "a",
 						Line:           2,
 						Comments:       []string{"terminal string beginning with newline"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "\nstuff"},
+											Primary:     iso.Primary{Terminal: "\nstuff"},
 										},
 									},
 								},
@@ -4509,13 +4509,13 @@ c = ;
 						MetaIdentifier: "b",
 						Line:           4,
 						Comments:       []string{"terminal string containing newline"},
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Terminal: "word\nsecond"},
+											Primary:     iso.Primary{Terminal: "word\nsecond"},
 										},
 									},
 								},
@@ -4525,13 +4525,13 @@ c = ;
 					{
 						MetaIdentifier: "c",
 						Line:           6,
-						Definitions: ebnf.DefinitionsList{
+						Definitions: iso.DefinitionsList{
 							{
-								Terms: []ebnf.Term{
+								Terms: []iso.Term{
 									{
-										Factor: ebnf.Factor{
+										Factor: iso.Factor{
 											Repetitions: -1,
-											Primary:     ebnf.Primary{Empty: true},
+											Primary:     iso.Primary{Empty: true},
 										},
 									},
 								},
@@ -4548,19 +4548,19 @@ c = ;
 (* "double quoted terminal" 'single quoted terminal' ? special sequence ? *)
 *)
 a = ;`,
-			expectedSyntax: ebnf.Syntax{Rules: []ebnf.Rule{{
+			expectedSyntax: iso.Syntax{Rules: []iso.Rule{{
 				Comments: []string{
 					"(* \"double quoted terminal\" 'single quoted terminal' ? special sequence ? *)",
 				},
 				Line:           5,
 				MetaIdentifier: "a",
-				Definitions: ebnf.DefinitionsList{
+				Definitions: iso.DefinitionsList{
 					{
-						Terms: []ebnf.Term{
+						Terms: []iso.Term{
 							{
-								Factor: ebnf.Factor{
+								Factor: iso.Factor{
 									Repetitions: -1,
-									Primary:     ebnf.Primary{Empty: true},
+									Primary:     iso.Primary{Empty: true},
 								},
 							},
 						},
@@ -4571,7 +4571,7 @@ a = ;`,
 	}
 
 	for _, tc := range tcs {
-		parser := ebnf.New()
+		parser := iso.New()
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			syntax, err := parser.Parse(tc.grammar)
