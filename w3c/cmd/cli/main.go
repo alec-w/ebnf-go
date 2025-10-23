@@ -10,8 +10,17 @@ import (
 	"github.com/alec-w/ebnf-go/w3c"
 )
 
-const sample = "testRule ::= 'one' | 'two' | 'three'"
+//const sample = `StringLiteral ::= '"' ( [^\"]* ( '\"' | '\' )? )*  '"'`
 
+//const sample = `StringLiteral ::= '1' ( '2'* ( '3' | '4' )? )*  '5'`
+
+const sample = `testRule ::= 'one' 'two' 'three' | 'four' 'five' 'six'`
+
+/*
+'one'
+'two' | 'three' 'four' | 'five' | 'six'
+'three' 'four' | 'five' | 'six'
+*/
 func main() {
 	parser := w3c.New()
 	syntax, err := parser.Parse(sample)

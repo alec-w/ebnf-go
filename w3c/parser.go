@@ -2,6 +2,7 @@ package w3c
 
 import (
 	"fmt"
+	"strconv"
 	"unicode"
 	"unicode/utf8"
 )
@@ -93,7 +94,18 @@ func (p *Parser) parseExpression(_ bool) (Expression, error) {
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char == '(' {
 		p.offset += width
-		return p.parseExpression(true)
+		var err error
+		expression, err = p.parseExpression(true)
+		if err != nil {
+			return nil, err
+		}
+		p.skipWhitespace()
+		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+		if char != ')' {
+			return nil, fmt.Errorf("expected closing parenthesis at end of parenthesised expression")
+		}
+		p.offset += width
+		expression.setParenthesised(true)
 	} else {
 		var err error
 		expression, err = p.parseSimpleExpression()
@@ -110,26 +122,21 @@ func (p *Parser) parseExpression(_ bool) (Expression, error) {
 		p.skipWhitespace()
 		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 		switch {
-		case char == utf8.RuneError && width == 0:
-			return expression, nil
-		case p.isBasicLatinLetter(char):
-			if p.isRuleEnd() {
-				return expression, nil
-			}
-			fallthrough
-		case char == '[' || char == '#' || char == '\'' || char == '"' || char == '(' || char == '|':
-			if char == '|' {
-				p.offset += width
-			}
+		case p.isBasicLatinLetter(char) || char == '[' || char == '#' || char == '\'' || char == '"' || char == '(':
 			next, err := p.parseExpression(false)
 			if err != nil {
 				return nil, err
 			}
-			if char == '|' {
-				expression = p.parseExpressionsAsAlternates(expression, next)
-			} else {
-				expression = p.parseExpressionsAsList(expression, next)
+			expression = p.parseExpressionsAsList(expression, next)
+		case char == '|':
+			p.offset += width
+			next, err := p.parseExpression(false)
+			if err != nil {
+				return nil, err
 			}
+			expression = p.parseExpressionsAsAlternates(expression, next)
+		case char == ')':
+			return expression, nil
 		default:
 			return nil, fmt.Errorf("expected end of rule, another expression, or an expression alternate symbol")
 		}
@@ -139,26 +146,24 @@ func (p *Parser) parseExpression(_ bool) (Expression, error) {
 
 func (p *Parser) parseSimpleExpression() (Expression, error) {
 	p.skipWhitespace()
-	var expression Expression
 	char, _ := utf8.DecodeRuneInString(p.source[p.offset:])
 	switch {
 	case char == '[':
 		fallthrough
 	case char == '#':
 		// character set, check next character to see if is a forbidden list
-		return nil, fmt.Errorf("parsing character set expression not yet supported")
+		return p.parseCharacterSetExpression()
 	case char == '"':
 		fallthrough
 	case char == '\'':
 		// literal string
-		expression = p.parseLiteralExpression()
+		return p.parseLiteralExpression(), nil
 	case p.isBasicLatinLetter(char):
-		expression = &SymbolExpression{Symbol: p.parseSymbol()}
+		return &SymbolExpression{Symbol: p.parseSymbol()}, nil
 	default:
 		// error
 		return nil, fmt.Errorf("looking for start of expression but character at offset %d was not the start of an expression", p.offset)
 	}
-	return expression, nil
 }
 
 func (p *Parser) parseExpressionRepetitions(expression Expression) Expression {
@@ -193,11 +198,15 @@ func (p *Parser) parseExpressionException(expression Expression) (Expression, er
 	char, _ = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char == '(' {
 		expression, err = p.parseExpression(false)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		expression, err = p.parseSimpleExpression()
-	}
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
+		expression = p.parseExpressionRepetitions(expression)
 	}
 	exceptExpression.Except = expression
 	return exceptExpression, nil
@@ -216,59 +225,249 @@ func (p *Parser) parseLiteralExpression() *LiteralExpression {
 	return expression
 }
 
-func (p *Parser) parseExpressionsAsList(first, second Expression) Expression {
-	if alternateExpression := second.AlternateExpression(); alternateExpression != nil {
-		// Get the first expression in second (the alternate) and make it the end of the list and then make that the first in the alternate
-		// E.g. expression = A, next = alternate(B, C)
-		// becomes alternate(list (A, B), C)
-		// TODO handle parenthesis expressions
-		list := p.expressionToList(first)
-		toAppendToList := []Expression{alternateExpression.Expressions[0]}
-		if firstFromAlternateAsList := toAppendToList[0].ListExpression(); firstFromAlternateAsList != nil {
-			toAppendToList = firstFromAlternateAsList.Expressions
+func (p *Parser) parseCharacterSetExpression() (*CharacterSetExpression, error) {
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	if char == '#' {
+		char, err := p.parseHexCharacter()
+		if err != nil {
+			return nil, err
 		}
-		list.Expressions = append(list.Expressions, toAppendToList...)
-		alternateExpression.Expressions = append([]Expression{list}, alternateExpression.Expressions[1:]...)
-		return alternateExpression
+		return &CharacterSetExpression{Enumerations: []rune{char}}, nil
 	}
-	if nextListExpression := second.ListExpression(); nextListExpression != nil {
-		// TODO handle parenthesis expressions
-		nextListExpression.Expressions = append(p.expressionToList(first).Expressions, nextListExpression.Expressions...)
-		return nextListExpression
+	p.offset += width
+	expression := &CharacterSetExpression{}
+	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+	if char == '^' {
+		expression.Forbidden = true
+		p.offset += width
 	}
-	// TODO handle parenthesis expressions
-	list := p.expressionToList(first)
-	list.Expressions = append(list.Expressions, second)
-	return list
+	for char, width = utf8.DecodeRuneInString(p.source[p.offset:]); char != ']'; char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+		if char == '#' {
+			var err error
+			char, err = p.parseHexCharacter()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			p.offset += width
+		}
+		first := char
+		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+		if char == '-' {
+			p.offset += width
+			char, width = utf8.DecodeRuneInString(p.source[p.offset:])
+			if char == '#' {
+				var err error
+				char, err = p.parseHexCharacter()
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				p.offset += width
+			}
+			expression.Ranges = append(expression.Ranges, Range{Low: first, High: char})
+		} else {
+			enumeration, err := p.parseCharacterSetEnumeration()
+			if err != nil {
+				return nil, err
+			}
+			expression.Enumerations = append(expression.Enumerations, first)
+			expression.Enumerations = append(expression.Enumerations, enumeration...)
+		}
+	}
+	p.offset += width
+	return expression, nil
 }
 
+func (p *Parser) parseHexCharacter() (rune, error) {
+	_, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	p.offset += width
+	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
+	if char != 'x' {
+		return 0, fmt.Errorf("did not get x after # in hex character")
+	}
+	p.offset += width
+	var chars []rune
+	for char, width := utf8.DecodeRuneInString(p.source[p.offset:]); char >= '0' && char <= '9'; char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+		p.offset += width
+		chars = append(chars, char)
+	}
+	intVal, err := strconv.ParseUint(string(chars), 16, 32)
+	if err != nil {
+		return 0, err
+	}
+	return rune(intVal), nil
+}
+
+func (p *Parser) parseCharacterSetEnumeration() ([]rune, error) {
+	var chars []rune
+	var offsets []int
+	for char, width := utf8.DecodeRuneInString(p.source[p.offset:]); char != ']'; char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+		offsets = append(offsets, p.offset)
+		if char == '#' {
+			var err error
+			char, err = p.parseHexCharacter()
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			p.offset += width
+		}
+		chars = append(chars, char)
+		if char == '-' {
+			p.offset = offsets[len(offsets)-2]
+			chars = chars[:len(chars)-2]
+			break
+		}
+	}
+	return chars, nil
+}
+
+func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
+	// A B
+	// A or B have repetitions => list(A, B)
+	// A or B is parethesised alternate => list(A, B)
+	// A and B are both alternates => list(alt(A[:-1]), A[-1], B[0], alt(B[1:]))
+	// A is alternate and B is not list => alt(A[:-1], list(A[-1], B))
+	// A is alternate and B is list => alt(A[:-1], list(A[-1], B...))
+	// B is alternate and A is not list => alt(list(A, B[0]), B[1:])
+	// B is alternate and A is list => alt(list(A..., B[0]), B[1:])
+	// A is list and B is not list => list(A..., B)
+	// A is not list and B is list => list(A, B...)
+	// A is list and B is list => list(A..., B...)
+	// else => list(A, B)
+	aAsAlternate := a.AlternateExpression()
+	bAsAlternate := b.AlternateExpression()
+	aAsList := a.ListExpression()
+	bAsList := b.ListExpression()
+	if (a.hasRepetitions() || b.hasRepetitions()) ||
+		(aAsAlternate != nil && a.isParenthesised()) ||
+		(bAsAlternate != nil && b.isParenthesised()) ||
+		((aAsList == nil && bAsList == nil) && (aAsAlternate == nil && bAsAlternate == nil)) {
+		return &ListExpression{Expressions: []Expression{a, b}}
+	}
+	if aAsAlternate != nil && bAsAlternate != nil {
+		middle := []Expression{aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1], bAsAlternate.Expressions[0]}
+		aAsAlternate.Expressions = aAsAlternate.Expressions[:len(aAsAlternate.Expressions)-1]
+		bAsAlternate.Expressions = bAsAlternate.Expressions[1:]
+		return &AlternateExpression{Expressions: append(
+			append(
+				aAsAlternate.Expressions,
+				middle...,
+			),
+			bAsAlternate.Expressions...,
+		),
+		}
+	}
+	if aAsAlternate != nil {
+		listExpression := &ListExpression{Expressions: []Expression{aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1]}}
+		if first := listExpression.Expressions[0].ListExpression(); first != nil {
+			listExpression = first
+		}
+		aAsAlternate.Expressions = aAsAlternate.Expressions[:len(aAsAlternate.Expressions)-1]
+		if bAsList != nil {
+			listExpression.Expressions = append(listExpression.Expressions, bAsList.Expressions...)
+		} else {
+			listExpression.Expressions = append(listExpression.Expressions, b)
+		}
+		return &AlternateExpression{Expressions: append(aAsAlternate.Expressions, listExpression)}
+	}
+	if bAsAlternate != nil {
+		listExpression := &ListExpression{Expressions: []Expression{bAsAlternate.Expressions[0]}}
+		if first := listExpression.Expressions[0].ListExpression(); first != nil {
+			listExpression = first
+		}
+		bAsAlternate.Expressions = bAsAlternate.Expressions[1:]
+		if aAsList != nil {
+			listExpression.Expressions = append(aAsList.Expressions, listExpression.Expressions...)
+		} else {
+			listExpression.Expressions = append([]Expression{a}, listExpression.Expressions...)
+		}
+		return &AlternateExpression{Expressions: append([]Expression{listExpression}, bAsAlternate.Expressions...)}
+	}
+	expressions := []Expression{a}
+	if aAsList != nil {
+		expressions = aAsList.Expressions
+	}
+	expressions = append(expressions, b)
+	if bAsList != nil {
+		expressions = expressions[:len(expressions)-1]
+		expressions = append(expressions, bAsList.Expressions...)
+	}
+	return &ListExpression{Expressions: expressions}
+	/*
+		if alternateExpression := second.AlternateExpression(); alternateExpression != nil && !second.isParenthesised() {
+			// Get the first expression in second (the alternate) and make it the end of the list and then make that the first in the alternate
+			// E.g. expression = A, next = alternate(B, C)
+			// becomes alternate(list (A, B), C)
+			list := p.expressionToList(first)
+			toAppendToList := []Expression{alternateExpression.Expressions[0]}
+			if firstFromAlternateAsList := toAppendToList[0].ListExpression(); firstFromAlternateAsList != nil {
+				toAppendToList = firstFromAlternateAsList.Expressions
+			}
+			list.Expressions = append(list.Expressions, toAppendToList...)
+			alternateExpression.Expressions = append([]Expression{list}, alternateExpression.Expressions[1:]...)
+			return alternateExpression
+		}
+		if nextListExpression := second.ListExpression(); nextListExpression != nil && !repetitionsEmpty(nextListExpression.Repetitions) {
+			nextListExpression.Expressions = append(p.expressionToList(first).Expressions, nextListExpression.Expressions...)
+			return nextListExpression
+		}
+		list := p.expressionToList(first)
+		list.Expressions = append(list.Expressions, second)
+		return list
+	*/
+}
+
+/*
 func (p *Parser) expressionToList(expression Expression) *ListExpression {
 	if expression := expression.ListExpression(); expression != nil {
 		return expression
 	}
 	return &ListExpression{Expressions: []Expression{expression}}
 }
+*/
 
-func (p *Parser) parseExpressionsAsAlternates(first, second Expression) Expression {
-	// Make the expression an alternate with the next expression the last item
-	// E.g. expression = A, next = list(B, C)
-	// becomes alternate(A, list(B, C))
-	// TODO handle parenthesis expressions
-	out := p.expressionToAlternates(first)
-	toAppend := []Expression{second}
-	if alternateExpression := second.AlternateExpression(); alternateExpression != nil {
-		toAppend = alternateExpression.Expressions
+func (p *Parser) parseExpressionsAsAlternates(a, b Expression) Expression {
+	// A | B
+	// if A or B has repetitions => alt(A, B)
+	// if A is alternate => first_terms = A... else A
+	// if B is alternate => second_terms = B... else B
+	// => alt(first_terms..., second_terms...)
+	if a.hasRepetitions() || b.hasRepetitions() {
+		return &AlternateExpression{Expressions: []Expression{a, b}}
 	}
-	out.Expressions = append(out.Expressions, toAppend...)
-	return out
+	firstTerms := []Expression{a}
+	if aAsAlternate := a.AlternateExpression(); aAsAlternate != nil {
+		firstTerms = aAsAlternate.Expressions
+	}
+	secondTerms := []Expression{b}
+	if bAsAlternate := b.AlternateExpression(); bAsAlternate != nil {
+		secondTerms = bAsAlternate.Expressions
+	}
+	return &AlternateExpression{Expressions: append(firstTerms, secondTerms...)}
+	/*
+		// Make the expression an alternate with the next expression the last item
+		// E.g. expression = A, next = list(B, C)
+		// becomes alternate(A, list(B, C))
+		out := p.expressionToAlternates(first)
+		toAppend := []Expression{second}
+		if alternateExpression := second.AlternateExpression(); alternateExpression != nil && repetitionsEmpty(alternateExpression.Repetitions) {
+			toAppend = alternateExpression.Expressions
+		}
+		out.Expressions = append(out.Expressions, toAppend...)
+		return out
+	*/
 }
 
+/*
 func (p *Parser) expressionToAlternates(expression Expression) *AlternateExpression {
 	if expression := expression.AlternateExpression(); expression != nil {
 		return expression
 	}
 	return &AlternateExpression{Expressions: []Expression{expression}}
 }
+*/
 
 func (p *Parser) isRuleEnd() bool {
 	p.skipWhitespace()

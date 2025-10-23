@@ -52,18 +52,41 @@ func assertRulesEqual(t *testing.T, expected, actual w3c.Rule) bool {
 		t.Errorf("Expected rule to have symbol %q but got %q.", expected.Symbol, actual.Symbol)
 		failed = true
 	}
+	if expected.Line != actual.Line {
+		t.Errorf("Expected rule to be from line %d but got %d.", expected.Line, actual.Line)
+		failed = true
+	}
 	return assertExpressionsEqual(t, expected.Expression, actual.Expression) && !failed
 }
 
 func assertExpressionsEqual(t *testing.T, expected, actual w3c.Expression) bool {
 	t.Helper()
 	var failed bool
+	if expected == nil && actual == nil {
+		return true
+	}
+	if expected == nil {
+		t.Error("Got unexpected expression")
+		return false
+	}
+	if actual == nil {
+		t.Error("Expected expression")
+		return false
+	}
 	if !assertLiteralExpressionsEqual(t, expected.LiteralExpression(), actual.LiteralExpression()) {
 		t.Errorf("Literal expressions were not equal")
 		failed = true
 	}
 	if !assertSymbolExpressionsEqual(t, expected.SymbolExpression(), actual.SymbolExpression()) {
 		t.Errorf("Symbol expressions were not equal")
+		failed = true
+	}
+	if !assertCharacterSetExpressionsEqual(t, expected.CharacterSetExpression(), actual.CharacterSetExpression()) {
+		t.Errorf("Character set expressions were not equal")
+		failed = true
+	}
+	if !assertExceptionExpressionsEqual(t, expected.ExceptionExpression(), actual.ExceptionExpression()) {
+		t.Errorf("Exception expressions were not equal")
 		failed = true
 	}
 	if !assertListExpressionsEqual(t, expected.ListExpression(), actual.ListExpression()) {
@@ -74,8 +97,28 @@ func assertExpressionsEqual(t *testing.T, expected, actual w3c.Expression) bool 
 		t.Errorf("Alternate expressions were not equal")
 		failed = true
 	}
-	if !assertExceptionExpressionsEqual(t, expected.ExceptionExpression(), actual.ExceptionExpression()) {
-		t.Errorf("Exception expressions were not equal")
+	if expected.Optional() != actual.Optional() {
+		if expected.Optional() {
+			t.Errorf("Expected expression to be optional")
+		} else {
+			t.Errorf("Expected expression not to be optional")
+		}
+		failed = true
+	}
+	if expected.OneOrMore() != actual.OneOrMore() {
+		if expected.OneOrMore() {
+			t.Errorf("Expected expression to match one or more")
+		} else {
+			t.Errorf("Expected expression not to match one or more")
+		}
+		failed = true
+	}
+	if expected.ZeroOrMore() != actual.ZeroOrMore() {
+		if expected.ZeroOrMore() {
+			t.Errorf("Expected expression to match zero or more")
+		} else {
+			t.Errorf("Expected expression not to match zero or more")
+		}
 		failed = true
 	}
 	return !failed
@@ -121,52 +164,60 @@ func assertSymbolExpressionsEqual(t *testing.T, expected, actual *w3c.SymbolExpr
 	return false
 }
 
-func assertListExpressionsEqual(t *testing.T, expected, actual *w3c.ListExpression) bool {
+func assertCharacterSetExpressionsEqual(t *testing.T, expected, actual *w3c.CharacterSetExpression) bool {
 	t.Helper()
+	var failed bool
 	if expected == nil && actual == nil {
 		return true
 	}
 	if expected == nil {
-		t.Error("Got unexpected list expression.")
+		t.Error("Got unexpected character set expression.")
 		return false
 	}
 	if actual == nil {
-		t.Error("Expected list expression.")
+		t.Error("Expected character set expression.")
 		return false
 	}
-	if len(expected.Expressions) != len(actual.Expressions) {
-		t.Errorf("Expected %d expressions in list but got %d", len(expected.Expressions), len(actual.Expressions))
-		return false
+	if expected.Forbidden != actual.Forbidden {
+		if expected.Forbidden {
+			t.Errorf("Expected character set expression to be forbidden")
+		} else {
+			t.Errorf("Expected character set expression not to be forbidden")
+		}
+		failed = true
 	}
-	if assertSlicesEqual(t, expected.Expressions, actual.Expressions, "expressions", "expression", assertExpressionsEqual) {
+	if !assertSlicesEqual(t, expected.Enumerations, actual.Enumerations, "enumerations", "enumeration", assertEnumerationsEqual) {
+		t.Error("Character set expressions enumerations where not equal")
+		failed = true
+	}
+	if !assertSlicesEqual(t, expected.Ranges, actual.Ranges, "ranges", "range", assertRangesEqual) {
+		t.Error("Character set expressions ranges where not equal")
+		failed = true
+	}
+	return !failed
+}
+
+func assertEnumerationsEqual(t *testing.T, expected, actual rune) bool {
+	t.Helper()
+	if expected == actual {
 		return true
 	}
-	t.Error("List expressions where not equal")
+	t.Errorf("Expected enumeration %q but got %q", expected, actual)
 	return false
 }
 
-func assertAlternateExpressionsEqual(t *testing.T, expected, actual *w3c.AlternateExpression) bool {
+func assertRangesEqual(t *testing.T, expected, actual w3c.Range) bool {
 	t.Helper()
-	if expected == nil && actual == nil {
-		return true
+	var failed bool
+	if expected.Low != actual.Low {
+		t.Errorf("Expected range low to be %q but got %q", expected.Low, actual.Low)
+		failed = true
 	}
-	if expected == nil {
-		t.Error("Got unexpected alternate expression.")
-		return false
+	if expected.High != actual.High {
+		t.Errorf("Expected range high to be %q but got %q", expected.High, actual.High)
+		failed = true
 	}
-	if actual == nil {
-		t.Error("Expected alternate expression.")
-		return false
-	}
-	if len(expected.Expressions) != len(actual.Expressions) {
-		t.Errorf("Expected %d expressions in alternates but got %d", len(expected.Expressions), len(actual.Expressions))
-		return false
-	}
-	if assertSlicesEqual(t, expected.Expressions, actual.Expressions, "expressions", "expression", assertExpressionsEqual) {
-		return true
-	}
-	t.Error("Alternate expressions where not equal")
-	return false
+	return !failed
 }
 
 func assertExceptionExpressionsEqual(t *testing.T, expected, actual *w3c.ExceptionExpression) bool {
@@ -192,6 +243,46 @@ func assertExceptionExpressionsEqual(t *testing.T, expected, actual *w3c.Excepti
 		failed = true
 	}
 	return !failed
+}
+
+func assertListExpressionsEqual(t *testing.T, expected, actual *w3c.ListExpression) bool {
+	t.Helper()
+	if expected == nil && actual == nil {
+		return true
+	}
+	if expected == nil {
+		t.Error("Got unexpected list expression.")
+		return false
+	}
+	if actual == nil {
+		t.Error("Expected list expression.")
+		return false
+	}
+	if assertSlicesEqual(t, expected.Expressions, actual.Expressions, "expressions", "expression", assertExpressionsEqual) {
+		return true
+	}
+	t.Error("List expressions where not equal")
+	return false
+}
+
+func assertAlternateExpressionsEqual(t *testing.T, expected, actual *w3c.AlternateExpression) bool {
+	t.Helper()
+	if expected == nil && actual == nil {
+		return true
+	}
+	if expected == nil {
+		t.Error("Got unexpected alternate expression.")
+		return false
+	}
+	if actual == nil {
+		t.Error("Expected alternate expression.")
+		return false
+	}
+	if assertSlicesEqual(t, expected.Expressions, actual.Expressions, "expressions", "expression", assertExpressionsEqual) {
+		return true
+	}
+	t.Error("Alternate expressions where not equal")
+	return false
 }
 
 func TestParserParse(t *testing.T) {
@@ -345,6 +436,118 @@ func TestParserParse(t *testing.T) {
 				{
 					Symbol: "testRule", Line: 1, Expression: &w3c.SymbolExpression{
 						Symbol: "AnotherRule",
+					},
+				},
+			}},
+		},
+		{
+			name:    "parentheses override precedence",
+			grammar: "testRule ::= ('one' | 'two') 'three'",
+			expectedSyntax: w3c.Syntax{Rules: []w3c.Rule{
+				{
+					Symbol: "testRule", Line: 1, Expression: &w3c.ListExpression{
+						Expressions: []w3c.Expression{
+							&w3c.AlternateExpression{Expressions: []w3c.Expression{
+								&w3c.LiteralExpression{Literal: "one"},
+								&w3c.LiteralExpression{Literal: "two"},
+							}},
+							&w3c.LiteralExpression{Literal: "three"},
+						},
+					},
+				},
+			}},
+		},
+		{
+			name:    "character set enumeration with literals",
+			grammar: "testRule ::= [123]",
+			expectedSyntax: w3c.Syntax{Rules: []w3c.Rule{
+				{
+					Symbol: "testRule", Line: 1, Expression: &w3c.CharacterSetExpression{
+						Enumerations: []rune{'1', '2', '3'},
+					},
+				},
+			}},
+		},
+		{
+			name:    "character set enumeration with hex",
+			grammar: "testRule ::= [#x31#x32#x33]",
+			expectedSyntax: w3c.Syntax{Rules: []w3c.Rule{
+				{
+					Symbol: "testRule", Line: 1, Expression: &w3c.CharacterSetExpression{
+						Enumerations: []rune{'1', '2', '3'},
+					},
+				},
+			}},
+		},
+		{
+			name:    "character set enumeration with mixed hex and literals",
+			grammar: "testRule ::= [1#x32#x33]",
+			expectedSyntax: w3c.Syntax{Rules: []w3c.Rule{
+				{
+					Symbol: "testRule", Line: 1, Expression: &w3c.CharacterSetExpression{
+						Enumerations: []rune{'1', '2', '3'},
+					},
+				},
+			}},
+		},
+		{
+			name:    "character set range with mixed hex and literals",
+			grammar: "testRule ::= [1-#x33]",
+			expectedSyntax: w3c.Syntax{Rules: []w3c.Rule{
+				{
+					Symbol: "testRule", Line: 1, Expression: &w3c.CharacterSetExpression{
+						Ranges: []w3c.Range{{Low: '1', High: '3'}},
+					},
+				},
+			}},
+		},
+		{
+			name:    "non-zero positive integer definition",
+			grammar: "testRule ::= [1-9] [0-9]*",
+			expectedSyntax: w3c.Syntax{Rules: []w3c.Rule{
+				{
+					Symbol: "testRule", Line: 1, Expression: &w3c.ListExpression{
+						Expressions: []w3c.Expression{
+							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '1', High: '9'}}},
+							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '0', High: '9'}}, Repetitions: w3c.Repetitions{ZeroOrMore: true}},
+						},
+					},
+				},
+			}},
+		},
+		{
+			name: "multirule covering multiple possible combinations",
+			grammar: `
+PositiveInteger ::= [1-9] [0-9]*
+StringLiteral ::= '"' ( [^\"]* ( '\"' | '\' )? )*  '"'`,
+			expectedSyntax: w3c.Syntax{Rules: []w3c.Rule{
+				{
+					Symbol: "PositiveInteger", Line: 2, Expression: &w3c.ListExpression{
+						Expressions: []w3c.Expression{
+							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '1', High: '9'}}},
+							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '0', High: '9'}}, Repetitions: w3c.Repetitions{ZeroOrMore: true}},
+						},
+					},
+				},
+				{
+					Symbol: "StringLiteral", Line: 3, Expression: &w3c.ListExpression{
+						Expressions: []w3c.Expression{
+							&w3c.LiteralExpression{Literal: "\""},
+							&w3c.ListExpression{
+								Expressions: []w3c.Expression{
+									&w3c.CharacterSetExpression{Enumerations: []rune{'\\', '"'}, Forbidden: true, Repetitions: w3c.Repetitions{ZeroOrMore: true}},
+									&w3c.AlternateExpression{
+										Expressions: []w3c.Expression{
+											&w3c.LiteralExpression{Literal: "\\\""},
+											&w3c.LiteralExpression{Literal: "\\"},
+										},
+										Repetitions: w3c.Repetitions{Optional: true},
+									},
+								},
+								Repetitions: w3c.Repetitions{ZeroOrMore: true},
+							},
+							&w3c.LiteralExpression{Literal: "\""},
+						},
 					},
 				},
 			}},

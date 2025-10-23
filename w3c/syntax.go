@@ -27,15 +27,37 @@ type Expression interface {
 	setZeroOrMore(bool)
 	isParenthesised() bool
 	setParenthesised(bool)
+	hasRepetitions() bool
 }
 
-var _ Expression = &baseExpression{}
-
 type baseExpression struct {
-	optional      bool
-	oneOrMore     bool
-	zeroOrMore    bool
 	parenthesised bool
+}
+
+type Repetitions struct {
+	Optional   bool `json:",omitempty"`
+	OneOrMore  bool `json:",omitempty"`
+	ZeroOrMore bool `json:",omitempty"`
+}
+
+func (r *Repetitions) setOptional(optional bool) {
+	r.Optional = optional
+}
+
+func (r *Repetitions) setOneOrMore(oneOrMore bool) {
+	r.OneOrMore = oneOrMore
+}
+
+func (r *Repetitions) setZeroOrMore(zeroOrMore bool) {
+	r.ZeroOrMore = zeroOrMore
+}
+
+func (r *Repetitions) hasRepetitions() bool {
+	return !repetitionsEmpty(*r)
+}
+
+func repetitionsEmpty(r Repetitions) bool {
+	return !r.Optional && !r.OneOrMore && !r.ZeroOrMore
 }
 
 func (b *baseExpression) ListExpression() *ListExpression {
@@ -62,30 +84,6 @@ func (b *baseExpression) LiteralExpression() *LiteralExpression {
 	return nil
 }
 
-func (b *baseExpression) Optional() bool {
-	return b.optional
-}
-
-func (b *baseExpression) OneOrMore() bool {
-	return b.oneOrMore
-}
-
-func (b *baseExpression) ZeroOrMore() bool {
-	return b.zeroOrMore
-}
-
-func (b *baseExpression) setOptional(optional bool) {
-	b.optional = optional
-}
-
-func (b *baseExpression) setOneOrMore(oneOrMore bool) {
-	b.optional = oneOrMore
-}
-
-func (b *baseExpression) setZeroOrMore(zeroOrMore bool) {
-	b.optional = zeroOrMore
-}
-
 func (b *baseExpression) isParenthesised() bool {
 	return b.parenthesised
 }
@@ -98,17 +96,32 @@ var _ Expression = &ListExpression{}
 
 type ListExpression struct {
 	baseExpression
+	Repetitions
 	Expressions []Expression
 }
 
-func (l *ListExpression) ListExpression() *ListExpression {
-	return l
+func (a *ListExpression) Optional() bool {
+	return a.Repetitions.Optional
 }
 
-func (l *ListExpression) MarshalJSON() ([]byte, error) {
+func (a *ListExpression) OneOrMore() bool {
+	return a.Repetitions.OneOrMore
+}
+
+func (a *ListExpression) ZeroOrMore() bool {
+	return a.Repetitions.ZeroOrMore
+}
+
+func (a *ListExpression) ListExpression() *ListExpression {
+	return a
+}
+
+func (a *ListExpression) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"type":        "list",
-		"expressions": l.Expressions,
+		"list": a.Expressions,
+		//		"Optional":    a.Optional(),
+		//		"OneOrMore":   a.OneOrMore(),
+		//		"ZeroOrMore":  a.ZeroOrMore(),
 	})
 }
 
@@ -116,17 +129,32 @@ var _ Expression = &AlternateExpression{}
 
 type AlternateExpression struct {
 	baseExpression
+	Repetitions
 	Expressions []Expression
 }
 
-func (a *AlternateExpression) AlternateExpression() *AlternateExpression {
-	return a
+func (l *AlternateExpression) Optional() bool {
+	return l.Repetitions.Optional
 }
 
-func (a *AlternateExpression) MarshalJSON() ([]byte, error) {
+func (l *AlternateExpression) OneOrMore() bool {
+	return l.Repetitions.OneOrMore
+}
+
+func (l *AlternateExpression) ZeroOrMore() bool {
+	return l.Repetitions.ZeroOrMore
+}
+
+func (l *AlternateExpression) AlternateExpression() *AlternateExpression {
+	return l
+}
+
+func (l *AlternateExpression) MarshalJSON() ([]byte, error) {
 	return json.Marshal(map[string]interface{}{
-		"type":        "alternate",
-		"expressions": a.Expressions,
+		"alternate": l.Expressions,
+		//		"Optional":    l.Optional(),
+		//		"OneOrMore":   l.OneOrMore(),
+		//		"ZeroOrMore":  l.ZeroOrMore(),
 	})
 }
 
@@ -134,8 +162,21 @@ var _ Expression = &ExceptionExpression{}
 
 type ExceptionExpression struct {
 	baseExpression
+	Repetitions
 	Match  Expression
 	Except Expression
+}
+
+func (e *ExceptionExpression) Optional() bool {
+	return e.Repetitions.Optional
+}
+
+func (e *ExceptionExpression) OneOrMore() bool {
+	return e.Repetitions.OneOrMore
+}
+
+func (e *ExceptionExpression) ZeroOrMore() bool {
+	return e.Repetitions.ZeroOrMore
 }
 
 func (e *ExceptionExpression) ExceptionExpression() *ExceptionExpression {
@@ -146,7 +187,20 @@ var _ Expression = &SymbolExpression{}
 
 type SymbolExpression struct {
 	baseExpression
+	Repetitions
 	Symbol string
+}
+
+func (s *SymbolExpression) Optional() bool {
+	return s.Repetitions.Optional
+}
+
+func (s *SymbolExpression) OneOrMore() bool {
+	return s.Repetitions.OneOrMore
+}
+
+func (s *SymbolExpression) ZeroOrMore() bool {
+	return s.Repetitions.ZeroOrMore
 }
 
 func (e *SymbolExpression) SymbolExpression() *SymbolExpression {
@@ -157,9 +211,22 @@ var _ Expression = &CharacterSetExpression{}
 
 type CharacterSetExpression struct {
 	baseExpression
-	Enumerations []string
+	Repetitions
+	Enumerations []rune
 	Ranges       []Range
 	Forbidden    bool
+}
+
+func (c *CharacterSetExpression) Optional() bool {
+	return c.Repetitions.Optional
+}
+
+func (c *CharacterSetExpression) OneOrMore() bool {
+	return c.Repetitions.OneOrMore
+}
+
+func (c *CharacterSetExpression) ZeroOrMore() bool {
+	return c.Repetitions.ZeroOrMore
 }
 
 func (c *CharacterSetExpression) CharacterSetExpression() *CharacterSetExpression {
@@ -170,7 +237,20 @@ var _ Expression = &LiteralExpression{}
 
 type LiteralExpression struct {
 	baseExpression
+	Repetitions
 	Literal string
+}
+
+func (l *LiteralExpression) Optional() bool {
+	return l.Repetitions.Optional
+}
+
+func (l *LiteralExpression) OneOrMore() bool {
+	return l.Repetitions.OneOrMore
+}
+
+func (l *LiteralExpression) ZeroOrMore() bool {
+	return l.Repetitions.ZeroOrMore
 }
 
 func (l *LiteralExpression) LiteralExpression() *LiteralExpression {
