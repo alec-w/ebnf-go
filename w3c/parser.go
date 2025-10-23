@@ -395,38 +395,7 @@ func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
 		expressions = append(expressions, bAsList.Expressions...)
 	}
 	return &ListExpression{Expressions: expressions}
-	/*
-		if alternateExpression := second.AlternateExpression(); alternateExpression != nil && !second.isParenthesised() {
-			// Get the first expression in second (the alternate) and make it the end of the list and then make that the first in the alternate
-			// E.g. expression = A, next = alternate(B, C)
-			// becomes alternate(list (A, B), C)
-			list := p.expressionToList(first)
-			toAppendToList := []Expression{alternateExpression.Expressions[0]}
-			if firstFromAlternateAsList := toAppendToList[0].ListExpression(); firstFromAlternateAsList != nil {
-				toAppendToList = firstFromAlternateAsList.Expressions
-			}
-			list.Expressions = append(list.Expressions, toAppendToList...)
-			alternateExpression.Expressions = append([]Expression{list}, alternateExpression.Expressions[1:]...)
-			return alternateExpression
-		}
-		if nextListExpression := second.ListExpression(); nextListExpression != nil && !repetitionsEmpty(nextListExpression.Repetitions) {
-			nextListExpression.Expressions = append(p.expressionToList(first).Expressions, nextListExpression.Expressions...)
-			return nextListExpression
-		}
-		list := p.expressionToList(first)
-		list.Expressions = append(list.Expressions, second)
-		return list
-	*/
 }
-
-/*
-func (p *Parser) expressionToList(expression Expression) *ListExpression {
-	if expression := expression.ListExpression(); expression != nil {
-		return expression
-	}
-	return &ListExpression{Expressions: []Expression{expression}}
-}
-*/
 
 func (p *Parser) parseExpressionsAsAlternates(a, b Expression) Expression {
 	// A | B
@@ -446,28 +415,7 @@ func (p *Parser) parseExpressionsAsAlternates(a, b Expression) Expression {
 		secondTerms = bAsAlternate.Expressions
 	}
 	return &AlternateExpression{Expressions: append(firstTerms, secondTerms...)}
-	/*
-		// Make the expression an alternate with the next expression the last item
-		// E.g. expression = A, next = list(B, C)
-		// becomes alternate(A, list(B, C))
-		out := p.expressionToAlternates(first)
-		toAppend := []Expression{second}
-		if alternateExpression := second.AlternateExpression(); alternateExpression != nil && repetitionsEmpty(alternateExpression.Repetitions) {
-			toAppend = alternateExpression.Expressions
-		}
-		out.Expressions = append(out.Expressions, toAppend...)
-		return out
-	*/
 }
-
-/*
-func (p *Parser) expressionToAlternates(expression Expression) *AlternateExpression {
-	if expression := expression.AlternateExpression(); expression != nil {
-		return expression
-	}
-	return &AlternateExpression{Expressions: []Expression{expression}}
-}
-*/
 
 func (p *Parser) isRuleEnd() bool {
 	p.skipWhitespace()
