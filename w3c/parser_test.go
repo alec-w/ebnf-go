@@ -518,19 +518,32 @@ func TestParserParse(t *testing.T) {
 		{
 			name: "multirule covering multiple possible combinations",
 			grammar: `
-PositiveInteger ::= [1-9] [0-9]*
-StringLiteral ::= '"' ( [^\"]* ( '\"' | '\' )? )*  '"'`,
+S ::= [#x20#x9]*
+RS ::= [#x20#x9]+
+Integer ::= '0' | [1-9] [0-9]*
+StringLiteral ::= '"' ( [^\"]* ( '\"' | '\' )? )* '"'
+IntegerMultiplicationExpr ::= Integer | IntegerMultiplicationExpr S ('*' | '/') S Integer
+IntegerAdditionExpr ::= IntegerMultiplicationExpr | IntegerAdditionExpr S ('+' | '-') S IntegerMultiplicationExpr
+PrintKeyword ::= "print"
+PrintStatement ::= PrintKeyword RS ( StringLiteral | IntegerAdditionExpr )`,
 			expectedSyntax: w3c.Syntax{Rules: []w3c.Rule{
+				{Symbol: "S", Line: 2, Expression: &w3c.CharacterSetExpression{
+					Enumerations: []rune{' ', '\t'}, Repetitions: w3c.Repetitions{ZeroOrMore: true},
+				}},
+				{Symbol: "RS", Line: 3, Expression: &w3c.CharacterSetExpression{
+					Enumerations: []rune{' ', '\t'}, Repetitions: w3c.Repetitions{OneOrMore: true},
+				}},
 				{
-					Symbol: "PositiveInteger", Line: 2, Expression: &w3c.ListExpression{
-						Expressions: []w3c.Expression{
+					Symbol: "Integer", Line: 4, Expression: &w3c.AlternateExpression{Expressions: []w3c.Expression{
+						&w3c.LiteralExpression{Literal: "0"},
+						&w3c.ListExpression{Expressions: []w3c.Expression{
 							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '1', High: '9'}}},
 							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '0', High: '9'}}, Repetitions: w3c.Repetitions{ZeroOrMore: true}},
-						},
-					},
+						}},
+					}},
 				},
 				{
-					Symbol: "StringLiteral", Line: 3, Expression: &w3c.ListExpression{
+					Symbol: "StringLiteral", Line: 5, Expression: &w3c.ListExpression{
 						Expressions: []w3c.Expression{
 							&w3c.LiteralExpression{Literal: "\""},
 							&w3c.ListExpression{
@@ -549,6 +562,49 @@ StringLiteral ::= '"' ( [^\"]* ( '\"' | '\' )? )*  '"'`,
 							&w3c.LiteralExpression{Literal: "\""},
 						},
 					},
+				},
+				{
+					Symbol: "IntegerMultiplicationExpr", Line: 6, Expression: &w3c.AlternateExpression{Expressions: []w3c.Expression{
+						&w3c.SymbolExpression{Symbol: "Integer"},
+						&w3c.ListExpression{Expressions: []w3c.Expression{
+							&w3c.SymbolExpression{Symbol: "IntegerMultiplicationExpr"},
+							&w3c.SymbolExpression{Symbol: "S"},
+							&w3c.AlternateExpression{Expressions: []w3c.Expression{
+								&w3c.LiteralExpression{Literal: "*"},
+								&w3c.LiteralExpression{Literal: "/"},
+							}},
+							&w3c.SymbolExpression{Symbol: "S"},
+							&w3c.SymbolExpression{Symbol: "Integer"},
+						}},
+					}},
+				},
+				{
+					Symbol: "IntegerAdditionExpr", Line: 7, Expression: &w3c.AlternateExpression{Expressions: []w3c.Expression{
+						&w3c.SymbolExpression{Symbol: "IntegerMultiplicationExpr"},
+						&w3c.ListExpression{Expressions: []w3c.Expression{
+							&w3c.SymbolExpression{Symbol: "IntegerAdditionExpr"},
+							&w3c.SymbolExpression{Symbol: "S"},
+							&w3c.AlternateExpression{Expressions: []w3c.Expression{
+								&w3c.LiteralExpression{Literal: "+"},
+								&w3c.LiteralExpression{Literal: "-"},
+							}},
+							&w3c.SymbolExpression{Symbol: "S"},
+							&w3c.SymbolExpression{Symbol: "IntegerMultiplicationExpr"},
+						}},
+					}},
+				},
+				{
+					Symbol: "PrintKeyword", Line: 8, Expression: &w3c.LiteralExpression{Literal: "print"},
+				},
+				{
+					Symbol: "PrintStatement", Line: 9, Expression: &w3c.ListExpression{Expressions: []w3c.Expression{
+						&w3c.SymbolExpression{Symbol: "PrintKeyword"},
+						&w3c.SymbolExpression{Symbol: "RS"},
+						&w3c.AlternateExpression{Expressions: []w3c.Expression{
+							&w3c.SymbolExpression{Symbol: "StringLiteral"},
+							&w3c.SymbolExpression{Symbol: "IntegerAdditionExpr"},
+						}},
+					}},
 				},
 			}},
 		},

@@ -325,96 +325,161 @@ func (p *Parser) parseCharacterSetEnumeration() ([]rune, error) {
 
 func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
 	// A B
-	// A or B have repetitions => list(A, B)
-	// A or B is parethesised alternate => list(A, B)
-	// A and B are both alternates => list(alt(A[:-1]), A[-1], B[0], alt(B[1:]))
-	// A is alternate and B is not list => alt(A[:-1], list(A[-1], B))
-	// A is alternate and B is list => alt(A[:-1], list(A[-1], B...))
-	// B is alternate and A is not list => alt(list(A, B[0]), B[1:])
-	// B is alternate and A is list => alt(list(A..., B[0]), B[1:])
-	// A is list and B is not list => list(A..., B)
-	// A is not list and B is list => list(A, B...)
-	// A is list and B is list => list(A..., B...)
-	// else => list(A, B)
-	aAsAlternate := a.AlternateExpression()
-	bAsAlternate := b.AlternateExpression()
+	// B is simple expression
+	// (A1 | A2 | A3) B => list(A, B)
+	// (A1 A2 A3)? B => list(A, B)
+	// A1 A2 A3 B => list(A..., B)
+	// A1 | A2 | A3 B => alt(A[:-1]..., listJoin(A[-1], B))
+	// A B => list(A, B)
+	// B is parenthesised alternate
+	// (A1 | A2 | A3) (B1 | B2 | B3) => list(A, B)
+	// (A1 A2 A3)? (B1 | B2 | B3) => list(A, B)
+	// A1 A2 A3 (B1 | B2 | B3) => list(A... B)
+	// A1 | A2 | A3 (B1 | B2 | B3) => alt(A[:-1]..., listJoin(A[-1], B))
+	// A (B1 | B2 | B3) => list(A, B)
+	// B has repetitions
+	// (A1 | A2 | A3) (B1 B2 B3)? => list(A, B)
+	// (A1 A2 A3)? (B1 B2 B3)? => list(A, B)
+	// A1 A2 A3 (B1 B2 B3)? => list(A..., B)
+	// A1 | A2 | A3 (B1 B2 B3)? => alt(A[:-1]..., listJoin(A[-1], B))
+	// A (B1 B2 B3)? => list(A, B)
+	// B is list without repetitions
+	// (A1 | A2 | A3) B1 B2 B3 => list(A, B...)
+	// (A1 A2 A3)? B1 B2 B3 => list(A, B...)
+	// A1 A2 A3 B1 B2 B3 => list(A..., B...)
+	// A1 | A2 | A3 B1 B2 B3 => alt(A[:-1]..., listJoin(A[-1], B))
+	// A B1 B2 B3 => list(A, B...)
+	// B is alternate without parentheses or repetitions
+	// (A1 | A2 | A3) B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// (A1 A2 A3)? B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// A1 A2 A3 B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// A B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// A1 | A2 | A3 B1 | B2 | B3 => alt(A[:-1]..., listJoin(A[-1], B[0]), B[1:]...)
+	//
+	// Reordered
+	// Set 1
+	// (A1 | A2 | A3) B => list(A, B)
+	// (A1 A2 A3)? B => list(A, B)
+	// A B => list(A, B)
+	// (A1 | A2 | A3) (B1 | B2 | B3) => list(A, B)
+	// (A1 A2 A3)? (B1 | B2 | B3) => list(A, B)
+	// A (B1 | B2 | B3) => list(A, B)
+	// (A1 | A2 | A3) (B1 B2 B3)? => list(A, B)
+	// (A1 A2 A3)? (B1 B2 B3)? => list(A, B)
+	// A (B1 B2 B3)? => list(A, B)
+	// Set 2a
+	// A1 A2 A3 B => list(A..., B)
+	// A1 A2 A3 (B1 | B2 | B3) => list(A... B)
+	// A1 A2 A3 (B1 B2 B3)? => list(A..., B)
+	// Set 2b
+	// (A1 | A2 | A3) B1 B2 B3 => list(A, B...)
+	// (A1 A2 A3)? B1 B2 B3 => list(A, B...)
+	// A B1 B2 B3 => list(A, B...)
+	// Set 2c
+	// A1 A2 A3 B1 B2 B3 => list(A..., B...)
+	// Set 3a
+	// A1 | A2 | A3 B => alt(A[:-1]..., listJoin(A[-1], B))
+	// A1 | A2 | A3 (B1 | B2 | B3) => alt(A[:-1]..., listJoin(A[-1], B))
+	// A1 | A2 | A3 (B1 B2 B3)? => alt(A[:-1]..., listJoin(A[-1], B))
+	// A1 | A2 | A3 B1 B2 B3 => alt(A[:-1]..., listJoin(A[-1], B))
+	// Set 3b
+	// (A1 | A2 | A3) B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// (A1 A2 A3)? B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// A1 A2 A3 B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// A B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// Set 3c
+	// A1 | A2 | A3 B1 | B2 | B3 => alt(A[:-1]..., listJoin(A[-1], B[0]), B[1:]...)
 	aAsList := a.ListExpression()
 	bAsList := b.ListExpression()
-	if (a.hasRepetitions() || b.hasRepetitions()) ||
-		(aAsAlternate != nil && a.isParenthesised()) ||
-		(bAsAlternate != nil && b.isParenthesised()) ||
-		((aAsList == nil && bAsList == nil) && (aAsAlternate == nil && bAsAlternate == nil)) {
+	aAsAlternate := a.AlternateExpression()
+	bAsAlternate := b.AlternateExpression()
+	// Set 1
+	// (A1 | A2 | A3) B => list(A, B)
+	// (A1 A2 A3)? B => list(A, B)
+	// A B => list(A, B)
+	// (A1 | A2 | A3) (B1 | B2 | B3) => list(A, B)
+	// (A1 A2 A3)? (B1 | B2 | B3) => list(A, B)
+	// A (B1 | B2 | B3) => list(A, B)
+	// (A1 | A2 | A3) (B1 B2 B3)? => list(A, B)
+	// (A1 A2 A3)? (B1 B2 B3)? => list(A, B)
+	// A (B1 B2 B3)? => list(A, B)
+	if ((aAsAlternate != nil && a.isParenthesised()) || a.hasRepetitions() || (aAsAlternate == nil && aAsList == nil)) &&
+		((bAsAlternate != nil && b.isParenthesised()) || b.hasRepetitions() || (bAsAlternate == nil && bAsList == nil)) {
 		return &ListExpression{Expressions: []Expression{a, b}}
 	}
+	// Set 2a
+	// A1 A2 A3 B => list(A..., B)
+	// A1 A2 A3 (B1 | B2 | B3) => list(A... B)
+	// A1 A2 A3 (B1 B2 B3)? => list(A..., B)
+	// Set 2b
+	// (A1 | A2 | A3) B1 B2 B3 => list(A, B...)
+	// (A1 A2 A3)? B1 B2 B3 => list(A, B...)
+	// A B1 B2 B3 => list(A, B...)
+	// Set 2c
+	// A1 A2 A3 B1 B2 B3 => list(A..., B...)
+	if (aAsList != nil && ((bAsAlternate != nil && b.isParenthesised()) || b.hasRepetitions() || (bAsAlternate == nil && bAsList == nil))) ||
+		(bAsList != nil && ((aAsAlternate != nil && a.isParenthesised()) || a.hasRepetitions() || (aAsAlternate == nil && aAsList == nil))) {
+		var expressions []Expression
+		if aAsList != nil && !a.hasRepetitions() {
+			expressions = append(expressions, aAsList.Expressions...)
+		} else {
+			expressions = append(expressions, a)
+		}
+		if bAsList != nil && !b.hasRepetitions() {
+			expressions = append(expressions, bAsList.Expressions...)
+		} else {
+			expressions = append(expressions, b)
+		}
+		return &ListExpression{Expressions: expressions}
+	}
+	// Set 3a
+	// A1 | A2 | A3 B => alt(A[:-1]..., listJoin(A[-1], B))
+	// A1 | A2 | A3 (B1 | B2 | B3) => alt(A[:-1]..., listJoin(A[-1], B))
+	// A1 | A2 | A3 (B1 B2 B3)? => alt(A[:-1]..., listJoin(A[-1], B))
+	// A1 | A2 | A3 B1 B2 B3 => alt(A[:-1]..., listJoin(A[-1], B))
+	// Set 3b
+	// (A1 | A2 | A3) B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// (A1 A2 A3)? B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// A1 A2 A3 B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// A B1 | B2 | B3 => alt(listJoin(A, B[0]), B[1:]...)
+	// Set 3c
+	// A1 | A2 | A3 B1 | B2 | B3 => alt(A[:-1]..., listJoin(A[-1], B[0]), B[1:]...)
 	if aAsAlternate != nil && bAsAlternate != nil {
-		middle := []Expression{aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1], bAsAlternate.Expressions[0]}
-		aAsAlternate.Expressions = aAsAlternate.Expressions[:len(aAsAlternate.Expressions)-1]
-		bAsAlternate.Expressions = bAsAlternate.Expressions[1:]
 		return &AlternateExpression{Expressions: append(
 			append(
-				aAsAlternate.Expressions,
-				middle...,
+				aAsAlternate.Expressions[:len(aAsAlternate.Expressions)-1],
+				p.parseExpressionsAsList(aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1], bAsAlternate.Expressions[0]),
 			),
-			bAsAlternate.Expressions...,
-		),
-		}
+			bAsAlternate.Expressions[1:]...,
+		)}
+	} else if aAsAlternate != nil {
+		return &AlternateExpression{Expressions: append(
+			aAsAlternate.Expressions[:len(aAsAlternate.Expressions)-1],
+			p.parseExpressionsAsList(aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1], b),
+		)}
+	} else {
+		return &AlternateExpression{Expressions: append(
+			[]Expression{p.parseExpressionsAsList(a, bAsAlternate.Expressions[0])},
+			bAsAlternate.Expressions[1:]...,
+		)}
 	}
-	if aAsAlternate != nil {
-		listExpression := &ListExpression{Expressions: []Expression{aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1]}}
-		if first := listExpression.Expressions[0].ListExpression(); first != nil {
-			listExpression = first
-		}
-		aAsAlternate.Expressions = aAsAlternate.Expressions[:len(aAsAlternate.Expressions)-1]
-		if bAsList != nil {
-			listExpression.Expressions = append(listExpression.Expressions, bAsList.Expressions...)
-		} else {
-			listExpression.Expressions = append(listExpression.Expressions, b)
-		}
-		return &AlternateExpression{Expressions: append(aAsAlternate.Expressions, listExpression)}
-	}
-	if bAsAlternate != nil {
-		listExpression := &ListExpression{Expressions: []Expression{bAsAlternate.Expressions[0]}}
-		if first := listExpression.Expressions[0].ListExpression(); first != nil {
-			listExpression = first
-		}
-		bAsAlternate.Expressions = bAsAlternate.Expressions[1:]
-		if aAsList != nil {
-			listExpression.Expressions = append(aAsList.Expressions, listExpression.Expressions...)
-		} else {
-			listExpression.Expressions = append([]Expression{a}, listExpression.Expressions...)
-		}
-		return &AlternateExpression{Expressions: append([]Expression{listExpression}, bAsAlternate.Expressions...)}
-	}
-	expressions := []Expression{a}
-	if aAsList != nil {
-		expressions = aAsList.Expressions
-	}
-	expressions = append(expressions, b)
-	if bAsList != nil {
-		expressions = expressions[:len(expressions)-1]
-		expressions = append(expressions, bAsList.Expressions...)
-	}
-	return &ListExpression{Expressions: expressions}
 }
 
 func (p *Parser) parseExpressionsAsAlternates(a, b Expression) Expression {
-	// A | B
-	// if A or B has repetitions => alt(A, B)
-	// if A is alternate => first_terms = A... else A
-	// if B is alternate => second_terms = B... else B
-	// => alt(first_terms..., second_terms...)
-	if a.hasRepetitions() || b.hasRepetitions() {
-		return &AlternateExpression{Expressions: []Expression{a, b}}
+	aAsAlternate := a.AlternateExpression()
+	bAsAlternate := b.AlternateExpression()
+	var expressions []Expression
+	if aAsAlternate != nil && !a.hasRepetitions() {
+		expressions = append(expressions, aAsAlternate.Expressions...)
+	} else {
+		expressions = append(expressions, a)
 	}
-	firstTerms := []Expression{a}
-	if aAsAlternate := a.AlternateExpression(); aAsAlternate != nil {
-		firstTerms = aAsAlternate.Expressions
+	if bAsAlternate != nil && !b.hasRepetitions() {
+		expressions = append(expressions, bAsAlternate.Expressions...)
+	} else {
+		expressions = append(expressions, b)
 	}
-	secondTerms := []Expression{b}
-	if bAsAlternate := b.AlternateExpression(); bAsAlternate != nil {
-		secondTerms = bAsAlternate.Expressions
-	}
-	return &AlternateExpression{Expressions: append(firstTerms, secondTerms...)}
+	return &AlternateExpression{Expressions: expressions}
 }
 
 func (p *Parser) isRuleEnd() bool {
@@ -427,10 +492,15 @@ func (p *Parser) isRuleEnd() bool {
 		return false
 	}
 	startOffset := p.offset
+	startLine := p.line
 	p.parseSymbol()
 	p.skipWhitespace()
 	potentialDefiningSymbolOffset := p.offset
 	p.offset = startOffset
+	p.line = startLine
+	if potentialDefiningSymbolOffset+3 >= len(p.source) {
+		return false
+	}
 	return p.source[potentialDefiningSymbolOffset:potentialDefiningSymbolOffset+3] == "::="
 }
 
