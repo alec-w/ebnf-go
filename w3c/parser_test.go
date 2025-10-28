@@ -42,6 +42,7 @@ func assertSyntaxesEqual(t *testing.T, expected, actual w3c.Syntax) bool {
 		return true
 	}
 	t.Error("Syntax rules were not equal.")
+
 	return false
 }
 
@@ -56,6 +57,7 @@ func assertRulesEqual(t *testing.T, expected, actual w3c.Rule) bool {
 		t.Errorf("Expected rule to be from line %d but got %d.", expected.Line, actual.Line)
 		failed = true
 	}
+
 	return assertExpressionsEqual(t, expected.Expression, actual.Expression) && !failed
 }
 
@@ -67,10 +69,12 @@ func assertExpressionsEqual(t *testing.T, expected, actual w3c.Expression) bool 
 	}
 	if expected == nil {
 		t.Error("Got unexpected expression")
+
 		return false
 	}
 	if actual == nil {
 		t.Error("Expected expression")
+
 		return false
 	}
 	if !assertLiteralExpressionsEqual(t, expected.LiteralExpression(), actual.LiteralExpression()) {
@@ -81,11 +85,19 @@ func assertExpressionsEqual(t *testing.T, expected, actual w3c.Expression) bool 
 		t.Errorf("Symbol expressions were not equal")
 		failed = true
 	}
-	if !assertCharacterSetExpressionsEqual(t, expected.CharacterSetExpression(), actual.CharacterSetExpression()) {
+	if !assertCharacterSetExpressionsEqual(
+		t,
+		expected.CharacterSetExpression(),
+		actual.CharacterSetExpression(),
+	) {
 		t.Errorf("Character set expressions were not equal")
 		failed = true
 	}
-	if !assertExceptionExpressionsEqual(t, expected.ExceptionExpression(), actual.ExceptionExpression()) {
+	if !assertExceptionExpressionsEqual(
+		t,
+		expected.ExceptionExpression(),
+		actual.ExceptionExpression(),
+	) {
 		t.Errorf("Exception expressions were not equal")
 		failed = true
 	}
@@ -93,7 +105,11 @@ func assertExpressionsEqual(t *testing.T, expected, actual w3c.Expression) bool 
 		t.Errorf("List expressions were not equal")
 		failed = true
 	}
-	if !assertAlternateExpressionsEqual(t, expected.AlternateExpression(), actual.AlternateExpression()) {
+	if !assertAlternateExpressionsEqual(
+		t,
+		expected.AlternateExpression(),
+		actual.AlternateExpression(),
+	) {
 		t.Errorf("Alternate expressions were not equal")
 		failed = true
 	}
@@ -121,6 +137,7 @@ func assertExpressionsEqual(t *testing.T, expected, actual w3c.Expression) bool 
 		}
 		failed = true
 	}
+
 	return !failed
 }
 
@@ -131,16 +148,23 @@ func assertLiteralExpressionsEqual(t *testing.T, expected, actual *w3c.LiteralEx
 	}
 	if expected == nil {
 		t.Error("Got unexpected literal expression.")
+
 		return false
 	}
 	if actual == nil {
 		t.Error("Expected literal expression.")
+
 		return false
 	}
 	if expected.Literal == actual.Literal {
 		return true
 	}
-	t.Errorf("Expected literal expression to have literal %q but got %q.", expected.Literal, actual.Literal)
+	t.Errorf(
+		"Expected literal expression to have literal %q but got %q.",
+		expected.Literal,
+		actual.Literal,
+	)
+
 	return false
 }
 
@@ -151,20 +175,30 @@ func assertSymbolExpressionsEqual(t *testing.T, expected, actual *w3c.SymbolExpr
 	}
 	if expected == nil {
 		t.Error("Got unexpected symbol expression.")
+
 		return false
 	}
 	if actual == nil {
 		t.Error("Expected symbol expression.")
+
 		return false
 	}
 	if expected.Symbol == actual.Symbol {
 		return true
 	}
-	t.Errorf("Expected symbol expression to have symbol %q but got %q.", expected.Symbol, actual.Symbol)
+	t.Errorf(
+		"Expected symbol expression to have symbol %q but got %q.",
+		expected.Symbol,
+		actual.Symbol,
+	)
+
 	return false
 }
 
-func assertCharacterSetExpressionsEqual(t *testing.T, expected, actual *w3c.CharacterSetExpression) bool {
+func assertCharacterSetExpressionsEqual(
+	t *testing.T,
+	expected, actual *w3c.CharacterSetExpression,
+) bool {
 	t.Helper()
 	var failed bool
 	if expected == nil && actual == nil {
@@ -172,10 +206,12 @@ func assertCharacterSetExpressionsEqual(t *testing.T, expected, actual *w3c.Char
 	}
 	if expected == nil {
 		t.Error("Got unexpected character set expression.")
+
 		return false
 	}
 	if actual == nil {
 		t.Error("Expected character set expression.")
+
 		return false
 	}
 	if expected.Forbidden != actual.Forbidden {
@@ -186,7 +222,14 @@ func assertCharacterSetExpressionsEqual(t *testing.T, expected, actual *w3c.Char
 		}
 		failed = true
 	}
-	if !assertSlicesEqual(t, expected.Enumerations, actual.Enumerations, "enumerations", "enumeration", assertEnumerationsEqual) {
+	if !assertSlicesEqual(
+		t,
+		expected.Enumerations,
+		actual.Enumerations,
+		"enumerations",
+		"enumeration",
+		assertEnumerationsEqual,
+	) {
 		t.Error("Character set expressions enumerations where not equal")
 		failed = true
 	}
@@ -194,6 +237,7 @@ func assertCharacterSetExpressionsEqual(t *testing.T, expected, actual *w3c.Char
 		t.Error("Character set expressions ranges where not equal")
 		failed = true
 	}
+
 	return !failed
 }
 
@@ -203,6 +247,7 @@ func assertEnumerationsEqual(t *testing.T, expected, actual rune) bool {
 		return true
 	}
 	t.Errorf("Expected enumeration %q but got %q", expected, actual)
+
 	return false
 }
 
@@ -217,6 +262,7 @@ func assertRangesEqual(t *testing.T, expected, actual w3c.Range) bool {
 		t.Errorf("Expected range high to be %q but got %q", expected.High, actual.High)
 		failed = true
 	}
+
 	return !failed
 }
 
@@ -228,10 +274,12 @@ func assertExceptionExpressionsEqual(t *testing.T, expected, actual *w3c.Excepti
 	}
 	if expected == nil {
 		t.Error("Got unexpected exception expression.")
+
 		return false
 	}
 	if actual == nil {
 		t.Error("Expected exception expression.")
+
 		return false
 	}
 	if !assertExpressionsEqual(t, expected.Match, actual.Match) {
@@ -242,6 +290,7 @@ func assertExceptionExpressionsEqual(t *testing.T, expected, actual *w3c.Excepti
 		t.Error("Exception except expression were not equal.")
 		failed = true
 	}
+
 	return !failed
 }
 
@@ -252,16 +301,26 @@ func assertListExpressionsEqual(t *testing.T, expected, actual *w3c.ListExpressi
 	}
 	if expected == nil {
 		t.Error("Got unexpected list expression.")
+
 		return false
 	}
 	if actual == nil {
 		t.Error("Expected list expression.")
+
 		return false
 	}
-	if assertSlicesEqual(t, expected.Expressions, actual.Expressions, "expressions", "expression", assertExpressionsEqual) {
+	if assertSlicesEqual(
+		t,
+		expected.Expressions,
+		actual.Expressions,
+		"expressions",
+		"expression",
+		assertExpressionsEqual,
+	) {
 		return true
 	}
 	t.Error("List expressions where not equal")
+
 	return false
 }
 
@@ -272,16 +331,26 @@ func assertAlternateExpressionsEqual(t *testing.T, expected, actual *w3c.Alterna
 	}
 	if expected == nil {
 		t.Error("Got unexpected alternate expression.")
+
 		return false
 	}
 	if actual == nil {
 		t.Error("Expected alternate expression.")
+
 		return false
 	}
-	if assertSlicesEqual(t, expected.Expressions, actual.Expressions, "expressions", "expression", assertExpressionsEqual) {
+	if assertSlicesEqual(
+		t,
+		expected.Expressions,
+		actual.Expressions,
+		"expressions",
+		"expression",
+		assertExpressionsEqual,
+	) {
 		return true
 	}
 	t.Error("Alternate expressions where not equal")
+
 	return false
 }
 
@@ -509,7 +578,10 @@ func TestParserParse(t *testing.T) {
 					Symbol: "testRule", Line: 1, Expression: &w3c.ListExpression{
 						Expressions: []w3c.Expression{
 							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '1', High: '9'}}},
-							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '0', High: '9'}}, Repetitions: w3c.Repetitions{ZeroOrMore: true}},
+							&w3c.CharacterSetExpression{
+								Ranges:      []w3c.Range{{Low: '0', High: '9'}},
+								Repetitions: w3c.Repetitions{ZeroOrMore: true},
+							},
 						},
 					},
 				},
@@ -538,7 +610,10 @@ PrintStatement ::= PrintKeyword RS ( StringLiteral | IntegerAdditionExpr )`,
 						&w3c.LiteralExpression{Literal: "0"},
 						&w3c.ListExpression{Expressions: []w3c.Expression{
 							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '1', High: '9'}}},
-							&w3c.CharacterSetExpression{Ranges: []w3c.Range{{Low: '0', High: '9'}}, Repetitions: w3c.Repetitions{ZeroOrMore: true}},
+							&w3c.CharacterSetExpression{
+								Ranges:      []w3c.Range{{Low: '0', High: '9'}},
+								Repetitions: w3c.Repetitions{ZeroOrMore: true},
+							},
 						}},
 					}},
 				},
@@ -548,7 +623,11 @@ PrintStatement ::= PrintKeyword RS ( StringLiteral | IntegerAdditionExpr )`,
 							&w3c.LiteralExpression{Literal: "\""},
 							&w3c.ListExpression{
 								Expressions: []w3c.Expression{
-									&w3c.CharacterSetExpression{Enumerations: []rune{'\\', '"'}, Forbidden: true, Repetitions: w3c.Repetitions{ZeroOrMore: true}},
+									&w3c.CharacterSetExpression{
+										Enumerations: []rune{'\\', '"'},
+										Forbidden:    true,
+										Repetitions:  w3c.Repetitions{ZeroOrMore: true},
+									},
 									&w3c.AlternateExpression{
 										Expressions: []w3c.Expression{
 											&w3c.LiteralExpression{Literal: "\\\""},

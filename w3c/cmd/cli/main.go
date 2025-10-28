@@ -10,22 +10,8 @@ import (
 	"github.com/alec-w/ebnf-go/w3c"
 )
 
-//const sample = `StringLiteral ::= '"' ( [^\"]* ( '\"' | '\' )? )*  '"'`
-
-//const sample = `StringLiteral ::= '1' ( '2'* ( '3' | '4' )? )*  '5'`
-
 const sample = `test ::= '1' | '2' '3' ('4' | '5') '6' '7'`
 
-/*
-'1' | '2' '3' ('4' | '5') '6' '7'
----
-'7'
-'6' '7'
-('4' | '5') '6' '7'
-'3' ('4' | '5') '6' '7'
-'2' '3' ('4' | '5') '6' '7'
-'1' | '2' '3' ('4' | '5') '6' '7'
-*/
 func main() {
 	parser := w3c.New()
 	syntax, err := parser.Parse(sample)

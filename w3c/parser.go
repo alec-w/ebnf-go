@@ -7,21 +7,25 @@ import (
 	"unicode/utf8"
 )
 
+// Parser parses an EBNF grammar into a Syntax.
 type Parser struct {
 	source string
 	offset int
 	line   int
 }
 
+// New instantiates a Parser.
 func New() *Parser {
 	return &Parser{}
 }
 
+// Parse parses the given EBNF grammar into a Syntax representation.
 func (p *Parser) Parse(source string) (Syntax, error) {
 	p.source = source
 	p.offset = 0
 	p.line = 1
 	syntax, err := p.parseSyntax()
+
 	return syntax, err
 }
 
@@ -41,23 +45,39 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 func (p *Parser) parseRule() (Rule, error) {
 	p.skipWhitespace()
 	if char, _ := utf8.DecodeRuneInString(p.source[p.offset:]); !p.isBasicLatinLetter(char) {
-		return Rule{}, fmt.Errorf("expected start of rule on line %d at total offset %d to begin with basic latin letter", p.line, p.offset)
+		return Rule{}, fmt.Errorf(
+			"expected start of rule on line %d at total offset %d to begin with basic latin letter",
+			p.line,
+			p.offset,
+		)
 	}
 	rule := Rule{Symbol: p.parseSymbol(), Line: p.line}
 	p.skipWhitespace()
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != ':' {
-		return Rule{}, fmt.Errorf("expected rule defining symbol on line %d at total offset %d to be ':=='", p.line, p.offset)
+		return Rule{}, fmt.Errorf(
+			"expected rule defining symbol on line %d at total offset %d to be ':=='",
+			p.line,
+			p.offset,
+		)
 	}
 	p.offset += width
 	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != ':' {
-		return Rule{}, fmt.Errorf("expected rule defining symbol on line %d at total offset %d to be '::='", p.line, p.offset)
+		return Rule{}, fmt.Errorf(
+			"expected rule defining symbol on line %d at total offset %d to be '::='",
+			p.line,
+			p.offset,
+		)
 	}
 	p.offset += width
 	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != '=' {
-		return Rule{}, fmt.Errorf("expected rule defining symbol on line %d at total offset %d to be '::='", p.line, p.offset)
+		return Rule{}, fmt.Errorf(
+			"expected rule defining symbol on line %d at total offset %d to be '::='",
+			p.line,
+			p.offset,
+		)
 	}
 	p.offset += width
 	expression, err := p.parseExpression(false)
@@ -65,15 +85,17 @@ func (p *Parser) parseRule() (Rule, error) {
 		return Rule{}, err
 	}
 	rule.Expression = expression
+
 	return rule, nil
 }
 
 func (p *Parser) parseSymbol() string {
 	var symbol []rune
-	for char, width := utf8.DecodeRuneInString(p.source[p.offset:]); p.isBasicLatinLetter(char); char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+	for char, width := p.next(); p.isBasicLatinLetter(char); char, width = p.next() {
 		symbol = append(symbol, char)
 		p.offset += width
 	}
+
 	return string(symbol)
 }
 
@@ -102,7 +124,9 @@ func (p *Parser) parseExpression(_ bool) (Expression, error) {
 		p.skipWhitespace()
 		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != ')' {
-			return nil, fmt.Errorf("expected closing parenthesis at end of parenthesised expression")
+			return nil, fmt.Errorf(
+				"expected closing parenthesis at end of parenthesised expression",
+			)
 		}
 		p.offset += width
 		expression.setParenthesised(true)
@@ -138,9 +162,12 @@ func (p *Parser) parseExpression(_ bool) (Expression, error) {
 		case char == ')':
 			return expression, nil
 		default:
-			return nil, fmt.Errorf("expected end of rule, another expression, or an expression alternate symbol")
+			return nil, fmt.Errorf(
+				"expected end of rule, another expression, or an expression alternate symbol",
+			)
 		}
 	}
+
 	return expression, nil
 }
 
@@ -162,7 +189,10 @@ func (p *Parser) parseSimpleExpression() (Expression, error) {
 		return &SymbolExpression{Symbol: p.parseSymbol()}, nil
 	default:
 		// error
-		return nil, fmt.Errorf("looking for start of expression but character at offset %d was not the start of an expression", p.offset)
+		return nil, fmt.Errorf(
+			"looking for start of expression but character at offset %d was not the start of an expression",
+			p.offset,
+		)
 	}
 }
 
@@ -182,6 +212,7 @@ func (p *Parser) parseExpressionRepetitions(expression Expression) Expression {
 	default:
 		// No repetitions
 	}
+
 	return expression
 }
 
@@ -209,6 +240,7 @@ func (p *Parser) parseExpressionException(expression Expression) (Expression, er
 		expression = p.parseExpressionRepetitions(expression)
 	}
 	exceptExpression.Except = expression
+
 	return exceptExpression, nil
 }
 
@@ -217,11 +249,12 @@ func (p *Parser) parseLiteralExpression() *LiteralExpression {
 	p.offset += width
 	expression := &LiteralExpression{}
 	var char rune
-	for char, width = utf8.DecodeRuneInString(p.source[p.offset:]); char != terminalChar; char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+	for char, width = p.next(); char != terminalChar; char, width = p.next() {
 		expression.Literal += string(char)
 		p.offset += width
 	}
 	p.offset += width
+
 	return expression
 }
 
@@ -232,6 +265,7 @@ func (p *Parser) parseCharacterSetExpression() (*CharacterSetExpression, error) 
 		if err != nil {
 			return nil, err
 		}
+
 		return &CharacterSetExpression{Enumerations: []rune{char}}, nil
 	}
 	p.offset += width
@@ -241,7 +275,7 @@ func (p *Parser) parseCharacterSetExpression() (*CharacterSetExpression, error) 
 		expression.Forbidden = true
 		p.offset += width
 	}
-	for char, width = utf8.DecodeRuneInString(p.source[p.offset:]); char != ']'; char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+	for char, width = p.next(); char != ']'; char, width = p.next() {
 		if char == '#' {
 			var err error
 			char, err = p.parseHexCharacter()
@@ -276,6 +310,7 @@ func (p *Parser) parseCharacterSetExpression() (*CharacterSetExpression, error) 
 		}
 	}
 	p.offset += width
+
 	return expression, nil
 }
 
@@ -288,7 +323,7 @@ func (p *Parser) parseHexCharacter() (rune, error) {
 	}
 	p.offset += width
 	var chars []rune
-	for char, width := utf8.DecodeRuneInString(p.source[p.offset:]); char >= '0' && char <= '9'; char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+	for char, width := p.next(); char >= '0' && char <= '9'; char, width = p.next() {
 		p.offset += width
 		chars = append(chars, char)
 	}
@@ -296,13 +331,14 @@ func (p *Parser) parseHexCharacter() (rune, error) {
 	if err != nil {
 		return 0, err
 	}
+
 	return rune(intVal), nil
 }
 
 func (p *Parser) parseCharacterSetEnumeration() ([]rune, error) {
 	var chars []rune
 	var offsets []int
-	for char, width := utf8.DecodeRuneInString(p.source[p.offset:]); char != ']'; char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+	for char, width := p.next(); char != ']'; char, width = p.next() {
 		offsets = append(offsets, p.offset)
 		if char == '#' {
 			var err error
@@ -317,9 +353,11 @@ func (p *Parser) parseCharacterSetEnumeration() ([]rune, error) {
 		if char == '-' {
 			p.offset = offsets[len(offsets)-2]
 			chars = chars[:len(chars)-2]
+
 			break
 		}
 	}
+
 	return chars, nil
 }
 
@@ -393,6 +431,8 @@ func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
 	bAsList := b.ListExpression()
 	aAsAlternate := a.AlternateExpression()
 	bAsAlternate := b.AlternateExpression()
+	aIsSimpleExpression := aAsAlternate == nil && aAsList == nil
+	bIsSimpleExpression := bAsAlternate == nil && bAsList == nil
 	// Set 1
 	// (A1 | A2 | A3) B => list(A, B)
 	// (A1 A2 A3)? B => list(A, B)
@@ -403,8 +443,8 @@ func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
 	// (A1 | A2 | A3) (B1 B2 B3)? => list(A, B)
 	// (A1 A2 A3)? (B1 B2 B3)? => list(A, B)
 	// A (B1 B2 B3)? => list(A, B)
-	if ((aAsAlternate != nil && a.isParenthesised()) || a.hasRepetitions() || (aAsAlternate == nil && aAsList == nil)) &&
-		((bAsAlternate != nil && b.isParenthesised()) || b.hasRepetitions() || (bAsAlternate == nil && bAsList == nil)) {
+	if ((aAsAlternate != nil && a.isParenthesised()) || a.hasRepetitions() || (aIsSimpleExpression)) &&
+		((bAsAlternate != nil && b.isParenthesised()) || b.hasRepetitions() || (bIsSimpleExpression)) {
 		return &ListExpression{Expressions: []Expression{a, b}}
 	}
 	// Set 2a
@@ -417,8 +457,8 @@ func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
 	// A B1 B2 B3 => list(A, B...)
 	// Set 2c
 	// A1 A2 A3 B1 B2 B3 => list(A..., B...)
-	if (aAsList != nil && ((bAsAlternate != nil && b.isParenthesised()) || b.hasRepetitions() || (bAsAlternate == nil && bAsList == nil))) ||
-		(bAsList != nil && ((aAsAlternate != nil && a.isParenthesised()) || a.hasRepetitions() || (aAsAlternate == nil && aAsList == nil))) {
+	if (aAsList != nil && ((bAsAlternate != nil && b.isParenthesised()) || b.hasRepetitions() || (bIsSimpleExpression))) ||
+		(bAsList != nil && ((aAsAlternate != nil && a.isParenthesised()) || a.hasRepetitions() || (aIsSimpleExpression))) {
 		var expressions []Expression
 		if aAsList != nil && !a.hasRepetitions() {
 			expressions = append(expressions, aAsList.Expressions...)
@@ -430,6 +470,7 @@ func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
 		} else {
 			expressions = append(expressions, b)
 		}
+
 		return &ListExpression{Expressions: expressions}
 	}
 	// Set 3a
@@ -448,7 +489,10 @@ func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
 		return &AlternateExpression{Expressions: append(
 			append(
 				aAsAlternate.Expressions[:len(aAsAlternate.Expressions)-1],
-				p.parseExpressionsAsList(aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1], bAsAlternate.Expressions[0]),
+				p.parseExpressionsAsList(
+					aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1],
+					bAsAlternate.Expressions[0],
+				),
 			),
 			bAsAlternate.Expressions[1:]...,
 		)}
@@ -457,12 +501,12 @@ func (p *Parser) parseExpressionsAsList(a, b Expression) Expression {
 			aAsAlternate.Expressions[:len(aAsAlternate.Expressions)-1],
 			p.parseExpressionsAsList(aAsAlternate.Expressions[len(aAsAlternate.Expressions)-1], b),
 		)}
-	} else {
-		return &AlternateExpression{Expressions: append(
-			[]Expression{p.parseExpressionsAsList(a, bAsAlternate.Expressions[0])},
-			bAsAlternate.Expressions[1:]...,
-		)}
 	}
+
+	return &AlternateExpression{Expressions: append(
+		[]Expression{p.parseExpressionsAsList(a, bAsAlternate.Expressions[0])},
+		bAsAlternate.Expressions[1:]...,
+	)}
 }
 
 func (p *Parser) parseExpressionsAsAlternates(a, b Expression) Expression {
@@ -479,6 +523,7 @@ func (p *Parser) parseExpressionsAsAlternates(a, b Expression) Expression {
 	} else {
 		expressions = append(expressions, b)
 	}
+
 	return &AlternateExpression{Expressions: expressions}
 }
 
@@ -501,6 +546,7 @@ func (p *Parser) isRuleEnd() bool {
 	if potentialDefiningSymbolOffset+3 >= len(p.source) {
 		return false
 	}
+
 	return p.source[potentialDefiningSymbolOffset:potentialDefiningSymbolOffset+3] == "::="
 }
 
@@ -509,10 +555,14 @@ func (p *Parser) isBasicLatinLetter(char rune) bool {
 }
 
 func (p *Parser) skipWhitespace() {
-	for char, width := utf8.DecodeRuneInString(p.source[p.offset:]); unicode.IsSpace(char); char, width = utf8.DecodeRuneInString(p.source[p.offset:]) {
+	for char, width := p.next(); unicode.IsSpace(char); char, width = p.next() {
 		p.offset += width
 		if char == '\n' {
 			p.line++
 		}
 	}
+}
+
+func (p *Parser) next() (rune, int) {
+	return utf8.DecodeRuneInString(p.source[p.offset:])
 }
