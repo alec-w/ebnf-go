@@ -1,7 +1,6 @@
 package w3c
 
 import (
-	"fmt"
 	"strconv"
 	"unicode"
 	"unicode/utf8"
@@ -45,42 +44,26 @@ func (p *Parser) parseSyntax() (Syntax, error) {
 func (p *Parser) parseRule() (Rule, error) {
 	p.skipWhitespace()
 	if char, _ := utf8.DecodeRuneInString(p.source[p.offset:]); !p.isBasicLatinLetter(char) {
-		return Rule{}, fmt.Errorf(
-			"expected start of rule on line %d at total offset %d to begin with basic latin letter",
-			p.line,
-			p.offset,
-		)
+		return Rule{}, p.parseError("expected start of rule to begin with basic latin letter")
 	}
 	rule := Rule{Symbol: p.parseSymbol(), Line: p.line}
 	p.skipWhitespace()
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != ':' {
-		return Rule{}, fmt.Errorf(
-			"expected rule defining symbol on line %d at total offset %d to be ':=='",
-			p.line,
-			p.offset,
-		)
+		return Rule{}, p.parseError("expected rule defining symbol to be ':=='")
 	}
 	p.offset += width
 	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != ':' {
-		return Rule{}, fmt.Errorf(
-			"expected rule defining symbol on line %d at total offset %d to be '::='",
-			p.line,
-			p.offset,
-		)
+		return Rule{}, p.parseError("expected rule defining symbol to be '::='")
 	}
 	p.offset += width
 	char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != '=' {
-		return Rule{}, fmt.Errorf(
-			"expected rule defining symbol on line %d at total offset %d to be '::='",
-			p.line,
-			p.offset,
-		)
+		return Rule{}, p.parseError("expected rule defining symbol to be '::='")
 	}
 	p.offset += width
-	expression, err := p.parseExpression(false)
+	expression, err := p.parseExpression()
 	if err != nil {
 		return Rule{}, err
 	}
@@ -110,21 +93,21 @@ Is parsed as:
 5th call (invoked from 2nd) - expression = D, next = nil - returns D
 */
 
-func (p *Parser) parseExpression(_ bool) (Expression, error) {
+func (p *Parser) parseExpression() (Expression, error) {
 	var expression Expression
 	p.skipWhitespace()
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char == '(' {
 		p.offset += width
 		var err error
-		expression, err = p.parseExpression(true)
+		expression, err = p.parseExpression()
 		if err != nil {
 			return nil, err
 		}
 		p.skipWhitespace()
 		char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 		if char != ')' {
-			return nil, fmt.Errorf(
+			return nil, p.parseError(
 				"expected closing parenthesis at end of parenthesised expression",
 			)
 		}
@@ -147,14 +130,14 @@ func (p *Parser) parseExpression(_ bool) (Expression, error) {
 		char, width = utf8.DecodeRuneInString(p.source[p.offset:])
 		switch {
 		case p.isBasicLatinLetter(char) || char == '[' || char == '#' || char == '\'' || char == '"' || char == '(':
-			next, err := p.parseExpression(false)
+			next, err := p.parseExpression()
 			if err != nil {
 				return nil, err
 			}
 			expression = p.parseExpressionsAsList(expression, next)
 		case char == '|':
 			p.offset += width
-			next, err := p.parseExpression(false)
+			next, err := p.parseExpression()
 			if err != nil {
 				return nil, err
 			}
@@ -162,7 +145,7 @@ func (p *Parser) parseExpression(_ bool) (Expression, error) {
 		case char == ')':
 			return expression, nil
 		default:
-			return nil, fmt.Errorf(
+			return nil, p.parseError(
 				"expected end of rule, another expression, or an expression alternate symbol",
 			)
 		}
@@ -189,9 +172,8 @@ func (p *Parser) parseSimpleExpression() (Expression, error) {
 		return &SymbolExpression{Symbol: p.parseSymbol()}, nil
 	default:
 		// error
-		return nil, fmt.Errorf(
-			"looking for start of expression but character at offset %d was not the start of an expression",
-			p.offset,
+		return nil, p.parseError(
+			"looking for start of expression but character was not the start of an expression",
 		)
 	}
 }
@@ -228,7 +210,7 @@ func (p *Parser) parseExpressionException(expression Expression) (Expression, er
 	p.skipWhitespace()
 	char, _ = utf8.DecodeRuneInString(p.source[p.offset:])
 	if char == '(' {
-		expression, err = p.parseExpression(false)
+		expression, err = p.parseExpression()
 		if err != nil {
 			return nil, err
 		}
@@ -319,7 +301,7 @@ func (p *Parser) parseHexCharacter() (rune, error) {
 	p.offset += width
 	char, width := utf8.DecodeRuneInString(p.source[p.offset:])
 	if char != 'x' {
-		return 0, fmt.Errorf("did not get x after # in hex character")
+		return 0, p.parseError("did not get x after # in hex character")
 	}
 	p.offset += width
 	var chars []rune
@@ -329,7 +311,7 @@ func (p *Parser) parseHexCharacter() (rune, error) {
 	}
 	intVal, err := strconv.ParseUint(string(chars), 16, 32)
 	if err != nil {
-		return 0, err
+		return 0, p.parseErrorWithCause("could not parse hex character", err)
 	}
 
 	return rune(intVal), nil
@@ -565,4 +547,12 @@ func (p *Parser) skipWhitespace() {
 
 func (p *Parser) next() (rune, int) {
 	return utf8.DecodeRuneInString(p.source[p.offset:])
+}
+
+func (p *Parser) parseError(msg string) *ParseError {
+	return NewParseError(msg, p.line, p.offset, nil)
+}
+
+func (p *Parser) parseErrorWithCause(msg string, cause error) *ParseError {
+	return NewParseError(msg, p.line, p.offset, cause)
 }

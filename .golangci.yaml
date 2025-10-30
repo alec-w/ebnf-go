@@ -36,6 +36,7 @@ linters:
       allow:
         - error
         - generic
+        - github.com\/alec-w\/ebnf-go\/w3c\.Expression
 
 formatters:
   enable:

@@ -25,11 +25,11 @@ type Expression interface {
 	Optional() bool
 	OneOrMore() bool
 	ZeroOrMore() bool
-	setOptional(bool)
-	setOneOrMore(bool)
-	setZeroOrMore(bool)
+	setOptional(optional bool)
+	setOneOrMore(oneOrMore bool)
+	setZeroOrMore(zeroOrMore bool)
 	isParenthesised() bool
-	setParenthesised(bool)
+	setParenthesised(parenthesised bool)
 	hasRepetitions() bool
 }
 
@@ -113,6 +113,7 @@ var _ Expression = &ListExpression{}
 type ListExpression struct {
 	baseExpression
 	Repetitions
+
 	Expressions []Expression
 }
 
@@ -151,7 +152,12 @@ func (l *ListExpression) MarshalJSON() ([]byte, error) {
 		out["zeroOrMore"] = true
 	}
 
-	return json.Marshal(out)
+	marshalled, err := json.Marshal(out)
+	if err != nil {
+		return nil, NewMarshalError("could not marshal list expression as JSON", err)
+	}
+
+	return marshalled, nil
 }
 
 var _ Expression = &AlternateExpression{}
@@ -160,6 +166,7 @@ var _ Expression = &AlternateExpression{}
 type AlternateExpression struct {
 	baseExpression
 	Repetitions
+
 	Expressions []Expression
 }
 
@@ -198,7 +205,12 @@ func (a *AlternateExpression) MarshalJSON() ([]byte, error) {
 		out["zeroOrMore"] = true
 	}
 
-	return json.Marshal(out)
+	marshalled, err := json.Marshal(out)
+	if err != nil {
+		return nil, NewMarshalError("could not marshal alternate expression as JSON", err)
+	}
+
+	return marshalled, nil
 }
 
 var _ Expression = &ExceptionExpression{}
@@ -208,6 +220,7 @@ var _ Expression = &ExceptionExpression{}
 type ExceptionExpression struct {
 	baseExpression
 	Repetitions
+
 	Match  Expression `json:"match"`
 	Except Expression `json:"except"`
 }
@@ -238,6 +251,7 @@ var _ Expression = &SymbolExpression{}
 type SymbolExpression struct {
 	baseExpression
 	Repetitions
+
 	Symbol string `json:"symbol"`
 }
 
@@ -269,6 +283,7 @@ var _ Expression = &CharacterSetExpression{}
 type CharacterSetExpression struct {
 	baseExpression
 	Repetitions
+
 	Enumerations []rune  `json:"enumerations,omitempty"`
 	Ranges       []Range `json:"ranges,omitempty"`
 	Forbidden    bool    `json:"forbidden,omitempty"`
@@ -300,6 +315,7 @@ var _ Expression = &LiteralExpression{}
 type LiteralExpression struct {
 	baseExpression
 	Repetitions
+
 	Literal string `json:"literal"`
 }
 
